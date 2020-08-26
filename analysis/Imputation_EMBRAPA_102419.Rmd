@@ -1,0 +1,1023 @@
+---
+title: "Imputation of Latin American Cassava"
+site: workflowr::wflow_site
+date: "2019-October-24"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+# !diagnostics off
+```
+
+Solanine --> cbsurobbins
+```{bash}
+scp -r ~/embrapa_dataset mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/
+```
+Rename (on cbsurobbins hereon)
+```{bash}
+mv /workdir/marnin/embrapa_dataset /workdir/marnin/embrapa_dataset_102419
+```
+Destination folder for results
+```{bash}
+mkdir /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419
+```
+
+```{r}
+paste0("/workdir/marnin/nextgenImputation2019/",
+       "DCas19_4301_DArTseqLD_AllSites_AllChrom_raw_70919.vcf.gz")
+```
+
+
+/workdir/marnin/EMBRAPA/TrainPopSamplesWithGBSplusDArT_80718.txt
+/workdir/marnin/EMBRAPA/TrainPopSamplesWithGBSonly_80718.txt
+
+# Prepare samples with GBS+DArT
+
+## Sample Lists
+```{r}
+IBDmatches<-readRDS(file=paste0("/workdir/marnin/nextgenImputation2019/VerifyByIBD_EMBRAPA_102419/",
+                                "gbs2dart_SamplesVerifiedByIBD_102419.rds"))
+
+samplesWithVerifiedGBSandDart<-IBDmatches$NameGBS
+write.table(samplesWithVerifiedGBSandDart,
+            file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                        "samplesWithVerifiedGBSandDart_102419.txt"), 
+            row.names = F, col.names = F, quote = F)  
+dartNames_samplesWithVerifiedGBSandDart<-IBDmatches$NameDArT
+write.table(dartNames_samplesWithVerifiedGBSandDart,
+            file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                        "dartNames_samplesWithVerifiedGBSandDart_102419.txt"), 
+            row.names = F, col.names = F, quote = F)  
+
+
+```
+## Site+Allele Lists
+```{r}
+library(tidyverse); library(magrittr); library(furrr); plan(multiprocess); options(mc.cores=18)
+
+embrapa_dataset_sites<-tibble(Chr=1:18) %>% 
+  mutate(SiteWithAlleles=future_map(Chr,function(Chr){ 
+    sites<-read.table(file = paste0("/workdir/marnin/embrapa_dataset_102419/tassel_embrapa_newfastq_filter/",
+                                    "tassel_embrapa_newfastq.chr",Chr,".bial.recode.sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }))
+
+dart_sites<-read.table(paste0("/workdir/marnin/nextgenImputation2019/",
+                              "DCas19_4301_DArTseqLD_AllSites_AllChrom_raw_70919.sitesWithAlleles"),
+                       stringsAsFactors = F, header = T)
+
+# GBS-unique sites
+gbs_unique_sites<-embrapa_dataset_sites %>% # GBS sites
+    unnest(SiteWithAlleles) %>% 
+    rename(CHROM=V1,
+         POS=V2,
+         ID=V3,
+         REF=V4,
+         ALT=V5) %>% 
+  anti_join(dart_sites) %>%  # that are unique (not in the dart report 4301)
+  select(CHROM,POS) %>% arrange(CHROM,POS); nrow(gbs_unique_sites) # 398327 
+                 ## it's alot because we are starting from unimputed GBS data
+write.table(gbs_unique_sites,
+            file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                        "gbs_unique_sites_102419.txt"), 
+            row.names = F, col.names = F, quote = F) 
+
+
+```
+## Extract from raw VCF
+```{r}
+library(tidyverse); library(magrittr); require(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/embrapa_dataset_102419/tassel_embrapa_newfastq_filter/",
+                  "tassel_embrapa_newfastq.chr",Chr,".bial.recode.vcf.gz ",
+                  "--keep /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "samplesWithVerifiedGBSandDart_102419.txt ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "gbs_unique_sites_102419.txt ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromGBS_gbsUniqueSites_unfiltered_102419.vcf.gz")) }))
+```
+## Extract from DCas19_4301
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_dartSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/",
+                               "DCas19_4301_DArTseqLD_AllSites_AllChrom_raw_70919.vcf.gz ",
+                  "--keep /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "dartNames_samplesWithVerifiedGBSandDart_102419.txt ",
+                  "--chr ",Chr," ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_102419.vcf.gz")) }))
+```
+
+```{r}
+system(paste0("bcftools query --list-samples /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+              "chr1_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_102419.vcf.gz ",
+              "> /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+              "sampleNamesInOrder_samplesWithGBSandDArT_FromDArT_102419.txt")) 
+
+dart_sampleNamesInOrder<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "sampleNamesInOrder_samplesWithGBSandDArT_FromDArT_102419.txt"), 
+           stringsAsFactors = F, header = F)
+dart_sampleNamesInOrder %>%
+  rename(NameDArT=V1) %>% 
+  mutate(Order=1:nrow(.)) %>% 
+  left_join(IBDmatches) %$% NameGBS %>% 
+  write.table(.,
+            file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                        "gbsNames_InOrder_forRenamingDartSamples_102419.txt"), 
+            row.names = F, col.names = F, quote = F) 
+```
+
+## Rename extracted DArT VCF to match GBS
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_102419.vcf.gz"))
+    }))
+tibble(Chr=1:18) %>%
+  mutate(Header=future_map(Chr,function(Chr){ 
+    system(paste0("tabix --print-header -f /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_102419.vcf.gz ",
+                  "> /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_102419.header"))
+    }))
+tibble(Chr=1:18) %>%
+  mutate(ReNameVCF=future_map(Chr,function(Chr){
+    system(paste0("bcftools reheader --samples /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "gbsNames_InOrder_forRenamingDartSamples_102419.txt ",
+                  "--output /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_renamed_102419.vcf.gz ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_102419.vcf.gz"))
+    }))
+```
+## Index everything
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromGBS_gbsUniqueSites_unfiltered_102419.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_renamed_102419.vcf.gz"))
+    }))
+
+```
+## Reorder DArT and GBS files to match
+```{r}
+system(paste0("bcftools query --list-samples /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+              "chr1_samplesWithGBSandDArT_FromGBS_gbsUniqueSites_unfiltered_102419.vcf.gz ",
+              "> /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+              "sampleNamesInOrder_samplesWithGBSandDArT_FromGBS_gbsUniqueSites_unfiltered_102419.txt"))
+
+tibble(Chr=1:18) %>%
+  mutate(Sort=future_map(Chr,function(Chr){ 
+    system(paste0("bcftools view --samples-file ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "sampleNamesInOrder_samplesWithGBSandDArT_FromGBS_gbsUniqueSites_unfiltered_102419.txt ",
+                  "--output-type z --output-file ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_sorted_102419.vcf.gz ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_renamed_102419.vcf.gz"))}))
+
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_sorted_102419.vcf.gz")) }))
+```
+## Concat DArT and GBS
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Concat=future_map(Chr,function(Chr){ 
+    system(paste0("bcftools concat --allow-overlaps ",
+                  "--output /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.vcf.gz ",
+                  "--output-type z --threads 6 ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSandDArT_FromDArT_dartUniquePlusIntersectingSites_unfiltered_sorted_102419.vcf.gz ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSandDArT_FromGBS_gbsUniqueSites_unfiltered_102419.vcf.gz"))}))
+```
+
+# Prepare samples with GBS-only
+## Extract from raw VCF
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsOnlySamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/embrapa_dataset_102419/tassel_embrapa_newfastq_filter/",
+                  "tassel_embrapa_newfastq.chr",Chr,".bial.recode.vcf.gz ",
+                  "--remove /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/",
+                  "samplesWithVerifiedGBSandDart_102419.txt ",
+                  "--chr ",Chr," ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.vcf.gz")) }))
+```
+# Prepare samples from DCas19_4403
+See convertDCas19_4403_ToVCF_102419.Rmd
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_dartPerChrom=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/DCas19_4403/DCas19_4403_102419.vcf.gz ",
+                  "--chr ",Chr," ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_102419.vcf.gz"))}))
+```
+
+# Merge VCFs to form panel to be imputed
+## Index
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_102419.vcf.gz"))
+    }))
+#system(paste0("tabix -f -p vcf /workdir/marnin/DCas19_4403/DCas19_4403_102419.vcf.gz"))
+    
+```
+... merge step had problems.... duplicate sites in one of the files!?
+
+## Site+Allele Lists
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(SiteWithAlleles=future_map(Chr,function(Chr){ 
+    system(paste0("zcat /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.sitesWithAlleles"))
+
+    system(paste0("zcat /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.sitesWithAlleles"))
+  
+        system(paste0("zcat /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_102419.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_102419.sitesWithAlleles"))
+    }))
+
+site_lists<-tibble(Chr=1:18) %>% 
+  mutate(samplesWithGBSandDArT=future_map(Chr,function(Chr){ 
+    sites<-read.table(file = paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                                    Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }),
+    samplesWithGBSonly=future_map(Chr,function(Chr){ 
+    sites<-read.table(file = paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                                    Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }),
+    dcas19_4403=future_map(Chr,function(Chr){ 
+    sites<-read.table(file = paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                                    Chr,"_DCas19_4403_102419.sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }))
+
+site_lists %<>%
+  mutate(samplesWithGBSandDArT=map(samplesWithGBSandDArT,function(samplesWithGBSandDArT){
+    samplesWithGBSandDArT %>% 
+      semi_join(samplesWithGBSandDArT %>% count(V1,V2) %>% ungroup() %>% filter(n==1))
+  }),
+  samplesWithGBSonly=map(samplesWithGBSonly,function(samplesWithGBSonly){
+    samplesWithGBSonly %>% 
+      semi_join(samplesWithGBSonly %>% count(V1,V2) %>% ungroup() %>% filter(n==1))
+  }),
+  dcas19_4403=map(dcas19_4403,function(dcas19_4403){
+    dcas19_4403 %>% 
+      semi_join(dcas19_4403 %>% count(V1,V2) %>% ungroup() %>% filter(n==1))
+  }))
+
+site_lists %>%
+  mutate(samplesWithGBSonly=future_map2(Chr,samplesWithGBSonly,function(Chr,samplesWithGBSonly){
+    samplesWithGBSonly %>% 
+      select(V1,V2) %>% 
+      arrange(V1,V2) %>% 
+      write.table(.,
+                  file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                              Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.sites2keep"), 
+                  row.names = F, col.names = F, quote = F) 
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                              Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.vcf.gz ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_102419.sites2keep ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_read2merge_102419.vcf.gz")) }))
+  
+site_lists %>%
+  mutate(samplesWithGBSandDArT=future_map2(Chr,samplesWithGBSandDArT,function(Chr,samplesWithGBSandDArT){
+    samplesWithGBSandDArT %>% 
+      select(V1,V2) %>% 
+      arrange(V1,V2) %>% 
+      write.table(.,
+                  file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                              Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.sites2keep"), 
+                  row.names = F, col.names = F, quote = F) 
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                              Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.vcf.gz ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_102419.sites2keep ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_read2merge_102419.vcf.gz")) }))
+
+site_lists %>% 
+  mutate(dcas19_4403_dcas19_4301=map2(dcas19_4403,samplesWithGBSandDArT,~.y %>% semi_join(.x)))
+
+site_lists %>%
+  mutate(dcas19_4403=future_pmap(.,function(Chr,dcas19_4403,samplesWithGBSandDArT,...){
+    dcas19_4403 %>% 
+      semi_join(samplesWithGBSandDArT) %>% 
+      select(V1,V2) %>% 
+      arrange(V1,V2) %>% 
+      write.table(.,
+                  file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                              Chr,"_DCas19_4403_102419.sites2keep"), 
+                  row.names = F, col.names = F, quote = F) 
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                              Chr,"_DCas19_4403_102419.vcf.gz ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_102419.sites2keep ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_read2merge_102419.vcf.gz")) }))
+
+
+```
+## Index
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_read2merge_102419.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_read2merge_102419.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_DCas19_4403_read2merge_102419.vcf.gz"))
+    }))
+#system(paste0("tabix -f -p vcf /workdir/marnin/DCas19_4403/DCas19_4403_102419.vcf.gz"))
+    
+```
+## Merge
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Merge=future_map(Chr,function(Chr){ 
+    system(paste0("bcftools merge ",
+                  "--output /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_unfiltered_102419.vcf.gz ",
+                  "--merge snps --output-type z --threads 6 ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSandDArT_GBSandDArTsites_unfiltered_read2merge_102419.vcf.gz ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_samplesWithGBSonly_FromGBS_allGBSsites_unfiltered_read2merge_102419.vcf.gz ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",Chr,
+                  "_DCas19_4403_read2merge_102419.vcf.gz")) }))
+```
+
+# Pre-imputation filter
+
+Exclude dart-unique sites from missingness (and hwe?) filter to avoid their loss from the refpanel, which will only have 415/5033=8.2% potentially observed.
+
+--minDP 5 --maxDP 50
+--hwe 1e-20 (HWE p-values more extreme than this are excluded) 
+--max-missing 0.6 (maximum 40% missing is allowed)
+
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(PreImputeFilter=future_map(Chr,function(Chr){ 
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_unfiltered_102419.vcf.gz ",
+                  "--min-alleles 2 --max-alleles 2 --minDP 5 --maxDP 50 ",
+                  "--recode --stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.vcf.gz"))}))
+
+tibble(Chr=1:18) %>%
+  mutate(PreImputeFilter=future_map(Chr,function(Chr){ 
+    system(paste0("vcftools --gzvcf ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.vcf.gz ",
+                  "--missing-site ",
+                  "--out /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419"))
+    system(paste0("vcftools --gzvcf ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.vcf.gz ",
+                  "--site-mean-depth ",
+                  "--out /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419"))
+    system(paste0("vcftools --gzvcf ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.vcf.gz ",
+                  "--hardy ",
+                  "--out /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419"))
+  }))
+    
+```
+```{r}
+stats2filterOn<-tibble(Chr=1:18) %>%
+  mutate(lmiss=future_map(Chr,function(Chr){ 
+    input<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                             Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.lmiss"),
+                      stringsAsFactors = F, header = T) }),
+    ldepth=future_map(Chr,function(Chr){
+      input<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                               Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.ldepth.mean"),
+                        stringsAsFactors = F, header = T) }),
+    hwe=future_map(Chr,function(Chr){
+      input<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                               Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.hwe"),
+                        stringsAsFactors = F, header = T) }))
+```
+
+```{r}
+stats2filterOn %<>% 
+  mutate(lmiss=map2(lmiss,ldepth,~left_join(.x %>% rename(CHROM=CHR),
+                                            .y)),
+         lmiss=map2(lmiss,hwe,~left_join(.x,
+                                         .y %>% rename(CHROM=CHR)))) %>% 
+  unnest(lmiss)
+stats2filterOn %<>% 
+  select(-Chr)
+```
+409959 SNPs 
+
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(PreImputeFilter=map(Chr,function(Chr){ 
+    sitesThatPass<-stats2filterOn %>% 
+      filter(MEAN_DEPTH<=120,
+             -log10(P_HWE)<20,
+             CHROM==Chr) %>% 
+      select(CHROM,POS) }))
+tibble(Chr=1:18) %>%
+  mutate(PreImputeFilter=map(Chr,function(Chr){ 
+    sitesThatPass<-stats2filterOn %>% 
+      filter(MEAN_DEPTH<=120,
+             -log10(P_HWE)<20,
+             CHROM==Chr) %>% 
+      select(CHROM,POS) 
+    write.table(sitesThatPass,
+                paste0("/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                       Chr,"_sitesThatPassPreImputeFilter_102419.txt"),
+                row.names = F, col.names = F, quote = F) }))
+
+tibble(Chr=1:18) %>%
+  mutate(PreImputeFilter=future_map(Chr,function(Chr){ 
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_ready2filter_102419.vcf.gz ",
+                  "--positions ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_sitesThatPassPreImputeFilter_102419.txt ",
+                  "--recode --stdout | ",
+                  "awk '$4 != \"-\" {print}' | awk '$5 != \"-\" {print}' | ",
+                  "bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz"))}))
+
+```
+
+# Rsync
+cbsulm08
+cbsulm12
+cbsulm17
+
+```{bash}
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419 mw489@cbsulm08.biohpc.cornell.edu:/workdir/mw489/
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419 mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419 mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/
+
+# Pull data from cbsurobbins to solanine
+mkdir ~/ImputationEMBRAPA_102419
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ~/ImputationEMBRAPA_102419 
+```
+
+
+# Impute EMBRAPA dataset (Beagle4.1 GL)
+
+## cbsulm17 (112) [1, 2, 6-7]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1,2)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+
+library(tidyverse); library(magrittr);
+tibble(Chr=c(6,7)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+
+```
+## cbsulm12 (112) [3, 4, 11-15 done, 8-9]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(3,4)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+library(tidyverse); library(magrittr);
+tibble(Chr=c(11,12,13,14,15)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+library(tidyverse); library(magrittr);
+tibble(Chr=c(8,9)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+```
+
+## cbsulm08 (64) [5, 16-18 done, 10]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(5)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-64
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+tibble(Chr=c(16,17,18)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-64
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+tibble(Chr=c(10)) %>%
+  mutate(ImputeRefPanel=map(Chr,function(Chr){
+    nthreads<-64
+    system(paste0("java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar ",
+                  "gl=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419 ",
+                  "nthreads=",nthreads," niterations=10"))}))
+```
+
+## For GB
+```{bash}
+java -Xms2g -Xmx450g -jar /programs/beagle41/beagle41.jar \
+                  gl=/workdir/mw489/ImputationEMBRAPA_102419/chr1_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz \
+                  out=/workdir/mw489/ImputationEMBRAPA_102419/chr1_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419 \
+                  nthreads=112 niterations=10
+```
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEMBRAPA_102419; 
+mkdir BeagleLogs;
+cp *_ImputationReferencePanel_EMBRAPA_Imputed_102419.log BeagleLogs/
+```
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEMBRAPA_102419/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm08.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+```
+
+# Post-impute, Pre-Phase Filter
+
+## Extract and read AR2, AF, HWE 
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+# pathIn<-"/workdir/mw489/ImputationEMBRAPA_102419/"
+
+tibble(Chr=1:18) %>% 
+  mutate(PreImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"/chr",
+                            Chr,"_ImputationReferencePanel_EMBRAPA_Imputed_102419")
+            system(paste0(fileIn,"--get-INFO AR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+# pathIn<-"/workdir/mw489/ImputationEMBRAPA_102419/"
+
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_ImputationReferencePanel_EMBRAPA_Imputed_102419.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_ImputationReferencePanel_EMBRAPA_Imputed_102419.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe) %>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+## Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,AR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # 65185 (very similar to number passing in Africa)
+sitesPassingFilters
+```
+ Chr allSitesPassing     
+   <int> <list>              
+ 1     1 <df[,2] [5,598 x 2]>
+ 2     2 <df[,2] [4,842 x 2]>
+ 3     3 <df[,2] [4,035 x 2]>
+ 4     4 <df[,2] [3,391 x 2]>
+ 5     5 <df[,2] [4,131 x 2]>
+ 6     6 <df[,2] [3,766 x 2]>
+ 7     7 <df[,2] [2,767 x 2]>
+ 8     8 <df[,2] [3,043 x 2]>
+ 9     9 <df[,2] [3,310 x 2]>
+10    10 <df[,2] [4,081 x 2]>
+11    11 <df[,2] [3,970 x 2]>
+12    12 <df[,2] [2,875 x 2]>
+13    13 <df[,2] [2,850 x 2]>
+14    14 <df[,2] [3,793 x 2]>
+15    15 <df[,2] [3,643 x 2]>
+16    16 <df[,2] [2,518 x 2]>
+17    17 <df[,2] [3,578 x 2]>
+18    18 <df[,2] [2,994 x 2]>
+
+The introgressed chromsomes 1, 4 and 14 _are_ notoutliers in numbers of SNPs. Makes sense!
+
+## Apply filter
+```{r}
+sitesPassingFilters %>% 
+  mutate(PostImputePrePhaseFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+    pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+    #pathIn<-"/workdir/mw489/ImputationEMBRAPA_102419/"
+    sitesPassing_thisChr<-allSitesPassing %>% 
+      select(CHROM,POS)
+    write.table(sitesPassing_thisChr,
+                file = paste0(pathIn,"chr",Chr,
+                              "_ImputationReferencePanel_EMBRAPA_Imputed_102419.sitesPassing"),
+                row.names = F, col.names = F, quote = F)
+    system(paste0("vcftools --gzvcf ",pathIn,"chr",Chr,
+                  "_ImputationReferencePanel_EMBRAPA_Imputed_102419.vcf.gz ",
+                  "--positions ",pathIn,"chr",Chr,
+                  "_ImputationReferencePanel_EMBRAPA_Imputed_102419.sitesPassing ",
+                  "--recode --stdout | ",
+                  "bgzip -c -@ 24 > ",
+                  pathIn,"chr",Chr,
+                  "_ImputationReferencePanel_EMBRAPA_Ready2Phase_102419.vcf.gz"))}))
+```
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEMBRAPA_102419 mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+```
+
+# Phase EMBRAPA dataset (Beagle5 GT)
+```{r}
+cp -r ~/CassavaGeneticMap /workdir/mw489
+```
+
+## cbsulm17 (112)
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1:18)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSplusDArTsamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Ready2Phase_102419.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Phased_102619 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEMBRAPA_102419; 
+#mkdir BeagleLogs;
+cp *_ImputationReferencePanel_EMBRAPA_Phased_102619.log BeagleLogs/
+```
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEMBRAPA_102419/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm08.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+```
+
+# Impute EMBRAPA C1
+
+## Extract from DCas19_4301
+
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+
+system(paste0("bcftools query --list-samples ",pathIn,
+              "chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz ",
+              "> ",pathIn,"chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.samples"))
+
+system(paste0("bcftools query --list-samples /workdir/marnin/EMBRAPA/",
+              "chr1_DArTseqLD_C1progeny_unimputed_80718.vcf.gz ",
+              "> /workdir/marnin/EMBRAPA/chr1_DArTseqLD_C1progeny_unimputed_80718.samples"))
+```
+
+```{r}
+dcas18_3633_c1_samples<-read.table(paste0("/workdir/marnin/EMBRAPA/",
+                                       "chr1_DArTseqLD_C1progeny_unimputed_80718.samples"),
+                                header = F, stringsAsFactors = F)$V1
+dcas19_4301_samples<-read.table(paste0("/workdir/marnin/nextgenImputation2019/",
+                                       "DCas19_4301_DArTseqLD_AllSites_AllChrom_raw_70919.samples"),
+                                header = F, stringsAsFactors = F)$V1
+refpanel_samples<-read.table(paste0(pathIn,
+                                    "chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.samples"),
+                                header = F, stringsAsFactors = F)$V1
+
+table(dcas18_3633_c1_samples %in% dcas19_4301_samples) # 2120 EMBRAPA C1 are in the 4301 VCF, these are what we want to impute
+table(dcas19_4301_samples %in% refpanel_samples) # 182 4301 samples are already in the refpanel... 
+
+c1_toImpute<-dcas18_3633_c1_samples %>% 
+  .[. %in% dcas19_4301_samples] %>% 
+  .[!. %in% refpanel_samples] # 2099 samples
+
+write.table(c1_toImpute,
+            file=paste0(pathIn,"EMBRAPA_C1progeny_FromDCas19_4301_102619.samples"),
+            row.names = F, col.names = F, quote = F)
+
+
+```
+
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_dartSamples=future_map(Chr,function(Chr){
+    pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+    #pathIn<-"/workdir/mw489/ImputationEMBRAPA_102419/"
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/",
+                               "DCas19_4301_DArTseqLD_AllSites_AllChrom_raw_70919.vcf.gz ",
+                  "--keep ",pathIn,"EMBRAPA_C1progeny_FromDCas19_4301_102619.samples ",
+                  "--chr ",Chr," ",
+                  "--minDP 4 --maxDP 50 ", # because using GT not PL for impute (Beagle5) 
+                  "--positions ",pathIn,"chr",Chr,
+                  "_ImputationReferencePanel_EMBRAPA_Imputed_102419.sitesPassing ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr",
+                  Chr,"_EMBRAPA_C1progeny_FromDCas19_4301_ready2impute_102419.vcf.gz")) }))
+```
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEMBRAPA_102419/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419/
+```
+
+## Beagle5 REF impute
+
+### cbsulm17 (112) [1-18]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1:18)) %>% 
+  mutate(REFimpute_EMBRAPA_C1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_EMBRAPA_C1progeny_FromDCas19_4301_ready2impute_102419.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEMBRAPA_102419/chr",
+                  Chr,"_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+
+```
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEMBRAPA_102419; 
+#mkdir BeagleLogs;
+cp *_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.log BeagleLogs/
+```
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEMBRAPA_102419/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEMBRAPA_102419
+```
+
+## Post-impute filter
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+tibble(Chr=1:18) %>% 
+  mutate(PostImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"chr",
+                            Chr,"_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619")
+            system(paste0(fileIn,"--get-INFO DR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          DR2=as.numeric(DR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(DR2),
+                           !is.na(AF))))
+
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,DR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+stats2filterOn %>% unnest() %>% nrow() # 64886 
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # Only 8495 passed in the C1... :(
+stats2filterOn %>% left_join(sitesPassingFilters)
+```
+  Chr INFO                   allSitesPassing     
+   <int> <list>                 <list>              
+ 1     1 <df[,13] [5,598 x 13]> <df[,2] [1,002 x 2]>
+ 2     2 <df[,13] [4,842 x 13]> <df[,2] [438 x 2]>  
+ 3     3 <df[,13] [4,035 x 13]> <df[,2] [430 x 2]>  
+ 4     4 <df[,13] [3,092 x 13]> <df[,2] [239 x 2]>  
+ 5     5 <df[,13] [4,131 x 13]> <df[,2] [796 x 2]>  
+ 6     6 <df[,13] [3,766 x 13]> <df[,2] [413 x 2]>  
+ 7     7 <df[,13] [2,767 x 13]> <df[,2] [199 x 2]>  
+ 8     8 <df[,13] [3,043 x 13]> <df[,2] [532 x 2]>  
+ 9     9 <df[,13] [3,310 x 13]> <df[,2] [438 x 2]>  
+10    10 <df[,13] [4,081 x 13]> <df[,2] [234 x 2]>  
+11    11 <df[,13] [3,970 x 13]> <df[,2] [308 x 2]>  
+12    12 <df[,13] [2,875 x 13]> <df[,2] [407 x 2]>  
+13    13 <df[,13] [2,850 x 13]> <df[,2] [335 x 2]>  
+14    14 <df[,13] [3,793 x 13]> <df[,2] [716 x 2]>  
+15    15 <df[,13] [3,643 x 13]> <df[,2] [746 x 2]>  
+16    16 <df[,13] [2,518 x 13]> <df[,2] [267 x 2]>  
+17    17 <df[,13] [3,578 x 13]> <df[,2] [391 x 2]>  
+18    18 <df[,13] [2,994 x 13]> <df[,2] [604 x 2]> 
+
+Apply filter
+```{r}
+sitesPassingFilters %>% 
+  mutate(PostImputeFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/"
+    sitesPassing_thisChr<-allSitesPassing %>% 
+      select(CHROM,POS)
+    write.table(sitesPassing_thisChr,
+                file = paste0(pathIn,"chr",Chr,
+                              "_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.sitesPassing"),
+                row.names = F, col.names = F, quote = F)
+    system(paste0("vcftools --gzvcf ",pathIn,"chr",Chr,
+                  "_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.vcf.gz ",
+                  "--positions ",pathIn,"chr",Chr,
+                  "_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.sitesPassing ",
+                  "--recode --stdout | ",
+                  "bgzip -c -@ 24 > ",
+                  pathIn,"chr",Chr,
+                  "_EMBRAPA_C1progeny_FromDCas19_4301_REFimputedAndFiltered_102619.vcf.gz"))}))
+
+```
+
+```{bash}
+# Pull data from cbsurobbins to solanine
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_EMBRAPA_C1progeny_FromDCas19_4301_REFimputedAndFiltered_102619.vcf.gz ~/ImputationEMBRAPA_102419 
+
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.vcf.gz ~/ImputationEMBRAPA_102419 
+
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz ~/ImputationEMBRAPA_102419 
+
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_ImputationReferencePanel_EMBRAPA_Ready2Phase_102419.vcf.gz ~/ImputationEMBRAPA_102419 
+
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_ImputationReferencePanel_EMBRAPA_Imputed_102419.vcf.gz ~/ImputationEMBRAPA_102419 
+
+scp mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEMBRAPA_102419/chr\*_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz ~/ImputationEMBRAPA_102419 
+```
+
+Imputation is done! I have uploaded the key vcf files to `~/ImputationEMBRAPA_102419` on Solanine. Can everyone access it there?
+
+I didn't upload all the intermediate files. Happy to share if you want. 11 GB total.
+
+Files in sequence of creation/imputation are:  
+
+*_ImputationReferencePanel_EMBRAPA_FilteredAndReadyToImpute_102419.vcf.gz*:  
+RefPanel samples (everything from L. America except EMBRAPA C1). 723 (of 869) EMBRAPA TP samples had IBD-validated matching GBS and DArT samples, which were combined for imputation. Unimputated data, but filtered.
+
+*_ImputationReferencePanel_EMBRAPA_Imputed_102419.vcf.gz*:  
+RefPanel samples after imputation with Beagle4.1 GL mode.
+
+*_ImputationReferencePanel_EMBRAPA_Ready2Phase_102419.vcf.gz*:  
+RefPanel samples post-impute filtered. This or the phased file would be what I would use for most analyses. 
+
+*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz*: 
+After post-impute quality filtering, Beagle5 was used to phase the RefPanel samples.  
+
+*_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.vcf.gz:*  
+2099 EMBRAPA C1 progeny samples were extracted from the DArTseqLD report DCas19_4301 at RefPanel intersecting sites and imputed with Beagle5, using the RefPanel.  
+
+*_EMBRAPA_C1progeny_FromDCas19_4301_REFimputedAndFiltered_102619.vcf.gz*:  
+Post-imputation quality filters were really harsh to this dataset. Out of ~64K SNPs imputed, <9K passed the filters I've been using as my standard. 
+
+I'd like to request you guys all do some checks of the dataset. Does a PCA look right? Do prediction accuracies match previously? Whatever makes sense. Is there any problem with the limited number of well-imputed SNPs for the C1? I might be able to do another round of impute or something else to improve it.
+

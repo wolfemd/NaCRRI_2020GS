@@ -1,0 +1,107 @@
+---
+title: "Impute EMBRAPA GS C2 (DCas20_5360)"
+site: workflowr::wflow_site
+author: "Marnin Wolfe"
+date: "2020-August-26"
+output: 
+  workflowr::wflow_html:
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+DArTseqLD (DCas20-5360) arrived on Aug. 22, 2020. Contains **GS C2** for EMBRAPA. 
+
+Last year's reference panel for imputation had ~64K SNP. The C1 progeny imputed by it had <9K SNP _after_ post-imputation filters.
+
+Options to proceed with imputation of C2 (DCas20-5360):
+
+1. Last year's reference panel, without C1 (64K SNP)
+2. Last year's reference panel + C1 (reduce refpanel to sites passing post-impute filter in C1 = 9K SNP)
+3. Last year's ref. panel + C1 (include unfiltered C1 data = 64K refpanel SNP)
+
+If I can use Beagle5 or latest, should be possible (fast) to create all 3 and compare the results using PCA, prediction, correlation of kinship matrices, etc.
+
+# Impute EMBRAPA GS C2
+
+Copy the imputation reference panel from 2019 to the `data/` folder.
+
+```{bash}
+cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz /workdir/EMBRAPA_2020GS/data/
+cp -r /home/jj332_cas/CassavaGenotypeData/CassavaGeneticMap /workdir/EMBRAPA_2020GS/data/
+```
+
+## RefPanel: Exclude C1
+
+Impute with [Beagle V5.0](https://faculty.washington.edu/browning/beagle/b5_0.html).
+
+Use the "imputation reference panel" dataset from 2019, e.g. `chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz` as reference.
+
+Requires 1 large memory Cornell CBSU machine (e.g. cbsulm17; 112 cores, 512 GB RAM), running 1 chromosome at a time.
+
+R functions are stored in the `code/` sub-directory. Functions sourced from e.g. **imputationFunctions.R** are wrappers around e.g. Beagle, and other command line programs.
+
+```{r}
+targetVCFpath<-here::here("data/Report-DCas20-5360/") # location of the targetVCF
+refVCFpath<-here::here("data/")
+mapPath<-here::here("data/CassavaGeneticMap/")
+outPath<-here::here("output/")
+outSuffix<-"DCas20_5360"
+```
+
+```{r}
+source(imputationFunctions.R)
+purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,"chr",.,"_DCas20_5360.vcf.gz"),
+                            refVCF=paste0(refVCFpath,"chr",.,"_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz"),
+                            mapFile=paste0(mapPath,"chr",.,"_cassava_cM_pred.v6_91019.map"),
+                            outName=paste0(outPath,"chr",.,"_DCas20_5360_REFimputed"),
+                            nthreads=112))
+```
+
+Clean up Beagle log files after run. Move to sub-directory `output/BeagleLogs/`.
+```{bash}
+cd /workdir/EMBRAPA_2020GS/output/; 
+mkdir BeagleLogs;
+cp *_DCas20_5360_REFimputed.log BeagleLogs/
+```
+
+## Post-impute filter
+
+For now, the function will just do a fixed filter: AR2>0.75 (DR2>0.75 as of Beagle5.0), P_HWE>1e-20, MAF>0.005 [0.5%]. 
+
+It can easily be modified in the future to include parameters to vary the filter specifications.
+
+Input parameters
+```{r}
+#' @inPath path to input VCF-to-be-filtered, can be left null if path included in @inName . Must end in "/"
+#' @inName name of input VCF file EXCLUDING file extension. Assumes .vcf.gz
+#' @outPath path where filtered VCF and related are to be stored.Can be left null if path included in @outName . Must end in "/".
+#' @outName name desired for output EXCLUDING extension. Output will be .vcf.gz 
+inPath<-here::here("output/")
+outPath<-here::here("output/")
+```
+
+Loop to filter all 18 VCF files in parallel
+```{r}
+source(imputationFunctions.R)
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~postImputeFilter(inPath=inPath,
+                                  inName=paste0("chr",.,"_DCas20_5360_REFimputed"),
+                                  outPath=outPath,
+                                  outName=paste0("chr",.,"_DCas20_5360_REFimputedAndFiltered")))
+```
+
+Check what's left
+```{r}
+purrr::map(list(Chr=1:18),~system(paste0("wc -l ",here::here("output/"),"chr",.,"_",outName,".vcf.gz")))
+```
+
+
+## RefPanel: Include C1, filtered sites only
+
+## RefPanel: Include C1, all sites
+
+

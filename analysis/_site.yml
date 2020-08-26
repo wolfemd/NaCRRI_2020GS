@@ -15,8 +15,10 @@ navbar:
       href: Imputation_EMBRAPA_102419.html
   - text: Imputation 2020
     menu:
-    - text: Conversion DArT report to VCF
-      href: convertDCas19_4403_ToVCF_102419.html
+    - text: Conversion DArT report DCas20_5360 to VCF
+      href: convertDCas20_5360_ToVCF.html
+    - text: Impute GS C2 (DCas20_5360)
+      href: ImputeDCas20_5360.html
   - text: Other
     menu:
     - text: About

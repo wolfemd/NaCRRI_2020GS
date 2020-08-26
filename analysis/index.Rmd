@@ -32,7 +32,8 @@ Two options to proceed with imputation of C2 (DCas20-5360):
 
 If I can use Beagle5 or latest, should be possible (fast) to create all 3 and compare the results using PCA, prediction, correlation of kinship matrices, etc.
 
-[Imputation](imputation.html):  
+  * [Convert DCas20-5360 report to VCF for imputation](convertDCas20_5360_ToVCF.html):
+  * [Impute DCas20-5360](ImputeDCas20_5360.html):  
 
 
 # Data availability and reproducibility
