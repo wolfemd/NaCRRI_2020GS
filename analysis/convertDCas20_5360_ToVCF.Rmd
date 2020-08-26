@@ -124,7 +124,7 @@ convertDart2vcf(dartvcfInput,dartcountsInput,outName,
 
 Split the genome-wide VCF into per-chromosome VCFs for imputation.
 
-```{r}
+```{r,eval = FALSE}
 require(furrr); options(mc.cores=18); plan(multiprocess)
 source(here::here("code","imputationFunctions.R"))
 

@@ -29,7 +29,7 @@ If I can use Beagle5 or latest, should be possible (fast) to create all 3 and co
 
 Copy the imputation reference panel from 2019 to the `data/` folder.
 
-```{bash}
+```{bash,eval = FALSE}
 cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz /workdir/EMBRAPA_2020GS/data/
 cp -r /home/jj332_cas/CassavaGenotypeData/CassavaGeneticMap /workdir/EMBRAPA_2020GS/data/
 ```
@@ -44,7 +44,7 @@ Requires 1 large memory Cornell CBSU machine (e.g. cbsulm17; 112 cores, 512 GB R
 
 R functions are stored in the `code/` sub-directory. Functions sourced from e.g. **imputationFunctions.R** are wrappers around e.g. Beagle, and other command line programs.
 
-```{r}
+```{r,eval = FALSE}
 targetVCFpath<-here::here("data/Report-DCas20-5360/") # location of the targetVCF
 refVCFpath<-here::here("data/")
 mapPath<-here::here("data/CassavaGeneticMap/")
@@ -52,7 +52,7 @@ outPath<-here::here("output/")
 outSuffix<-"DCas20_5360"
 ```
 
-```{r}
+```{r,eval = FALSE}
 source(imputationFunctions.R)
 purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,"chr",.,"_DCas20_5360.vcf.gz"),
                             refVCF=paste0(refVCFpath,"chr",.,"_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz"),
@@ -62,7 +62,7 @@ purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,"chr",.,"_DCas20_5360
 ```
 
 Clean up Beagle log files after run. Move to sub-directory `output/BeagleLogs/`.
-```{bash}
+```{bash,eval = FALSE}
 cd /workdir/EMBRAPA_2020GS/output/; 
 mkdir BeagleLogs;
 cp *_DCas20_5360_REFimputed.log BeagleLogs/
@@ -75,7 +75,7 @@ For now, the function will just do a fixed filter: AR2>0.75 (DR2>0.75 as of Beag
 It can easily be modified in the future to include parameters to vary the filter specifications.
 
 Input parameters
-```{r}
+```{r,eval = FALSE}
 #' @inPath path to input VCF-to-be-filtered, can be left null if path included in @inName . Must end in "/"
 #' @inName name of input VCF file EXCLUDING file extension. Assumes .vcf.gz
 #' @outPath path where filtered VCF and related are to be stored.Can be left null if path included in @outName . Must end in "/".
@@ -85,7 +85,7 @@ outPath<-here::here("output/")
 ```
 
 Loop to filter all 18 VCF files in parallel
-```{r}
+```{r,eval = FALSE}
 source(imputationFunctions.R)
 require(furrr); options(mc.cores=ncores); plan(multiprocess)
 future_map(1:18,~postImputeFilter(inPath=inPath,
@@ -95,7 +95,7 @@ future_map(1:18,~postImputeFilter(inPath=inPath,
 ```
 
 Check what's left
-```{r}
+```{r,eval = FALSE}
 purrr::map(list(Chr=1:18),~system(paste0("wc -l ",here::here("output/"),"chr",.,"_",outName,".vcf.gz")))
 ```
 
