@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Marnin Wolfe" />
+
+
+<title>Convert DCas20-5360 to VCF</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EMBRAPA_2020GS</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Imputation 2019
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="convertDCas19_4403_ToVCF_102419.html">Conversion DArT report to VCF</a>
+    </li>
+    <li>
+      <a href="Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html">Verify GBS-to-DArTseqLD sample matches</a>
+    </li>
+    <li>
+      <a href="Imputation_EMBRAPA_102419.html">Imputation steps</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Imputation 2020
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="convertDCas20_5360_ToVCF.html">Conversion DArT report DCas20_5360 to VCF</a>
+    </li>
+    <li>
+      <a href="ImputeDCas20_5360.html">Impute GS C2 (DCas20_5360)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Other
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="about.html">About</a>
+    </li>
+    <li>
+      <a href="license.html">License</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Convert DCas20-5360 to VCF</h1>
+<h4 class="author">Marnin Wolfe</h4>
+<h4 class="date">2020-August-26</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-08-26
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>EMBRAPA_2020GS/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200826code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200826)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200826code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200826)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongbcd83b4"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> bcd83b4 </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongbcd83b4" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version bcd83b4. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/.DS_Store
+
+Untracked files:
+    Untracked:  data/Report-DCas20-5360/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/convertDCas20_5360_ToVCF.Rmd</code>) and HTML (<code>docs/convertDCas20_5360_ToVCF.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+bcd83b4
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-08-26
+</td>
+<td>
+Initial publish (prior to running imputation). Debugging will be
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+9d4dfab
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-08-26
+</td>
+<td>
+Code organized into functions. Ready to run imputation of C2?
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="input-parameters" class="section level1">
+<h1>Input Parameters</h1>
+<pre class="r"><code>#&#39; @dartvcfInput input name and path of &quot;vcf&quot; file from DArT
+#&#39; @dartcountsInput input name and path of counts file from DArT
+#&#39; @outName output path and name
+#&#39; @nskipvcf number of &quot;VCF&quot; rows to skip on read-in
+#&#39; @nskipcounts number of &quot;counts file&quot; rows to skip on read in
+#&#39; @ncores number of cores to use, could be VERY memory intensive
+#&#39; @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file
+
+library(tidyverse); library(magrittr)
+dartvcfInput&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;Report_DCas20-5360_SNP_VCF_Version_6.csv&quot;)
+dartcountsInput&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;Report_DCas20-5360_SNP_Counts_Version_6_final.csv&quot;)
+outName&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;DCas20_5360&quot;)
+
+# From report to report, there has been minor (NOT SO MINOR?) variation
+# in format among files, requiring user input
+# rather frustrating
+# can&#39;t pipeline their stuff
+nskipvcf&lt;-2 
+nskipcounts&lt;-3
+ncores&lt;-75
+dartVars&lt;-read.csv(dartcountsInput, 
+                   stringsAsFactors = F,
+                   header = T,
+                   skip=nskipcounts,
+                   nrows = 1) %&gt;% colnames(.) %&gt;% .[1:26] </code></pre>
+</div>
+<div id="prelim.-check-format" class="section level1">
+<h1>Prelim. check format</h1>
+<p>Start manual. Check that the files read in according to previous code. Adjust code if necessary. Make a function and apply it to the input files.</p>
+<pre class="r"><code>vcf&lt;-read.table(dartvcfInput,
+                stringsAsFactors = F,skip = nskipvcf, header = T, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
+readCounts&lt;-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
+
+# dim(vcf) 
+# [1] 13603  3749
+# dim(readCounts) 
+# [1] 27206  4105
+
+# colnames(readCounts)[1:100]
+ # [1] &quot;AlleleID&quot;                    &quot;CloneID&quot;                    
+ #  [3] &quot;AlleleSequence&quot;              &quot;TrimmedSequence&quot;            
+ #  [5] &quot;TrimmedSequence_plus_Strand&quot; &quot;Chrom_Cassava_v61&quot;          
+ #  [7] &quot;ChromPos_Cassava_v61&quot;        &quot;SNP_ChromPos_Cassava_v61&quot;   
+ #  [9] &quot;AlnCnt_Cassava_v61&quot;          &quot;AlnEvalue_Cassava_v61&quot;      
+ # [11] &quot;Strand_Cassava_v61&quot;          &quot;SeqDiff_Cassava_v61&quot;        
+ # [13] &quot;SNP&quot;                         &quot;SnpPosition.on.Tag&quot;         
+ # [15] &quot;CallRate&quot;                    &quot;OneRatioRef&quot;                
+ # [17] &quot;OneRatioSnp&quot;                 &quot;FreqHomRef&quot;                 
+ # [19] &quot;FreqHomSnp&quot;                  &quot;FreqHets&quot;                   
+ # [21] &quot;PICRef&quot;                      &quot;PICSnp&quot;                     
+ # [23] &quot;AvgPIC&quot;                      &quot;AvgCountRef&quot;                
+ # [25] &quot;AvgCountSnp&quot;                 &quot;RepAvg&quot;                     
+ # [27] &quot;X9624.09&quot;                    &quot;BGM.0004&quot; 
+ # [29] &quot;BGM.0005&quot;                    &quot;BGM.0006&quot;                   
+ # [31] &quot;BGM.0014&quot;                    &quot;BGM.0018&quot;                   
+ # [33] &quot;BGM.0019&quot;                    &quot;BGM.0020&quot;                   
+ # [35] &quot;BGM.0021&quot;                    &quot;BGM.0022&quot;                   
+ # [37] &quot;BGM.0023&quot;                    &quot;BGM.0024&quot; 
+# colnames(vcf)[1:30]
+#  [1] &quot;X.CHROM&quot;            &quot;POS&quot;                &quot;ID&quot;                
+#  [4] &quot;REF&quot;                &quot;ALT&quot;                &quot;QUAL&quot;              
+#  [7] &quot;FILTER&quot;             &quot;INFO&quot;               &quot;FORMAT&quot;            
+# [10] &quot;X911118200001_A_1&quot;  &quot;X911118200001_A_10&quot; &quot;X911118200001_A_11&quot;
+# [13] &quot;X911118200001_A_12&quot; &quot;X911118200001_A_2&quot;  &quot;X911118200001_A_3&quot; 
+# [16] &quot;X911118200001_A_4&quot;  &quot;X911118200001_A_5&quot;  &quot;X911118200001_A_6&quot; 
+# [19] &quot;X911118200001_A_7&quot;  &quot;X911118200001_A_8&quot;  &quot;X911118200001_A_9&quot; 
+# [22] &quot;X911118200001_B_1&quot;  &quot;X911118200001_B_10&quot; &quot;X911118200001_B_11&quot;
+# [25] &quot;X911118200001_B_12&quot; &quot;X911118200001_B_2&quot;  &quot;X911118200001_B_3&quot; 
+# [28] &quot;X911118200001_B_4&quot;  &quot;X911118200001_B_5&quot;  &quot;X911118200001_B_6&quot; 
+
+
+colnames(vcf)[10:length(colnames(vcf))]&lt;-colnames(readCounts)[length(dartVars):length(colnames(readCounts))]
+
+vcf %&lt;&gt;% 
+    mutate(X.CHROM=gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)) %&gt;% 
+    rename(Pos=POS) %&gt;% 
+    mutate(Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)),
+           Pos=as.numeric(Pos)) 
+
+
+# dim(readCounts)
+# readCounts %&gt;% .[,1:30] %&gt;% str
+# readCounts[1:5,1:30]
+# readCounts[1:10,] %&gt;% select(SNP,CloneID,AlleleID,Chrom_Cassava_v61,SNP_ChromPos_Cassava_v61)
+# vcf[1:10,1:5]
+# Note: The ID column in &quot;vcf&quot; is the value for the ALT allele in AlleleID of &quot;readCounts&quot;
+readCounts %&lt;&gt;% 
+  mutate(RefAlt=ifelse(SNP==&quot;&quot;,&quot;REF&quot;,&quot;ALT&quot;),
+         Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,Chrom_Cassava_v61)),
+         Pos=as.numeric(SNP_ChromPos_Cassava_v61))</code></pre>
+</div>
+<div id="conversion-function" class="section level1">
+<h1>Conversion function</h1>
+<p>Printed here, but available and sourced from <code>code/</code> subdirectory.</p>
+<pre class="r"><code>convertDart2vcf&lt;-function(dartvcfInput,dartcountsInput,outName,
+                          nskipvcf=2,nskipcounts=3,ncores){
+  require(tidyverse); require(magrittr)
+  # Read and format the counts/vcf files  -------------------
+
+  ## Read in &quot;VCF&quot; (called genotypes from DArT)
+  ## and &quot;counts&quot; files (read counts)
+  vcf&lt;-read.table(dartvcfInput,
+                  stringsAsFactors = F,skip = nskipvcf, header = T, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
+  readCounts&lt;-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
+
+  ## Liftover the sampleIDs from readCounts onto the VCF
+
+  colnames(vcf)[10:length(colnames(vcf))]&lt;-colnames(readCounts)[length(dartVars):length(colnames(readCounts))]
+
+  ## Formatting chrom and position info
+  vcf %&lt;&gt;%
+    mutate(X.CHROM=gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)) %&gt;%
+    rename(Pos=POS) %&gt;%
+    mutate(Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)),
+           Pos=as.numeric(Pos))
+
+  readCounts %&lt;&gt;%
+    mutate(RefAlt=ifelse(SNP==&quot;&quot;,&quot;REF&quot;,&quot;ALT&quot;),
+           Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,Chrom_Cassava_v61)),
+           Pos=as.numeric(SNP_ChromPos_Cassava_v61))
+  # Add a SNPindex ------------------
+  # Add a unique value &quot;SNPindex&quot; to each SNP in the vcf and readCounts df&#39;s
+  # For readCounts, this is going to be the best way to keep track of pairs of rows. Since in many cases, multiple CloneID can point to same Chr-Pos-Alleles and it&#39;s otherwise unclear which pair of rows should go together when subsetting downstream.
+  vcf %&lt;&gt;%
+    mutate(SNPindex=1:nrow(.))
+  readCounts %&lt;&gt;%
+    mutate(SNPindex=sort(rep(1:(nrow(.)/2),2)))
+
+  readCounts %&lt;&gt;%
+    separate(AlleleID,c(&quot;tmp&quot;,&quot;Alleles&quot;),sep=-3,remove = F) %&gt;%
+    select(-tmp) %&gt;%
+    separate(Alleles,c(&quot;REF&quot;,&quot;ALT&quot;),&quot;&gt;&quot;,remove = F)
+  vcf %&lt;&gt;%
+    separate(ID,c(&quot;tmp&quot;,&quot;Alleles&quot;),sep=-3,remove = F) %&gt;%
+    select(-tmp)
+  vcf %&lt;&gt;%
+    separate(ID,c(&quot;CloneID&quot;,&quot;tmp&quot;),&quot;[|]&quot;,remove = F,extra = &#39;merge&#39;) %&gt;%
+    mutate(CloneID=as.numeric(CloneID)) %&gt;%
+    select(-tmp) %&gt;%
+    rename(AlleleID=ID)
+
+  # Add required VCF fields --------------------------
+  ## First have to do some data transformation and
+  ## create some of the meta-data fields in a VCF, e.g. QUAL, FILTER INFO.
+  readCounts %&lt;&gt;%
+    arrange(Chr,Pos,SNPindex,CloneID,AlleleID,RefAlt) %&gt;%
+    mutate(QUAL=&quot;.&quot;,
+           FILTER=&quot;.&quot;,
+           INFO=&quot;.&quot;,
+           FORMAT=&quot;GT:AD:DP:PL&quot;,
+           SNP_ID=paste0(&quot;S&quot;,Chr,&quot;_&quot;,Pos))
+  vcf %&lt;&gt;%
+    arrange(Chr,Pos,SNPindex,CloneID,AlleleID) %&gt;%
+    mutate(QUAL=&quot;.&quot;,
+           FILTER=&quot;.&quot;,
+           INFO=&quot;.&quot;,
+           FORMAT=&quot;GT:AD:DP:PL&quot;,
+           SNP_ID=paste0(&quot;S&quot;,Chr,&quot;_&quot;,Pos))
+
+  # Prune duplicate and multi-allelic sites ---------------
+  sites2keep&lt;-vcf %&gt;%
+    count(Chr,Pos) %&gt;%
+    ungroup() %&gt;%
+    filter(n==1) %&gt;%
+    select(-n) %&gt;%
+    semi_join(
+      readCounts %&gt;%
+        count(Chr,Pos) %&gt;%
+        arrange(desc(n)) %&gt;%
+        filter(n==2) %&gt;%
+        select(-n))
+  vcf %&lt;&gt;% semi_join(sites2keep)
+  readCounts %&lt;&gt;% semi_join(sites2keep)
+
+  sampleIDsFromDartVCF&lt;-colnames(vcf) %&gt;%
+    .[!. %in% c(&quot;X.CHROM&quot;,&quot;Pos&quot;,&quot;AlleleID&quot;,&quot;Alleles&quot;,&quot;REF&quot;,&quot;ALT&quot;,&quot;QUAL&quot;,&quot;FILTER&quot;,&quot;INFO&quot;,&quot;FORMAT&quot;,
+                &quot;Chr&quot;,&quot;SNPindex&quot;,&quot;CloneID&quot;,&quot;SNP_ID&quot;,&quot;SNP&quot;)]
+
+  tmp_counts &lt;-readCounts %&gt;%
+    .[,c(&quot;Chr&quot;,&quot;Pos&quot;,&quot;SNPindex&quot;,&quot;SNP_ID&quot;,
+         &quot;CloneID&quot;,&quot;AlleleID&quot;,&quot;RefAlt&quot;,&quot;Alleles&quot;,&quot;QUAL&quot;,&quot;FILTER&quot;,&quot;INFO&quot;,&quot;FORMAT&quot;,sampleIDsFromDartVCF)] %&gt;%
+    semi_join(sites2keep)
+
+  # readCounts and vcf long by sample ------------------------------
+  tmp_counts %&lt;&gt;%
+    pivot_longer(cols = all_of(sampleIDsFromDartVCF),
+                 names_to = &quot;FullSampleName&quot;,
+                 values_to = &quot;ReadCount&quot;)
+  #gather(FullSampleName,ReadCount,sampleIDsFromDartVCF)
+  tmp_counts %&lt;&gt;%
+    select(-AlleleID) %&gt;%
+    spread(RefAlt,ReadCount)
+  tmp_counts %&lt;&gt;%
+    rename(AltCount=ALT,
+           RefCount=REF)
+  vcf_long&lt;-vcf %&gt;%
+    .[,c(&quot;Chr&quot;,&quot;Pos&quot;,&quot;SNPindex&quot;,&quot;SNP_ID&quot;,
+         &quot;CloneID&quot;,&quot;Alleles&quot;,&quot;REF&quot;,&quot;ALT&quot;,&quot;QUAL&quot;,&quot;FILTER&quot;,&quot;INFO&quot;,&quot;FORMAT&quot;,sampleIDsFromDartVCF)] %&gt;%
+    pivot_longer(cols = all_of(sampleIDsFromDartVCF), names_to = &quot;FullSampleName&quot;, values_to = &quot;GT&quot;)
+  #    gather(FullSampleName,GT,sampleIDsFromDartVCF)
+
+  # Add GT from vcf to the counts -----------------------------------
+  tmp_counts %&lt;&gt;%
+    inner_join(vcf_long)
+
+  # Calc PL field  --------------------------------------------------
+  # AD+DP fields
+  ## Now we can calc DP and formate the VCF field &quot;AD&quot; (e.g. &quot;21,0&quot; for 21 reference reads and 0 alt. allele reads)
+  tmp_counts %&lt;&gt;%
+    mutate(DP=AltCount+RefCount,
+           AD=paste0(RefCount,&quot;,&quot;,AltCount))
+  tmp1&lt;-tmp_counts %&gt;%
+    filter(!is.na(AltCount),
+           !is.na(RefCount))
+  tmp&lt;-tmp1; rm(tmp1)
+
+  # Calc. genotype likelihoods ----------------------------------------
+
+  ## Genotype likelihoods calculated according to:
+  ### http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1000862#s4
+  ## Converted to Normalized Phred Scores according to:
+  ### https://gatkforums.broadinstitute.org/gatk/discussion/5913/math-notes-how-pl-is-calculated-in-haplotypecaller
+  ## Truncate low Phred probabilities (high Phred scores) to
+  ### 255 max according to TASSEL&#39;s convention (Jeff Glaubitz, pers. communication).
+
+  #ref&lt;-171; alt&lt;-171; error&lt;-0.001
+  calcPL&lt;-function(ref,alt,error=0.001){
+    # ref and alt arguments are read counts for ref and alt allele, repsectively
+    dp&lt;-ref+alt
+    # for values &gt;170, factorial() returns &#39;inf&#39;
+    # Since it means essentially 100% probability of a genotype...
+    # set DP to 169 cieling, ref/alt to equiv. allele proportions
+    if(dp&gt;=170){ ref&lt;-169*(ref/dp); alt&lt;-169*(alt/dp); dp&lt;-169 }
+    gl_RefRef&lt;-(factorial(dp)/(factorial(ref)*factorial(alt)))*(1-(0.75*error))^ref*(error/4)^(alt)
+    gl_RefAlt&lt;-(factorial(dp)/(factorial(ref)*factorial(alt)))*(0.5-(0.25*error))^(ref+alt)*(error/4)^(0)
+    gl_AltAlt&lt;-(factorial(dp)/(factorial(ref)*factorial(alt)))*(1-(0.75*error))^alt*(error/4)^(ref)
+    phredScale&lt;--10*log10(c(gl_RefRef,gl_RefAlt,gl_AltAlt))
+    minPhred&lt;-min(phredScale)
+    normPhred&lt;-round(phredScale-minPhred,0)
+    normPhred[which(normPhred&gt;=255)]&lt;-255
+    normPhred&lt;-paste0(normPhred,collapse = &quot;,&quot;)
+    if(dp==0){ normPhred&lt;-&quot;.&quot; }
+    return(normPhred)
+  }
+  require(furrr); options(mc.cores=ncores); plan(multiprocess)
+  tmp %&lt;&gt;%
+    mutate(PL=future_map2_chr(RefCount,AltCount,~calcPL(ref=.x,alt=.y)))
+
+  # Final VCF format ----------------------------------------
+  tmp %&lt;&gt;%
+    mutate(FORMATfields=paste(GT,AD,DP,PL,sep=&quot;:&quot;)) %&gt;%
+    select(Chr,Pos,SNP_ID,REF,ALT,QUAL,FILTER,INFO,FORMAT,FullSampleName,FORMATfields) %&gt;%
+    spread(FullSampleName,FORMATfields) %&gt;%
+    arrange(Chr,Pos) %&gt;%
+    rename(`#CHROM`=Chr,
+           POS=Pos,ID=SNP_ID)
+
+  # Header ----------------------------------------
+  header&lt;-c(&quot;##fileformat=VCFv4.0&quot;,
+            &quot;##FORMAT=&lt;ID=GT,Number=1,Type=String,Description=\&quot;Genotype\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description=\&quot;Allelic depths for the reference and alternate alleles in the order listed\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description=\&quot;Read Depth (only filtered reads used for calling)\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=PL,Number=3,Type=Float,Description=\&quot;Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\&quot;&gt;&quot;)
+
+  # Write to disk ----------------------------------------
+
+  options(&quot;scipen&quot;=1000, &quot;digits&quot;=4)
+  # for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)
+  write_lines(header,
+              path=paste0(outName,&quot;.vcf&quot;))
+  write.table(tmp,
+              paste0(outName,&quot;.vcf&quot;),
+              append = T,sep = &quot;\t&quot;,row.names=F, col.names=T, quote=F)
+  # Save sitesWithAlleles
+  tmp %&gt;%
+    rename(CHROM=`#CHROM`) %&gt;%
+    select(CHROM:ALT) %&gt;%
+    write.table(.,file=paste0(outName,&quot;.sitesWithAlleles&quot;),
+                row.names=F)
+  # Save sample list
+  write.table(sampleIDsFromDartVCF,file=paste0(outName,&quot;.samples&quot;),
+              row.names = F, col.names = F, quote = F)
+
+  # BGzip
+  system(paste0(&quot;cat &quot;,outName,&quot;.vcf &quot;,
+                &quot;| bgzip -c &gt; &quot;,outName,&quot;.vcf.gz&quot;))
+  system(paste0(&quot;rm &quot;,outName,&quot;.vcf&quot;))
+}</code></pre>
+</div>
+<div id="run-conversion-function" class="section level1">
+<h1>Run conversion function</h1>
+<pre class="r"><code>source(here::here(&quot;code/&quot;,&quot;convertDart2vcf.R&quot;))
+convertDart2vcf(dartvcfInput,dartcountsInput,outName,
+                nskipvcf=2,nskipcounts=3,ncores)</code></pre>
+</div>
+<div id="genomewide-to-per-chrom-vcfs" class="section level1">
+<h1>Genomewide to per-chrom VCFs</h1>
+<p>Split the genome-wide VCF into per-chromosome VCFs for imputation.</p>
+<pre class="r"><code>require(furrr); options(mc.cores=18); plan(multiprocess)
+source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+
+vcfIn&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;DCas20_5360.vcf.gz&quot;)
+filters&lt;-&quot;--minDP 4 --maxDP 50&quot; # because using GT not PL for impute (Beagle5)
+outPath&lt;-here::here(&quot;data/Report-DCas20-5360/&quot;)
+outSuffix&lt;-&quot;DCas20_5360&quot;
+
+future_map(list(Chr=1:18),
+           ~splitVCFbyChr(Chr=.),
+           vcfIn=vcfIn,filters=filters,
+           outPath=outPath,outSuffix=outSuffix)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.0.2 (2020-06-22)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Mojave 10.14.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] workflowr_1.6.2
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.5      whisker_0.4     knitr_1.29      magrittr_1.5   
+ [5] here_0.1        R6_2.4.1        rlang_0.4.7     stringr_1.4.0  
+ [9] tools_4.0.2     xfun_0.16       git2r_0.27.1    htmltools_0.5.0
+[13] ellipsis_0.3.1  yaml_2.2.1      digest_0.6.25   rprojroot_1.3-2
+[17] tibble_3.0.3    lifecycle_0.2.0 crayon_1.3.4    later_1.1.0.1  
+[21] vctrs_0.3.2     promises_1.1.1  fs_1.5.0        glue_1.4.1     
+[25] evaluate_0.14   rmarkdown_2.3   stringi_1.4.6   compiler_4.0.2 
+[29] pillar_1.4.6    backports_1.1.8 httpuv_1.5.4    pkgconfig_2.0.3</code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
