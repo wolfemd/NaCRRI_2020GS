@@ -1,6 +1,7 @@
 ---
-title: "Home"
+title: "EMBRAPA 2020 GS and related procedures"
 site: workflowr::wflow_site
+author: "Marnin Wolfe"
 output:
   workflowr::wflow_html:
     toc: false
@@ -8,4 +9,48 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+This repository and website documents all analyses, summary, tables and figures associated with EMBRAPA genomic prediction and related procedures (e.g. imputation). 
+
+# Analyses
+
+
+**Imputation conducted in 2019:** Imputation of the L. America reference panel (GBS+DArTseqLD) and EMBRAPA GS C1 (DArTseqLD only) was done in October 2019. The codes for 2019 imputation were never published in a Git repository, though they were shared internally. The 2019 imputed VCFs will serve as imputation reference panel for 2020. Therefore, I am publishing the 2019 codes here _as is_ for reference.
+
+  * [Convert DCas19-4403 report to VCF for imputation](convertDCas19_4403_ToVCF_102419.html): The report DCas19_4403 was converted to VCF and then included in the ImputationReferencePanel VCF and imputed along with the GBS/GBS+DArT samples.
+  * [Verify GBS-to-DArTseqLD sample matches](Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html): Verify GBS-2-DArT matches by PLINK IBD was done on samples DCas19_4301.
+  * [Imputation steps](Imputation_EMBRAPA_102419.html): this was a multi-stage process including assembly and filtering of VCFs, imputation with Beagle (4.1 and 5.0). The ultimate step of this pipeline was to impute the C1 progeny data, which were extracted from the DArTseqLD report "DCas19_4301", with the imputation reference panel.
+
+**Imputation 2020:** DArTseqLD (DCas20-5360) arrived on Aug. 22, 2020. Contains **GS C2** for EMBRAPA. 
+
+Last year's reference panel for imputation had ~64K SNP. The C1 progeny imputed by it had <9K SNP _after_ post-imputation filters.
+
+Two options to proceed with imputation of C2 (DCas20-5360):
+
+1. Last year's reference panel, without C1 (64K SNP)
+2. Last year's reference panel + C1 (reduce refpanel to sites passing post-impute filter in C1 = 9K SNP)
+3. Last year's ref. panel + C1 (include unfiltered C1 data = 64K refpanel SNP)
+
+If I can use Beagle5 or latest, should be possible (fast) to create all 3 and compare the results using PCA, prediction, correlation of kinship matrices, etc.
+
+[Imputation](imputation.html):  
+
+
+# Data availability and reproducibility
+
+The R package **workflowr** was used to document this study reproducibly. 
+
+Much of the supporting data _and_ output from the analyses documented here are too large for GitHub. 
+
+The repository will be mirrored, here:  [ftp://ftp.cassavabase.org/marnin_datasets/](ftp://ftp.cassavabase.org/marnin_datasets/) with all data.
+
+# Directory structure of this repository
+
+1. `data/`: raw data (e.g. unimputed SNP data)
+2. `output/`: outputs (e.g. imputed SNP data)
+3. `analysis/`: most code and workflow documented in **.Rmd** files
+4. `docs/`: compiled **.html**, "knitted" from **.Rmd**
+
+Supporting functions `code/`
+
+The analyses in the **html** / **Rmd** files referenced above often source R scripts in the `code/` sub-folder. These are wrapper functions around the packaged core functions in **predCrossVar**, to do the specific analyses for this paper.
+

@@ -5,13 +5,30 @@ navbar:
   left:
   - text: Home
     href: index.html
-  - text: About
-    href: about.html
-  - text: License
-    href: license.html
+  - text: Imputation 2019
+    href:
+      menu:
+    - text: Conversion DArT report to VCF
+      href: convertDCas19_4403_ToVCF_102419.html
+    - text: Verify GBS-to-DArTseqLD sample matches
+      href: Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html
+    - text: Imputation steps
+      href: Imputation_EMBRAPA_102419.html
+  - text: Imputation 2020
+    href:
+      menu:
+    - text: Conversion DArT report to VCF
+      href: convertDCas19_4403_ToVCF_102419.html
+
+  - text: Other
+    menu:
+    - text: About
+      href: about.html
+    - text: License
+      href: license.html
 output:
   workflowr::wflow_html:
-    toc: yes
-    toc_float: yes
-    theme: cosmo
-    highlight: textmate
+    toc: true
+    toc_float: true
+    theme: yeti
+    highlight: tango
