@@ -1,0 +1,17 @@
+name: "EMBRAPA_2020GS"
+output_dir: ../docs
+navbar:
+  title: "EMBRAPA_2020GS"
+  left:
+  - text: Home
+    href: index.html
+  - text: About
+    href: about.html
+  - text: License
+    href: license.html
+output:
+  workflowr::wflow_html:
+    toc: yes
+    toc_float: yes
+    theme: cosmo
+    highlight: textmate
