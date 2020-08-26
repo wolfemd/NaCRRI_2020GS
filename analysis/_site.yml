@@ -5,25 +5,23 @@ navbar:
   left:
   - text: Home
     href: index.html
-  - text: "Imputation 2019"
-    href:
-      menu:
-    - text: "Conversion DArT report to VCF"
-      href: convertDCas19_4403_ToVCF_102419.html
-    - text: "Verify GBS-to-DArTseqLD sample matches"
-      href: Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html
-    - text: "Imputation steps"
-      href: Imputation_EMBRAPA_102419.html
-  - text: "Imputation 2020"
-    href:
-      menu:
-    - text: "Conversion DArT report to VCF"
-      href: convertDCas19_4403_ToVCF_102419.html
-  - text: "Other"
+  - text: Imputation 2019
     menu:
-    - text: "About"
+    - text: Conversion DArT report to VCF
+      href: convertDCas19_4403_ToVCF_102419.html
+    - text: Verify GBS-to-DArTseqLD sample matches
+      href: Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html
+    - text: Imputation steps
+      href: Imputation_EMBRAPA_102419.html
+  - text: Imputation 2020
+    menu:
+    - text: Conversion DArT report to VCF
+      href: convertDCas19_4403_ToVCF_102419.html
+  - text: Other
+    menu:
+    - text: About
       href: about.html
-    - text: "License"
+    - text: License
       href: license.html
 output:
   workflowr::wflow_html:
