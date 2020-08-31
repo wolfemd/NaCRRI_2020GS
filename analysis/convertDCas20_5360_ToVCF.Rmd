@@ -20,8 +20,10 @@ editor_options:
 #' @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file
 
 library(tidyverse); library(magrittr)
-dartvcfInput<-here::here("data/Report-DCas20-5360","Report_DCas20-5360_SNP_VCF_Version_6.csv")
-dartcountsInput<-here::here("data/Report-DCas20-5360","Report_DCas20-5360_SNP_Counts_Version_6_final.csv")
+# dartvcfInput<-here::here("data/Report-DCas20-5360","Report_DCas20-5360_SNP_VCF_Version_6.csv")
+# dartcountsInput<-here::here("data/Report-DCas20-5360","Report_DCas20-5360_SNP_Counts_Version_6_final.csv")
+dartvcfInput<-here::here("data/OrderAppendix_1_DCas20-5360","Report_5360_coanalysis_version6_VCF.txt")
+dartcountsInput<-here::here("data/OrderAppendix_1_DCas20-5360","Report_5360_coanalysis_counts.csv")
 outName<-here::here("data/Report-DCas20-5360","DCas20_5360")
 
 # From report to report, there has been minor (NOT SO MINOR?) variation
@@ -31,11 +33,11 @@ outName<-here::here("data/Report-DCas20-5360","DCas20_5360")
 nskipvcf<-2 
 nskipcounts<-3
 ncores<-75
-dartVars<-read.csv(dartcountsInput, 
-                   stringsAsFactors = F,
-                   header = T,
-                   skip=nskipcounts,
-                   nrows = 1) %>% colnames(.) %>% .[1:26] 
+# dartVars<-read.csv(dartcountsInput, 
+#                    stringsAsFactors = F,
+#                    header = T,
+#                    skip=nskipcounts,
+#                    nrows = 1) %>% colnames(.) %>% .[1:26] 
 
 ```
 
@@ -48,64 +50,39 @@ vcf<-read.table(dartvcfInput,
                 stringsAsFactors = F,skip = nskipvcf, header = T, sep = "\t", comment.char = "")
 readCounts<-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
 
-# dim(vcf) 
+dim(vcf)
 # [1] 13603  3749
-# dim(readCounts) 
-# [1] 27206  4105
+dim(readCounts)
+# [1] 27206  3765
 
-# colnames(readCounts)[1:100]
- # [1] "AlleleID"                    "CloneID"                    
+colnames(readCounts)[1:100]
+ #  [1] "AlleleID"                    "CloneID"                    
  #  [3] "AlleleSequence"              "TrimmedSequence"            
  #  [5] "TrimmedSequence_plus_Strand" "Chrom_Cassava_v61"          
  #  [7] "ChromPos_Cassava_v61"        "SNP_ChromPos_Cassava_v61"   
  #  [9] "AlnCnt_Cassava_v61"          "AlnEvalue_Cassava_v61"      
- # [11] "Strand_Cassava_v61"          "SeqDiff_Cassava_v61"        
- # [13] "SNP"                         "SnpPosition.on.Tag"         
- # [15] "CallRate"                    "OneRatioRef"                
- # [17] "OneRatioSnp"                 "FreqHomRef"                 
- # [19] "FreqHomSnp"                  "FreqHets"                   
- # [21] "PICRef"                      "PICSnp"                     
- # [23] "AvgPIC"                      "AvgCountRef"                
- # [25] "AvgCountSnp"                 "RepAvg"                     
- # [27] "X9624.09"                    "BGM.0004" 
- # [29] "BGM.0005"                    "BGM.0006"                   
- # [31] "BGM.0014"                    "BGM.0018"                   
- # [33] "BGM.0019"                    "BGM.0020"                   
- # [35] "BGM.0021"                    "BGM.0022"                   
- # [37] "BGM.0023"                    "BGM.0024" 
-# colnames(vcf)[1:30]
-#  [1] "X.CHROM"            "POS"                "ID"                
-#  [4] "REF"                "ALT"                "QUAL"              
-#  [7] "FILTER"             "INFO"               "FORMAT"            
-# [10] "X911118200001_A_1"  "X911118200001_A_10" "X911118200001_A_11"
-# [13] "X911118200001_A_12" "X911118200001_A_2"  "X911118200001_A_3" 
-# [16] "X911118200001_A_4"  "X911118200001_A_5"  "X911118200001_A_6" 
-# [19] "X911118200001_A_7"  "X911118200001_A_8"  "X911118200001_A_9" 
-# [22] "X911118200001_B_1"  "X911118200001_B_10" "X911118200001_B_11"
-# [25] "X911118200001_B_12" "X911118200001_B_2"  "X911118200001_B_3" 
-# [28] "X911118200001_B_4"  "X911118200001_B_5"  "X911118200001_B_6" 
-
-
-colnames(vcf)[10:length(colnames(vcf))]<-colnames(readCounts)[length(dartVars):length(colnames(readCounts))]
-
-vcf %<>% 
-    mutate(X.CHROM=gsub("Chromosome","",X.CHROM)) %>% 
-    rename(Pos=POS) %>% 
-    mutate(Chr=as.numeric(gsub("Chromosome","",X.CHROM)),
-           Pos=as.numeric(Pos)) 
-
-
-# dim(readCounts)
-# readCounts %>% .[,1:30] %>% str
-# readCounts[1:5,1:30]
-# readCounts[1:10,] %>% select(SNP,CloneID,AlleleID,Chrom_Cassava_v61,SNP_ChromPos_Cassava_v61)
-# vcf[1:10,1:5]
-# Note: The ID column in "vcf" is the value for the ALT allele in AlleleID of "readCounts"
-readCounts %<>% 
-  mutate(RefAlt=ifelse(SNP=="","REF","ALT"),
-         Chr=as.numeric(gsub("Chromosome","",Chrom_Cassava_v61)),
-         Pos=as.numeric(SNP_ChromPos_Cassava_v61))
+ # [11] "Strand_Cassava_v61"          "SNP"                        
+ # [13] "SnpPosition"                 "CallRate"                   
+ # [15] "OneRatioRef"                 "OneRatioSnp"                
+ # [17] "FreqHomRef"                  "FreqHomSnp"                 
+ # [19] "FreqHets"                    "PICRef"                     
+ # [21] "PICSnp"                      "AvgPIC"                     
+ # [23] "AvgCountRef"                 "AvgCountSnp"                
+ # [25] "RepAvg"                      "X9624.09"                   
+ # [27] "BGM.0004"                    "BGM.0005"                   
+ # [29] "BGM.0006"                    "BGM.0014"                   
+ # [31] "BGM.0018"                    "BGM.0019"                   
+ # [33] "BGM.0020"                    "BGM.0021"                   
+ # [35] "BGM.0022"                    "BGM.0023" 
+colnames(vcf)[1:30]
+#  [1] "X.CHROM"  "POS"      "ID"       "REF"      "ALT"      "QUAL"    
+#  [7] "FILTER"   "INFO"     "FORMAT"   "X9624.09" "BGM.0022" "BGM.0023"
+# [13] "BGM.0024" "BGM.0004" "BGM.0005" "BGM.0006" "BGM.0014" "BGM.0018"
+# [19] "BGM.0019" "BGM.0020" "BGM.0021" "BGM.0025" "BGM.0040" "BGM.0042"
+# [25] "BGM.0044" "BGM.0027" "BGM.0028" "BGM.0029" "BGM.0030" "BGM.0032"
 ```
+
+Everything checks out!
 
 # Conversion function
 Printed here, but available and sourced from `code/` subdirectory.

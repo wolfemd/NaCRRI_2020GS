@@ -9,10 +9,6 @@ convertDart2vcf<-function(dartvcfInput,dartcountsInput,outName,
                   stringsAsFactors = F,skip = nskipvcf, header = T, sep = "\t", comment.char = "")
   readCounts<-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
 
-  ## Liftover the sampleIDs from readCounts onto the VCF
-
-  colnames(vcf)[10:length(colnames(vcf))]<-colnames(readCounts)[length(dartVars):length(colnames(readCounts))]
-
   ## Formatting chrom and position info
   vcf %<>%
     mutate(X.CHROM=gsub("Chromosome","",X.CHROM)) %>%
