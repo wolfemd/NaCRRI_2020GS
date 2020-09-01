@@ -9,20 +9,21 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Marnin Wolfe" />
 
 
 <title>Convert DCas20-5360 to VCF</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -34,22 +35,99 @@ div.section {
 }
 </style>
 
+
 <style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
   }
 </style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
-
 
 
 <style type="text/css">
@@ -259,6 +337,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -266,6 +407,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -352,7 +503,6 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Convert DCas20-5360 to VCF</h1>
-<h4 class="author">Marnin Wolfe</h4>
 <h4 class="date">2020-August-26</h4>
 
 </div>
@@ -469,16 +619,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStree6e27397c0be45b378cfb6a9c538ecd02f711b285targetblank6e27397a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/6e27397c0be45b378cfb6a9c538ecd02f711b285" target="_blank">6e27397</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStreeb2e7af12e409e279004673a52e5aebb5083c8323targetblankb2e7af1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/b2e7af12e409e279004673a52e5aebb5083c8323" target="_blank">b2e7af1</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStree6e27397c0be45b378cfb6a9c538ecd02f711b285targetblank6e27397a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStreeb2e7af12e409e279004673a52e5aebb5083c8323targetblankb2e7af1a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/6e27397c0be45b378cfb6a9c538ecd02f711b285" target="_blank">6e27397</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/b2e7af12e409e279004673a52e5aebb5083c8323" target="_blank">b2e7af1</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -495,6 +645,9 @@ Untracked files:
     Untracked:  data/OrderAppendix_1_DCas20-5360/
     Untracked:  data/Report-DCas20-5360/
     Untracked:  workflowr_log.R
+
+Unstaged changes:
+    Modified:   analysis/ImputeDCas20_5360.Rmd
 
 </code></pre>
 <p>
@@ -533,6 +686,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/b2e7af12e409e279004673a52e5aebb5083c8323/analysis/convertDCas20_5360_ToVCF.Rmd" target="_blank">b2e7af1</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-09-01
+</td>
+<td>
+wflow_publish(c(“analysis/convertDCas20_5360_ToVCF.Rmd”))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/wolfemd/EMBRAPA_2020GS/d29d605f5072b6b63a25f0558da88c092d36934a/docs/convertDCas20_5360_ToVCF.html" target="_blank">d29d605</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-09-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -627,279 +814,279 @@ Code organized into functions. Ready to run imputation of C2?
 </div>
 <div id="input-parameters" class="section level1">
 <h1>Input Parameters</h1>
-<pre class="r"><code>#&#39; @dartvcfInput input name and path of &quot;vcf&quot; file from DArT
-#&#39; @dartcountsInput input name and path of counts file from DArT
-#&#39; @outName output path and name
-#&#39; @nskipvcf number of &quot;VCF&quot; rows to skip on read-in
-#&#39; @nskipcounts number of &quot;counts file&quot; rows to skip on read in
-#&#39; @ncores number of cores to use, could be VERY memory intensive
-#&#39; @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file
-
-library(tidyverse); library(magrittr)
-dartvcfInput&lt;-here::here(&quot;data/OrderAppendix_1_DCas20-5360&quot;,&quot;Report_5360_coanalysis_version6_VCF.txt&quot;)
-dartcountsInput&lt;-here::here(&quot;data/OrderAppendix_1_DCas20-5360&quot;,&quot;Report_5360_coanalysis_counts.csv&quot;)
-outName&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;DCas20_5360&quot;)
-
-# From report to report, there has been minor (NOT SO MINOR?) variation
-# in format among files, requiring user input
-nskipvcf&lt;-2 
-nskipcounts&lt;-3
-ncores&lt;-10</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#&#39; @dartvcfInput input name and path of &quot;vcf&quot; file from DArT</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&#39; @dartcountsInput input name and path of counts file from DArT</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&#39; @outName output path and name</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&#39; @nskipvcf number of &quot;VCF&quot; rows to skip on read-in</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&#39; @nskipcounts number of &quot;counts file&quot; rows to skip on read in</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&#39; @ncores number of cores to use, could be VERY memory intensive</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co">#&#39; @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(magrittr)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>dartvcfInput&lt;-here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/OrderAppendix_1_DCas20-5360&quot;</span>,<span class="st">&quot;Report_5360_coanalysis_version6_VCF.txt&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11"></a>dartcountsInput&lt;-here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/OrderAppendix_1_DCas20-5360&quot;</span>,<span class="st">&quot;Report_5360_coanalysis_counts.csv&quot;</span>)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>outName&lt;-here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/Report-DCas20-5360&quot;</span>,<span class="st">&quot;DCas20_5360&quot;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13"></a></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co"># From report to report, there has been minor (NOT SO MINOR?) variation</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co"># in format among files, requiring user input</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a>nskipvcf&lt;-<span class="dv">2</span> </span>
+<span id="cb1-17"><a href="#cb1-17"></a>nskipcounts&lt;-<span class="dv">3</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a>ncores&lt;-<span class="dv">10</span></span></code></pre></div>
 </div>
 <div id="prelim.-check-format" class="section level1">
 <h1>Prelim. check format</h1>
 <p>Start manual. Check that the files read in according to previous code. Adjust code if necessary. Make a function and apply it to the input files.</p>
-<pre class="r"><code>vcf&lt;-read.table(dartvcfInput,
-                stringsAsFactors = F,skip = nskipvcf, header = T, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
-readCounts&lt;-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
-
-dim(vcf)
-# [1] 13603  3749
-dim(readCounts)
-# [1] 27206  3765
-
-colnames(readCounts)[1:100]
- #  [1] &quot;AlleleID&quot;                    &quot;CloneID&quot;                    
- #  [3] &quot;AlleleSequence&quot;              &quot;TrimmedSequence&quot;            
- #  [5] &quot;TrimmedSequence_plus_Strand&quot; &quot;Chrom_Cassava_v61&quot;          
- #  [7] &quot;ChromPos_Cassava_v61&quot;        &quot;SNP_ChromPos_Cassava_v61&quot;   
- #  [9] &quot;AlnCnt_Cassava_v61&quot;          &quot;AlnEvalue_Cassava_v61&quot;      
- # [11] &quot;Strand_Cassava_v61&quot;          &quot;SNP&quot;                        
- # [13] &quot;SnpPosition&quot;                 &quot;CallRate&quot;                   
- # [15] &quot;OneRatioRef&quot;                 &quot;OneRatioSnp&quot;                
- # [17] &quot;FreqHomRef&quot;                  &quot;FreqHomSnp&quot;                 
- # [19] &quot;FreqHets&quot;                    &quot;PICRef&quot;                     
- # [21] &quot;PICSnp&quot;                      &quot;AvgPIC&quot;                     
- # [23] &quot;AvgCountRef&quot;                 &quot;AvgCountSnp&quot;                
- # [25] &quot;RepAvg&quot;                      &quot;X9624.09&quot;                   
- # [27] &quot;BGM.0004&quot;                    &quot;BGM.0005&quot;                   
- # [29] &quot;BGM.0006&quot;                    &quot;BGM.0014&quot;                   
- # [31] &quot;BGM.0018&quot;                    &quot;BGM.0019&quot;                   
- # [33] &quot;BGM.0020&quot;                    &quot;BGM.0021&quot;                   
- # [35] &quot;BGM.0022&quot;                    &quot;BGM.0023&quot; 
-colnames(vcf)[1:30]
-#  [1] &quot;X.CHROM&quot;  &quot;POS&quot;      &quot;ID&quot;       &quot;REF&quot;      &quot;ALT&quot;      &quot;QUAL&quot;    
-#  [7] &quot;FILTER&quot;   &quot;INFO&quot;     &quot;FORMAT&quot;   &quot;X9624.09&quot; &quot;BGM.0022&quot; &quot;BGM.0023&quot;
-# [13] &quot;BGM.0024&quot; &quot;BGM.0004&quot; &quot;BGM.0005&quot; &quot;BGM.0006&quot; &quot;BGM.0014&quot; &quot;BGM.0018&quot;
-# [19] &quot;BGM.0019&quot; &quot;BGM.0020&quot; &quot;BGM.0021&quot; &quot;BGM.0025&quot; &quot;BGM.0040&quot; &quot;BGM.0042&quot;
-# [25] &quot;BGM.0044&quot; &quot;BGM.0027&quot; &quot;BGM.0028&quot; &quot;BGM.0029&quot; &quot;BGM.0030&quot; &quot;BGM.0032&quot;</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>vcf&lt;-<span class="kw">read.table</span>(dartvcfInput,</span>
+<span id="cb2-2"><a href="#cb2-2"></a>                <span class="dt">stringsAsFactors =</span> F,<span class="dt">skip =</span> nskipvcf, <span class="dt">header =</span> T, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>, <span class="dt">comment.char =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>readCounts&lt;-<span class="kw">read.csv</span>(dartcountsInput, <span class="dt">stringsAsFactors =</span> F,<span class="dt">header =</span> T,<span class="dt">skip=</span>nskipcounts)</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="kw">dim</span>(vcf)</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># [1] 13603  3749</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="kw">dim</span>(readCounts)</span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># [1] 27206  3765</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="kw">colnames</span>(readCounts)[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]</span>
+<span id="cb2-11"><a href="#cb2-11"></a> <span class="co">#  [1] &quot;AlleleID&quot;                    &quot;CloneID&quot;                    </span></span>
+<span id="cb2-12"><a href="#cb2-12"></a> <span class="co">#  [3] &quot;AlleleSequence&quot;              &quot;TrimmedSequence&quot;            </span></span>
+<span id="cb2-13"><a href="#cb2-13"></a> <span class="co">#  [5] &quot;TrimmedSequence_plus_Strand&quot; &quot;Chrom_Cassava_v61&quot;          </span></span>
+<span id="cb2-14"><a href="#cb2-14"></a> <span class="co">#  [7] &quot;ChromPos_Cassava_v61&quot;        &quot;SNP_ChromPos_Cassava_v61&quot;   </span></span>
+<span id="cb2-15"><a href="#cb2-15"></a> <span class="co">#  [9] &quot;AlnCnt_Cassava_v61&quot;          &quot;AlnEvalue_Cassava_v61&quot;      </span></span>
+<span id="cb2-16"><a href="#cb2-16"></a> <span class="co"># [11] &quot;Strand_Cassava_v61&quot;          &quot;SNP&quot;                        </span></span>
+<span id="cb2-17"><a href="#cb2-17"></a> <span class="co"># [13] &quot;SnpPosition&quot;                 &quot;CallRate&quot;                   </span></span>
+<span id="cb2-18"><a href="#cb2-18"></a> <span class="co"># [15] &quot;OneRatioRef&quot;                 &quot;OneRatioSnp&quot;                </span></span>
+<span id="cb2-19"><a href="#cb2-19"></a> <span class="co"># [17] &quot;FreqHomRef&quot;                  &quot;FreqHomSnp&quot;                 </span></span>
+<span id="cb2-20"><a href="#cb2-20"></a> <span class="co"># [19] &quot;FreqHets&quot;                    &quot;PICRef&quot;                     </span></span>
+<span id="cb2-21"><a href="#cb2-21"></a> <span class="co"># [21] &quot;PICSnp&quot;                      &quot;AvgPIC&quot;                     </span></span>
+<span id="cb2-22"><a href="#cb2-22"></a> <span class="co"># [23] &quot;AvgCountRef&quot;                 &quot;AvgCountSnp&quot;                </span></span>
+<span id="cb2-23"><a href="#cb2-23"></a> <span class="co"># [25] &quot;RepAvg&quot;                      &quot;X9624.09&quot;                   </span></span>
+<span id="cb2-24"><a href="#cb2-24"></a> <span class="co"># [27] &quot;BGM.0004&quot;                    &quot;BGM.0005&quot;                   </span></span>
+<span id="cb2-25"><a href="#cb2-25"></a> <span class="co"># [29] &quot;BGM.0006&quot;                    &quot;BGM.0014&quot;                   </span></span>
+<span id="cb2-26"><a href="#cb2-26"></a> <span class="co"># [31] &quot;BGM.0018&quot;                    &quot;BGM.0019&quot;                   </span></span>
+<span id="cb2-27"><a href="#cb2-27"></a> <span class="co"># [33] &quot;BGM.0020&quot;                    &quot;BGM.0021&quot;                   </span></span>
+<span id="cb2-28"><a href="#cb2-28"></a> <span class="co"># [35] &quot;BGM.0022&quot;                    &quot;BGM.0023&quot; </span></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="kw">colnames</span>(vcf)[<span class="dv">1</span><span class="op">:</span><span class="dv">30</span>]</span>
+<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#  [1] &quot;X.CHROM&quot;  &quot;POS&quot;      &quot;ID&quot;       &quot;REF&quot;      &quot;ALT&quot;      &quot;QUAL&quot;    </span></span>
+<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#  [7] &quot;FILTER&quot;   &quot;INFO&quot;     &quot;FORMAT&quot;   &quot;X9624.09&quot; &quot;BGM.0022&quot; &quot;BGM.0023&quot;</span></span>
+<span id="cb2-32"><a href="#cb2-32"></a><span class="co"># [13] &quot;BGM.0024&quot; &quot;BGM.0004&quot; &quot;BGM.0005&quot; &quot;BGM.0006&quot; &quot;BGM.0014&quot; &quot;BGM.0018&quot;</span></span>
+<span id="cb2-33"><a href="#cb2-33"></a><span class="co"># [19] &quot;BGM.0019&quot; &quot;BGM.0020&quot; &quot;BGM.0021&quot; &quot;BGM.0025&quot; &quot;BGM.0040&quot; &quot;BGM.0042&quot;</span></span>
+<span id="cb2-34"><a href="#cb2-34"></a><span class="co"># [25] &quot;BGM.0044&quot; &quot;BGM.0027&quot; &quot;BGM.0028&quot; &quot;BGM.0029&quot; &quot;BGM.0030&quot; &quot;BGM.0032&quot;</span></span></code></pre></div>
 <p>Everything checks out!</p>
 </div>
 <div id="conversion-function" class="section level1">
 <h1>Conversion function</h1>
 <p>Printed here, but available and sourced from <code>code/</code> subdirectory.</p>
-<pre class="r"><code>convertDart2vcf&lt;-function(dartvcfInput,dartcountsInput,outName,
-                          nskipvcf=2,nskipcounts=3,ncores){
-  require(tidyverse); require(magrittr)
-  # Read and format the counts/vcf files  -------------------
-
-  ## Read in &quot;VCF&quot; (called genotypes from DArT)
-  ## and &quot;counts&quot; files (read counts)
-  vcf&lt;-read.table(dartvcfInput,
-                  stringsAsFactors = F,skip = nskipvcf, header = T, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
-  readCounts&lt;-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
-
-  ## Formatting chrom and position info
-  vcf %&lt;&gt;%
-    mutate(X.CHROM=gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)) %&gt;%
-    rename(Pos=POS) %&gt;%
-    mutate(Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)),
-           Pos=as.numeric(Pos))
-
-  readCounts %&lt;&gt;%
-    mutate(RefAlt=ifelse(SNP==&quot;&quot;,&quot;REF&quot;,&quot;ALT&quot;),
-           Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,Chrom_Cassava_v61)),
-           Pos=as.numeric(SNP_ChromPos_Cassava_v61))
-  # Add a SNPindex ------------------
-  # Add a unique value &quot;SNPindex&quot; to each SNP in the vcf and readCounts df&#39;s
-  # For readCounts, this is going to be the best way to keep track of pairs of rows. Since in many cases, multiple CloneID can point to same Chr-Pos-Alleles and it&#39;s otherwise unclear which pair of rows should go together when subsetting downstream.
-  vcf %&lt;&gt;%
-    mutate(SNPindex=1:nrow(.))
-  readCounts %&lt;&gt;%
-    mutate(SNPindex=sort(rep(1:(nrow(.)/2),2)))
-
-  readCounts %&lt;&gt;%
-    separate(AlleleID,c(&quot;tmp&quot;,&quot;Alleles&quot;),sep=-3,remove = F) %&gt;%
-    select(-tmp) %&gt;%
-    separate(Alleles,c(&quot;REF&quot;,&quot;ALT&quot;),&quot;&gt;&quot;,remove = F)
-  vcf %&lt;&gt;%
-    separate(ID,c(&quot;tmp&quot;,&quot;Alleles&quot;),sep=-3,remove = F) %&gt;%
-    select(-tmp)
-  vcf %&lt;&gt;%
-    separate(ID,c(&quot;CloneID&quot;,&quot;tmp&quot;),&quot;[|]&quot;,remove = F,extra = &#39;merge&#39;) %&gt;%
-    mutate(CloneID=as.numeric(CloneID)) %&gt;%
-    select(-tmp) %&gt;%
-    rename(AlleleID=ID)
-
-  # Add required VCF fields --------------------------
-  ## First have to do some data transformation and
-  ## create some of the meta-data fields in a VCF, e.g. QUAL, FILTER INFO.
-  readCounts %&lt;&gt;%
-    arrange(Chr,Pos,SNPindex,CloneID,AlleleID,RefAlt) %&gt;%
-    mutate(QUAL=&quot;.&quot;,
-           FILTER=&quot;.&quot;,
-           INFO=&quot;.&quot;,
-           FORMAT=&quot;GT:AD:DP:PL&quot;,
-           SNP_ID=paste0(&quot;S&quot;,Chr,&quot;_&quot;,Pos))
-  vcf %&lt;&gt;%
-    arrange(Chr,Pos,SNPindex,CloneID,AlleleID) %&gt;%
-    mutate(QUAL=&quot;.&quot;,
-           FILTER=&quot;.&quot;,
-           INFO=&quot;.&quot;,
-           FORMAT=&quot;GT:AD:DP:PL&quot;,
-           SNP_ID=paste0(&quot;S&quot;,Chr,&quot;_&quot;,Pos))
-
-  # Prune duplicate and multi-allelic sites ---------------
-  sites2keep&lt;-vcf %&gt;%
-    count(Chr,Pos) %&gt;%
-    ungroup() %&gt;%
-    filter(n==1) %&gt;%
-    select(-n) %&gt;%
-    semi_join(
-      readCounts %&gt;%
-        count(Chr,Pos) %&gt;%
-        arrange(desc(n)) %&gt;%
-        filter(n==2) %&gt;%
-        select(-n))
-  vcf %&lt;&gt;% semi_join(sites2keep)
-  readCounts %&lt;&gt;% semi_join(sites2keep)
-
-  sampleIDsFromDartVCF&lt;-colnames(vcf) %&gt;%
-    .[!. %in% c(&quot;X.CHROM&quot;,&quot;Pos&quot;,&quot;AlleleID&quot;,&quot;Alleles&quot;,&quot;REF&quot;,&quot;ALT&quot;,&quot;QUAL&quot;,&quot;FILTER&quot;,&quot;INFO&quot;,&quot;FORMAT&quot;,
-                &quot;Chr&quot;,&quot;SNPindex&quot;,&quot;CloneID&quot;,&quot;SNP_ID&quot;,&quot;SNP&quot;)]
-
-  tmp_counts &lt;-readCounts %&gt;%
-    .[,c(&quot;Chr&quot;,&quot;Pos&quot;,&quot;SNPindex&quot;,&quot;SNP_ID&quot;,
-         &quot;CloneID&quot;,&quot;AlleleID&quot;,&quot;RefAlt&quot;,&quot;Alleles&quot;,&quot;QUAL&quot;,&quot;FILTER&quot;,&quot;INFO&quot;,&quot;FORMAT&quot;,sampleIDsFromDartVCF)] %&gt;%
-    semi_join(sites2keep)
-
-  # readCounts and vcf long by sample ------------------------------
-  tmp_counts %&lt;&gt;%
-    pivot_longer(cols = all_of(sampleIDsFromDartVCF),
-                 names_to = &quot;FullSampleName&quot;,
-                 values_to = &quot;ReadCount&quot;)
-  #gather(FullSampleName,ReadCount,sampleIDsFromDartVCF)
-  tmp_counts %&lt;&gt;%
-    select(-AlleleID) %&gt;%
-    spread(RefAlt,ReadCount)
-  tmp_counts %&lt;&gt;%
-    rename(AltCount=ALT,
-           RefCount=REF)
-  vcf_long&lt;-vcf %&gt;%
-    .[,c(&quot;Chr&quot;,&quot;Pos&quot;,&quot;SNPindex&quot;,&quot;SNP_ID&quot;,
-         &quot;CloneID&quot;,&quot;Alleles&quot;,&quot;REF&quot;,&quot;ALT&quot;,&quot;QUAL&quot;,&quot;FILTER&quot;,&quot;INFO&quot;,&quot;FORMAT&quot;,sampleIDsFromDartVCF)] %&gt;%
-    pivot_longer(cols = all_of(sampleIDsFromDartVCF), names_to = &quot;FullSampleName&quot;, values_to = &quot;GT&quot;)
-  #    gather(FullSampleName,GT,sampleIDsFromDartVCF)
-
-  # Add GT from vcf to the counts -----------------------------------
-  tmp_counts %&lt;&gt;%
-    inner_join(vcf_long)
-
-  # Calc PL field  --------------------------------------------------
-  # AD+DP fields
-  ## Now we can calc DP and formate the VCF field &quot;AD&quot; (e.g. &quot;21,0&quot; for 21 reference reads and 0 alt. allele reads)
-  tmp_counts %&lt;&gt;%
-    mutate(DP=AltCount+RefCount,
-           AD=paste0(RefCount,&quot;,&quot;,AltCount))
-  tmp1&lt;-tmp_counts %&gt;%
-    filter(!is.na(AltCount),
-           !is.na(RefCount))
-  tmp&lt;-tmp1; rm(tmp1)
-
-  # Calc. genotype likelihoods ----------------------------------------
-
-  ## Genotype likelihoods calculated according to:
-  ### http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1000862#s4
-  ## Converted to Normalized Phred Scores according to:
-  ### https://gatkforums.broadinstitute.org/gatk/discussion/5913/math-notes-how-pl-is-calculated-in-haplotypecaller
-  ## Truncate low Phred probabilities (high Phred scores) to
-  ### 255 max according to TASSEL&#39;s convention (Jeff Glaubitz, pers. communication).
-
-  #ref&lt;-171; alt&lt;-171; error&lt;-0.001
-  calcPL&lt;-function(ref,alt,error=0.001){
-    # ref and alt arguments are read counts for ref and alt allele, repsectively
-    dp&lt;-ref+alt
-    # for values &gt;170, factorial() returns &#39;inf&#39;
-    # Since it means essentially 100% probability of a genotype...
-    # set DP to 169 cieling, ref/alt to equiv. allele proportions
-    if(dp&gt;=170){ ref&lt;-169*(ref/dp); alt&lt;-169*(alt/dp); dp&lt;-169 }
-    gl_RefRef&lt;-(factorial(dp)/(factorial(ref)*factorial(alt)))*(1-(0.75*error))^ref*(error/4)^(alt)
-    gl_RefAlt&lt;-(factorial(dp)/(factorial(ref)*factorial(alt)))*(0.5-(0.25*error))^(ref+alt)*(error/4)^(0)
-    gl_AltAlt&lt;-(factorial(dp)/(factorial(ref)*factorial(alt)))*(1-(0.75*error))^alt*(error/4)^(ref)
-    phredScale&lt;--10*log10(c(gl_RefRef,gl_RefAlt,gl_AltAlt))
-    minPhred&lt;-min(phredScale)
-    normPhred&lt;-round(phredScale-minPhred,0)
-    normPhred[which(normPhred&gt;=255)]&lt;-255
-    normPhred&lt;-paste0(normPhred,collapse = &quot;,&quot;)
-    if(dp==0){ normPhred&lt;-&quot;.&quot; }
-    return(normPhred)
-  }
-  require(furrr); options(mc.cores=ncores); plan(multiprocess)
-  tmp %&lt;&gt;%
-    mutate(PL=future_map2_chr(RefCount,AltCount,~calcPL(ref=.x,alt=.y)))
-
-  # Final VCF format ----------------------------------------
-  tmp %&lt;&gt;%
-    mutate(FORMATfields=paste(GT,AD,DP,PL,sep=&quot;:&quot;)) %&gt;%
-    select(Chr,Pos,SNP_ID,REF,ALT,QUAL,FILTER,INFO,FORMAT,FullSampleName,FORMATfields) %&gt;%
-    spread(FullSampleName,FORMATfields) %&gt;%
-    arrange(Chr,Pos) %&gt;%
-    rename(`#CHROM`=Chr,
-           POS=Pos,ID=SNP_ID)
-
-  # Header ----------------------------------------
-  header&lt;-c(&quot;##fileformat=VCFv4.0&quot;,
-            &quot;##FORMAT=&lt;ID=GT,Number=1,Type=String,Description=\&quot;Genotype\&quot;&gt;&quot;,
-            &quot;##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description=\&quot;Allelic depths for the reference and alternate alleles in the order listed\&quot;&gt;&quot;,
-            &quot;##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description=\&quot;Read Depth (only filtered reads used for calling)\&quot;&gt;&quot;,
-            &quot;##FORMAT=&lt;ID=PL,Number=3,Type=Float,Description=\&quot;Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\&quot;&gt;&quot;)
-
-  # Write to disk ----------------------------------------
-
-  options(&quot;scipen&quot;=1000, &quot;digits&quot;=4)
-  # for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)
-  write_lines(header,
-              path=paste0(outName,&quot;.vcf&quot;))
-  write.table(tmp,
-              paste0(outName,&quot;.vcf&quot;),
-              append = T,sep = &quot;\t&quot;,row.names=F, col.names=T, quote=F)
-  # Save sitesWithAlleles
-  tmp %&gt;%
-    rename(CHROM=`#CHROM`) %&gt;%
-    select(CHROM:ALT) %&gt;%
-    write.table(.,file=paste0(outName,&quot;.sitesWithAlleles&quot;),
-                row.names=F)
-  # Save sample list
-  write.table(sampleIDsFromDartVCF,file=paste0(outName,&quot;.samples&quot;),
-              row.names = F, col.names = F, quote = F)
-
-  # BGzip
-  system(paste0(&quot;cat &quot;,outName,&quot;.vcf &quot;,
-                &quot;| bgzip -c &gt; &quot;,outName,&quot;.vcf.gz&quot;))
-  system(paste0(&quot;rm &quot;,outName,&quot;.vcf&quot;))
-}</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>convertDart2vcf&lt;-<span class="cf">function</span>(dartvcfInput,dartcountsInput,outName,</span>
+<span id="cb3-2"><a href="#cb3-2"></a>                          <span class="dt">nskipvcf=</span><span class="dv">2</span>,<span class="dt">nskipcounts=</span><span class="dv">3</span>,ncores){</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="kw">require</span>(tidyverse); <span class="kw">require</span>(magrittr)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="co"># Read and format the counts/vcf files  -------------------</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="co">## Read in &quot;VCF&quot; (called genotypes from DArT)</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>  <span class="co">## and &quot;counts&quot; files (read counts)</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>  vcf&lt;-<span class="kw">read.table</span>(dartvcfInput,</span>
+<span id="cb3-9"><a href="#cb3-9"></a>                  <span class="dt">stringsAsFactors =</span> F,<span class="dt">skip =</span> nskipvcf, <span class="dt">header =</span> T, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>, <span class="dt">comment.char =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>  readCounts&lt;-<span class="kw">read.csv</span>(dartcountsInput, <span class="dt">stringsAsFactors =</span> F,<span class="dt">header =</span> T,<span class="dt">skip=</span>nskipcounts)</span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a>  <span class="co">## Formatting chrom and position info</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>  vcf <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">X.CHROM=</span><span class="kw">gsub</span>(<span class="st">&quot;Chromosome&quot;</span>,<span class="st">&quot;&quot;</span>,X.CHROM)) <span class="op">%&gt;%</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="st">    </span><span class="kw">rename</span>(<span class="dt">Pos=</span>POS) <span class="op">%&gt;%</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Chr=</span><span class="kw">as.numeric</span>(<span class="kw">gsub</span>(<span class="st">&quot;Chromosome&quot;</span>,<span class="st">&quot;&quot;</span>,X.CHROM)),</span>
+<span id="cb3-17"><a href="#cb3-17"></a>           <span class="dt">Pos=</span><span class="kw">as.numeric</span>(Pos))</span>
+<span id="cb3-18"><a href="#cb3-18"></a></span>
+<span id="cb3-19"><a href="#cb3-19"></a>  readCounts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">RefAlt=</span><span class="kw">ifelse</span>(SNP<span class="op">==</span><span class="st">&quot;&quot;</span>,<span class="st">&quot;REF&quot;</span>,<span class="st">&quot;ALT&quot;</span>),</span>
+<span id="cb3-21"><a href="#cb3-21"></a>           <span class="dt">Chr=</span><span class="kw">as.numeric</span>(<span class="kw">gsub</span>(<span class="st">&quot;Chromosome&quot;</span>,<span class="st">&quot;&quot;</span>,Chrom_Cassava_v61)),</span>
+<span id="cb3-22"><a href="#cb3-22"></a>           <span class="dt">Pos=</span><span class="kw">as.numeric</span>(SNP_ChromPos_Cassava_v61))</span>
+<span id="cb3-23"><a href="#cb3-23"></a>  <span class="co"># Add a SNPindex ------------------</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a>  <span class="co"># Add a unique value &quot;SNPindex&quot; to each SNP in the vcf and readCounts df&#39;s</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a>  <span class="co"># For readCounts, this is going to be the best way to keep track of pairs of rows. Since in many cases, multiple CloneID can point to same Chr-Pos-Alleles and it&#39;s otherwise unclear which pair of rows should go together when subsetting downstream.</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a>  vcf <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">SNPindex=</span><span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(.))</span>
+<span id="cb3-28"><a href="#cb3-28"></a>  readCounts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">SNPindex=</span><span class="kw">sort</span>(<span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>(<span class="kw">nrow</span>(.)<span class="op">/</span><span class="dv">2</span>),<span class="dv">2</span>)))</span>
+<span id="cb3-30"><a href="#cb3-30"></a></span>
+<span id="cb3-31"><a href="#cb3-31"></a>  readCounts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="st">    </span><span class="kw">separate</span>(AlleleID,<span class="kw">c</span>(<span class="st">&quot;tmp&quot;</span>,<span class="st">&quot;Alleles&quot;</span>),<span class="dt">sep=</span><span class="op">-</span><span class="dv">3</span>,<span class="dt">remove =</span> F) <span class="op">%&gt;%</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>tmp) <span class="op">%&gt;%</span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="st">    </span><span class="kw">separate</span>(Alleles,<span class="kw">c</span>(<span class="st">&quot;REF&quot;</span>,<span class="st">&quot;ALT&quot;</span>),<span class="st">&quot;&gt;&quot;</span>,<span class="dt">remove =</span> F)</span>
+<span id="cb3-35"><a href="#cb3-35"></a>  vcf <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="st">    </span><span class="kw">separate</span>(ID,<span class="kw">c</span>(<span class="st">&quot;tmp&quot;</span>,<span class="st">&quot;Alleles&quot;</span>),<span class="dt">sep=</span><span class="op">-</span><span class="dv">3</span>,<span class="dt">remove =</span> F) <span class="op">%&gt;%</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>tmp)</span>
+<span id="cb3-38"><a href="#cb3-38"></a>  vcf <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="st">    </span><span class="kw">separate</span>(ID,<span class="kw">c</span>(<span class="st">&quot;CloneID&quot;</span>,<span class="st">&quot;tmp&quot;</span>),<span class="st">&quot;[|]&quot;</span>,<span class="dt">remove =</span> F,<span class="dt">extra =</span> <span class="st">&#39;merge&#39;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">CloneID=</span><span class="kw">as.numeric</span>(CloneID)) <span class="op">%&gt;%</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>tmp) <span class="op">%&gt;%</span></span>
+<span id="cb3-42"><a href="#cb3-42"></a><span class="st">    </span><span class="kw">rename</span>(<span class="dt">AlleleID=</span>ID)</span>
+<span id="cb3-43"><a href="#cb3-43"></a></span>
+<span id="cb3-44"><a href="#cb3-44"></a>  <span class="co"># Add required VCF fields --------------------------</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a>  <span class="co">## First have to do some data transformation and</span></span>
+<span id="cb3-46"><a href="#cb3-46"></a>  <span class="co">## create some of the meta-data fields in a VCF, e.g. QUAL, FILTER INFO.</span></span>
+<span id="cb3-47"><a href="#cb3-47"></a>  readCounts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-48"><a href="#cb3-48"></a><span class="st">    </span><span class="kw">arrange</span>(Chr,Pos,SNPindex,CloneID,AlleleID,RefAlt) <span class="op">%&gt;%</span></span>
+<span id="cb3-49"><a href="#cb3-49"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">QUAL=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb3-50"><a href="#cb3-50"></a>           <span class="dt">FILTER=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb3-51"><a href="#cb3-51"></a>           <span class="dt">INFO=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb3-52"><a href="#cb3-52"></a>           <span class="dt">FORMAT=</span><span class="st">&quot;GT:AD:DP:PL&quot;</span>,</span>
+<span id="cb3-53"><a href="#cb3-53"></a>           <span class="dt">SNP_ID=</span><span class="kw">paste0</span>(<span class="st">&quot;S&quot;</span>,Chr,<span class="st">&quot;_&quot;</span>,Pos))</span>
+<span id="cb3-54"><a href="#cb3-54"></a>  vcf <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-55"><a href="#cb3-55"></a><span class="st">    </span><span class="kw">arrange</span>(Chr,Pos,SNPindex,CloneID,AlleleID) <span class="op">%&gt;%</span></span>
+<span id="cb3-56"><a href="#cb3-56"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">QUAL=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb3-57"><a href="#cb3-57"></a>           <span class="dt">FILTER=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb3-58"><a href="#cb3-58"></a>           <span class="dt">INFO=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb3-59"><a href="#cb3-59"></a>           <span class="dt">FORMAT=</span><span class="st">&quot;GT:AD:DP:PL&quot;</span>,</span>
+<span id="cb3-60"><a href="#cb3-60"></a>           <span class="dt">SNP_ID=</span><span class="kw">paste0</span>(<span class="st">&quot;S&quot;</span>,Chr,<span class="st">&quot;_&quot;</span>,Pos))</span>
+<span id="cb3-61"><a href="#cb3-61"></a></span>
+<span id="cb3-62"><a href="#cb3-62"></a>  <span class="co"># Prune duplicate and multi-allelic sites ---------------</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a>  sites2keep&lt;-vcf <span class="op">%&gt;%</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a><span class="st">    </span><span class="kw">count</span>(Chr,Pos) <span class="op">%&gt;%</span></span>
+<span id="cb3-65"><a href="#cb3-65"></a><span class="st">    </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></span>
+<span id="cb3-66"><a href="#cb3-66"></a><span class="st">    </span><span class="kw">filter</span>(n<span class="op">==</span><span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb3-67"><a href="#cb3-67"></a><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>n) <span class="op">%&gt;%</span></span>
+<span id="cb3-68"><a href="#cb3-68"></a><span class="st">    </span><span class="kw">semi_join</span>(</span>
+<span id="cb3-69"><a href="#cb3-69"></a>      readCounts <span class="op">%&gt;%</span></span>
+<span id="cb3-70"><a href="#cb3-70"></a><span class="st">        </span><span class="kw">count</span>(Chr,Pos) <span class="op">%&gt;%</span></span>
+<span id="cb3-71"><a href="#cb3-71"></a><span class="st">        </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n)) <span class="op">%&gt;%</span></span>
+<span id="cb3-72"><a href="#cb3-72"></a><span class="st">        </span><span class="kw">filter</span>(n<span class="op">==</span><span class="dv">2</span>) <span class="op">%&gt;%</span></span>
+<span id="cb3-73"><a href="#cb3-73"></a><span class="st">        </span><span class="kw">select</span>(<span class="op">-</span>n))</span>
+<span id="cb3-74"><a href="#cb3-74"></a>  vcf <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">semi_join</span>(sites2keep)</span>
+<span id="cb3-75"><a href="#cb3-75"></a>  readCounts <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">semi_join</span>(sites2keep)</span>
+<span id="cb3-76"><a href="#cb3-76"></a></span>
+<span id="cb3-77"><a href="#cb3-77"></a>  sampleIDsFromDartVCF&lt;-<span class="kw">colnames</span>(vcf) <span class="op">%&gt;%</span></span>
+<span id="cb3-78"><a href="#cb3-78"></a><span class="st">    </span>.[<span class="op">!</span>. <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;X.CHROM&quot;</span>,<span class="st">&quot;Pos&quot;</span>,<span class="st">&quot;AlleleID&quot;</span>,<span class="st">&quot;Alleles&quot;</span>,<span class="st">&quot;REF&quot;</span>,<span class="st">&quot;ALT&quot;</span>,<span class="st">&quot;QUAL&quot;</span>,<span class="st">&quot;FILTER&quot;</span>,<span class="st">&quot;INFO&quot;</span>,<span class="st">&quot;FORMAT&quot;</span>,</span>
+<span id="cb3-79"><a href="#cb3-79"></a>                <span class="st">&quot;Chr&quot;</span>,<span class="st">&quot;SNPindex&quot;</span>,<span class="st">&quot;CloneID&quot;</span>,<span class="st">&quot;SNP_ID&quot;</span>,<span class="st">&quot;SNP&quot;</span>)]</span>
+<span id="cb3-80"><a href="#cb3-80"></a></span>
+<span id="cb3-81"><a href="#cb3-81"></a>  tmp_counts &lt;-readCounts <span class="op">%&gt;%</span></span>
+<span id="cb3-82"><a href="#cb3-82"></a><span class="st">    </span>.[,<span class="kw">c</span>(<span class="st">&quot;Chr&quot;</span>,<span class="st">&quot;Pos&quot;</span>,<span class="st">&quot;SNPindex&quot;</span>,<span class="st">&quot;SNP_ID&quot;</span>,</span>
+<span id="cb3-83"><a href="#cb3-83"></a>         <span class="st">&quot;CloneID&quot;</span>,<span class="st">&quot;AlleleID&quot;</span>,<span class="st">&quot;RefAlt&quot;</span>,<span class="st">&quot;Alleles&quot;</span>,<span class="st">&quot;QUAL&quot;</span>,<span class="st">&quot;FILTER&quot;</span>,<span class="st">&quot;INFO&quot;</span>,<span class="st">&quot;FORMAT&quot;</span>,sampleIDsFromDartVCF)] <span class="op">%&gt;%</span></span>
+<span id="cb3-84"><a href="#cb3-84"></a><span class="st">    </span><span class="kw">semi_join</span>(sites2keep)</span>
+<span id="cb3-85"><a href="#cb3-85"></a></span>
+<span id="cb3-86"><a href="#cb3-86"></a>  <span class="co"># readCounts and vcf long by sample ------------------------------</span></span>
+<span id="cb3-87"><a href="#cb3-87"></a>  tmp_counts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-88"><a href="#cb3-88"></a><span class="st">    </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> <span class="kw">all_of</span>(sampleIDsFromDartVCF),</span>
+<span id="cb3-89"><a href="#cb3-89"></a>                 <span class="dt">names_to =</span> <span class="st">&quot;FullSampleName&quot;</span>,</span>
+<span id="cb3-90"><a href="#cb3-90"></a>                 <span class="dt">values_to =</span> <span class="st">&quot;ReadCount&quot;</span>)</span>
+<span id="cb3-91"><a href="#cb3-91"></a>  <span class="co">#gather(FullSampleName,ReadCount,sampleIDsFromDartVCF)</span></span>
+<span id="cb3-92"><a href="#cb3-92"></a>  tmp_counts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-93"><a href="#cb3-93"></a><span class="st">    </span><span class="kw">select</span>(<span class="op">-</span>AlleleID) <span class="op">%&gt;%</span></span>
+<span id="cb3-94"><a href="#cb3-94"></a><span class="st">    </span><span class="kw">spread</span>(RefAlt,ReadCount)</span>
+<span id="cb3-95"><a href="#cb3-95"></a>  tmp_counts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-96"><a href="#cb3-96"></a><span class="st">    </span><span class="kw">rename</span>(<span class="dt">AltCount=</span>ALT,</span>
+<span id="cb3-97"><a href="#cb3-97"></a>           <span class="dt">RefCount=</span>REF)</span>
+<span id="cb3-98"><a href="#cb3-98"></a>  vcf_long&lt;-vcf <span class="op">%&gt;%</span></span>
+<span id="cb3-99"><a href="#cb3-99"></a><span class="st">    </span>.[,<span class="kw">c</span>(<span class="st">&quot;Chr&quot;</span>,<span class="st">&quot;Pos&quot;</span>,<span class="st">&quot;SNPindex&quot;</span>,<span class="st">&quot;SNP_ID&quot;</span>,</span>
+<span id="cb3-100"><a href="#cb3-100"></a>         <span class="st">&quot;CloneID&quot;</span>,<span class="st">&quot;Alleles&quot;</span>,<span class="st">&quot;REF&quot;</span>,<span class="st">&quot;ALT&quot;</span>,<span class="st">&quot;QUAL&quot;</span>,<span class="st">&quot;FILTER&quot;</span>,<span class="st">&quot;INFO&quot;</span>,<span class="st">&quot;FORMAT&quot;</span>,sampleIDsFromDartVCF)] <span class="op">%&gt;%</span></span>
+<span id="cb3-101"><a href="#cb3-101"></a><span class="st">    </span><span class="kw">pivot_longer</span>(<span class="dt">cols =</span> <span class="kw">all_of</span>(sampleIDsFromDartVCF), <span class="dt">names_to =</span> <span class="st">&quot;FullSampleName&quot;</span>, <span class="dt">values_to =</span> <span class="st">&quot;GT&quot;</span>)</span>
+<span id="cb3-102"><a href="#cb3-102"></a>  <span class="co">#    gather(FullSampleName,GT,sampleIDsFromDartVCF)</span></span>
+<span id="cb3-103"><a href="#cb3-103"></a></span>
+<span id="cb3-104"><a href="#cb3-104"></a>  <span class="co"># Add GT from vcf to the counts -----------------------------------</span></span>
+<span id="cb3-105"><a href="#cb3-105"></a>  tmp_counts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-106"><a href="#cb3-106"></a><span class="st">    </span><span class="kw">inner_join</span>(vcf_long)</span>
+<span id="cb3-107"><a href="#cb3-107"></a></span>
+<span id="cb3-108"><a href="#cb3-108"></a>  <span class="co"># Calc PL field  --------------------------------------------------</span></span>
+<span id="cb3-109"><a href="#cb3-109"></a>  <span class="co"># AD+DP fields</span></span>
+<span id="cb3-110"><a href="#cb3-110"></a>  <span class="co">## Now we can calc DP and formate the VCF field &quot;AD&quot; (e.g. &quot;21,0&quot; for 21 reference reads and 0 alt. allele reads)</span></span>
+<span id="cb3-111"><a href="#cb3-111"></a>  tmp_counts <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-112"><a href="#cb3-112"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">DP=</span>AltCount<span class="op">+</span>RefCount,</span>
+<span id="cb3-113"><a href="#cb3-113"></a>           <span class="dt">AD=</span><span class="kw">paste0</span>(RefCount,<span class="st">&quot;,&quot;</span>,AltCount))</span>
+<span id="cb3-114"><a href="#cb3-114"></a>  tmp1&lt;-tmp_counts <span class="op">%&gt;%</span></span>
+<span id="cb3-115"><a href="#cb3-115"></a><span class="st">    </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(AltCount),</span>
+<span id="cb3-116"><a href="#cb3-116"></a>           <span class="op">!</span><span class="kw">is.na</span>(RefCount))</span>
+<span id="cb3-117"><a href="#cb3-117"></a>  tmp&lt;-tmp1; <span class="kw">rm</span>(tmp1)</span>
+<span id="cb3-118"><a href="#cb3-118"></a></span>
+<span id="cb3-119"><a href="#cb3-119"></a>  <span class="co"># Calc. genotype likelihoods ----------------------------------------</span></span>
+<span id="cb3-120"><a href="#cb3-120"></a></span>
+<span id="cb3-121"><a href="#cb3-121"></a>  <span class="co">## Genotype likelihoods calculated according to:</span></span>
+<span id="cb3-122"><a href="#cb3-122"></a>  <span class="co">### http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1000862#s4</span></span>
+<span id="cb3-123"><a href="#cb3-123"></a>  <span class="co">## Converted to Normalized Phred Scores according to:</span></span>
+<span id="cb3-124"><a href="#cb3-124"></a>  <span class="co">### https://gatkforums.broadinstitute.org/gatk/discussion/5913/math-notes-how-pl-is-calculated-in-haplotypecaller</span></span>
+<span id="cb3-125"><a href="#cb3-125"></a>  <span class="co">## Truncate low Phred probabilities (high Phred scores) to</span></span>
+<span id="cb3-126"><a href="#cb3-126"></a>  <span class="co">### 255 max according to TASSEL&#39;s convention (Jeff Glaubitz, pers. communication).</span></span>
+<span id="cb3-127"><a href="#cb3-127"></a></span>
+<span id="cb3-128"><a href="#cb3-128"></a>  <span class="co">#ref&lt;-171; alt&lt;-171; error&lt;-0.001</span></span>
+<span id="cb3-129"><a href="#cb3-129"></a>  calcPL&lt;-<span class="cf">function</span>(ref,alt,<span class="dt">error=</span><span class="fl">0.001</span>){</span>
+<span id="cb3-130"><a href="#cb3-130"></a>    <span class="co"># ref and alt arguments are read counts for ref and alt allele, repsectively</span></span>
+<span id="cb3-131"><a href="#cb3-131"></a>    dp&lt;-ref<span class="op">+</span>alt</span>
+<span id="cb3-132"><a href="#cb3-132"></a>    <span class="co"># for values &gt;170, factorial() returns &#39;inf&#39;</span></span>
+<span id="cb3-133"><a href="#cb3-133"></a>    <span class="co"># Since it means essentially 100% probability of a genotype...</span></span>
+<span id="cb3-134"><a href="#cb3-134"></a>    <span class="co"># set DP to 169 cieling, ref/alt to equiv. allele proportions</span></span>
+<span id="cb3-135"><a href="#cb3-135"></a>    <span class="cf">if</span>(dp<span class="op">&gt;=</span><span class="dv">170</span>){ ref&lt;-<span class="dv">169</span><span class="op">*</span>(ref<span class="op">/</span>dp); alt&lt;-<span class="dv">169</span><span class="op">*</span>(alt<span class="op">/</span>dp); dp&lt;-<span class="dv">169</span> }</span>
+<span id="cb3-136"><a href="#cb3-136"></a>    gl_RefRef&lt;-(<span class="kw">factorial</span>(dp)<span class="op">/</span>(<span class="kw">factorial</span>(ref)<span class="op">*</span><span class="kw">factorial</span>(alt)))<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>(<span class="fl">0.75</span><span class="op">*</span>error))<span class="op">^</span>ref<span class="op">*</span>(error<span class="op">/</span><span class="dv">4</span>)<span class="op">^</span>(alt)</span>
+<span id="cb3-137"><a href="#cb3-137"></a>    gl_RefAlt&lt;-(<span class="kw">factorial</span>(dp)<span class="op">/</span>(<span class="kw">factorial</span>(ref)<span class="op">*</span><span class="kw">factorial</span>(alt)))<span class="op">*</span>(<span class="fl">0.5</span><span class="op">-</span>(<span class="fl">0.25</span><span class="op">*</span>error))<span class="op">^</span>(ref<span class="op">+</span>alt)<span class="op">*</span>(error<span class="op">/</span><span class="dv">4</span>)<span class="op">^</span>(<span class="dv">0</span>)</span>
+<span id="cb3-138"><a href="#cb3-138"></a>    gl_AltAlt&lt;-(<span class="kw">factorial</span>(dp)<span class="op">/</span>(<span class="kw">factorial</span>(ref)<span class="op">*</span><span class="kw">factorial</span>(alt)))<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>(<span class="fl">0.75</span><span class="op">*</span>error))<span class="op">^</span>alt<span class="op">*</span>(error<span class="op">/</span><span class="dv">4</span>)<span class="op">^</span>(ref)</span>
+<span id="cb3-139"><a href="#cb3-139"></a>    phredScale&lt;-<span class="op">-</span><span class="dv">10</span><span class="op">*</span><span class="kw">log10</span>(<span class="kw">c</span>(gl_RefRef,gl_RefAlt,gl_AltAlt))</span>
+<span id="cb3-140"><a href="#cb3-140"></a>    minPhred&lt;-<span class="kw">min</span>(phredScale)</span>
+<span id="cb3-141"><a href="#cb3-141"></a>    normPhred&lt;-<span class="kw">round</span>(phredScale<span class="op">-</span>minPhred,<span class="dv">0</span>)</span>
+<span id="cb3-142"><a href="#cb3-142"></a>    normPhred[<span class="kw">which</span>(normPhred<span class="op">&gt;=</span><span class="dv">255</span>)]&lt;-<span class="dv">255</span></span>
+<span id="cb3-143"><a href="#cb3-143"></a>    normPhred&lt;-<span class="kw">paste0</span>(normPhred,<span class="dt">collapse =</span> <span class="st">&quot;,&quot;</span>)</span>
+<span id="cb3-144"><a href="#cb3-144"></a>    <span class="cf">if</span>(dp<span class="op">==</span><span class="dv">0</span>){ normPhred&lt;-<span class="st">&quot;.&quot;</span> }</span>
+<span id="cb3-145"><a href="#cb3-145"></a>    <span class="kw">return</span>(normPhred)</span>
+<span id="cb3-146"><a href="#cb3-146"></a>  }</span>
+<span id="cb3-147"><a href="#cb3-147"></a>  <span class="kw">require</span>(furrr); <span class="kw">options</span>(<span class="dt">mc.cores=</span>ncores); <span class="kw">plan</span>(multiprocess)</span>
+<span id="cb3-148"><a href="#cb3-148"></a>  tmp <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-149"><a href="#cb3-149"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">PL=</span><span class="kw">future_map2_chr</span>(RefCount,AltCount,<span class="op">~</span><span class="kw">calcPL</span>(<span class="dt">ref=</span>.x,<span class="dt">alt=</span>.y)))</span>
+<span id="cb3-150"><a href="#cb3-150"></a></span>
+<span id="cb3-151"><a href="#cb3-151"></a>  <span class="co"># Final VCF format ----------------------------------------</span></span>
+<span id="cb3-152"><a href="#cb3-152"></a>  tmp <span class="op">%&lt;&gt;%</span></span>
+<span id="cb3-153"><a href="#cb3-153"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">FORMATfields=</span><span class="kw">paste</span>(GT,AD,DP,PL,<span class="dt">sep=</span><span class="st">&quot;:&quot;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb3-154"><a href="#cb3-154"></a><span class="st">    </span><span class="kw">select</span>(Chr,Pos,SNP_ID,REF,ALT,QUAL,FILTER,INFO,FORMAT,FullSampleName,FORMATfields) <span class="op">%&gt;%</span></span>
+<span id="cb3-155"><a href="#cb3-155"></a><span class="st">    </span><span class="kw">spread</span>(FullSampleName,FORMATfields) <span class="op">%&gt;%</span></span>
+<span id="cb3-156"><a href="#cb3-156"></a><span class="st">    </span><span class="kw">arrange</span>(Chr,Pos) <span class="op">%&gt;%</span></span>
+<span id="cb3-157"><a href="#cb3-157"></a><span class="st">    </span><span class="kw">rename</span>(<span class="st">`</span><span class="dt">#CHROM</span><span class="st">`</span>=Chr,</span>
+<span id="cb3-158"><a href="#cb3-158"></a>           <span class="dt">POS=</span>Pos,<span class="dt">ID=</span>SNP_ID)</span>
+<span id="cb3-159"><a href="#cb3-159"></a></span>
+<span id="cb3-160"><a href="#cb3-160"></a>  <span class="co"># Header ----------------------------------------</span></span>
+<span id="cb3-161"><a href="#cb3-161"></a>  header&lt;-<span class="kw">c</span>(<span class="st">&quot;##fileformat=VCFv4.0&quot;</span>,</span>
+<span id="cb3-162"><a href="#cb3-162"></a>            <span class="st">&quot;##FORMAT=&lt;ID=GT,Number=1,Type=String,Description=</span><span class="ch">\&quot;</span><span class="st">Genotype</span><span class="ch">\&quot;</span><span class="st">&gt;&quot;</span>,</span>
+<span id="cb3-163"><a href="#cb3-163"></a>            <span class="st">&quot;##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description=</span><span class="ch">\&quot;</span><span class="st">Allelic depths for the reference and alternate alleles in the order listed</span><span class="ch">\&quot;</span><span class="st">&gt;&quot;</span>,</span>
+<span id="cb3-164"><a href="#cb3-164"></a>            <span class="st">&quot;##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description=</span><span class="ch">\&quot;</span><span class="st">Read Depth (only filtered reads used for calling)</span><span class="ch">\&quot;</span><span class="st">&gt;&quot;</span>,</span>
+<span id="cb3-165"><a href="#cb3-165"></a>            <span class="st">&quot;##FORMAT=&lt;ID=PL,Number=3,Type=Float,Description=</span><span class="ch">\&quot;</span><span class="st">Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic</span><span class="ch">\&quot;</span><span class="st">&gt;&quot;</span>)</span>
+<span id="cb3-166"><a href="#cb3-166"></a></span>
+<span id="cb3-167"><a href="#cb3-167"></a>  <span class="co"># Write to disk ----------------------------------------</span></span>
+<span id="cb3-168"><a href="#cb3-168"></a></span>
+<span id="cb3-169"><a href="#cb3-169"></a>  <span class="kw">options</span>(<span class="st">&quot;scipen&quot;</span>=<span class="dv">1000</span>, <span class="st">&quot;digits&quot;</span>=<span class="dv">4</span>)</span>
+<span id="cb3-170"><a href="#cb3-170"></a>  <span class="co"># for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)</span></span>
+<span id="cb3-171"><a href="#cb3-171"></a>  <span class="kw">write_lines</span>(header,</span>
+<span id="cb3-172"><a href="#cb3-172"></a>              <span class="dt">path=</span><span class="kw">paste0</span>(outName,<span class="st">&quot;.vcf&quot;</span>))</span>
+<span id="cb3-173"><a href="#cb3-173"></a>  <span class="kw">write.table</span>(tmp,</span>
+<span id="cb3-174"><a href="#cb3-174"></a>              <span class="kw">paste0</span>(outName,<span class="st">&quot;.vcf&quot;</span>),</span>
+<span id="cb3-175"><a href="#cb3-175"></a>              <span class="dt">append =</span> T,<span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>,<span class="dt">row.names=</span>F, <span class="dt">col.names=</span>T, <span class="dt">quote=</span>F)</span>
+<span id="cb3-176"><a href="#cb3-176"></a>  <span class="co"># Save sitesWithAlleles</span></span>
+<span id="cb3-177"><a href="#cb3-177"></a>  tmp <span class="op">%&gt;%</span></span>
+<span id="cb3-178"><a href="#cb3-178"></a><span class="st">    </span><span class="kw">rename</span>(<span class="dt">CHROM=</span><span class="st">`</span><span class="dt">#CHROM</span><span class="st">`</span>) <span class="op">%&gt;%</span></span>
+<span id="cb3-179"><a href="#cb3-179"></a><span class="st">    </span><span class="kw">select</span>(CHROM<span class="op">:</span>ALT) <span class="op">%&gt;%</span></span>
+<span id="cb3-180"><a href="#cb3-180"></a><span class="st">    </span><span class="kw">write.table</span>(.,<span class="dt">file=</span><span class="kw">paste0</span>(outName,<span class="st">&quot;.sitesWithAlleles&quot;</span>),</span>
+<span id="cb3-181"><a href="#cb3-181"></a>                <span class="dt">row.names=</span>F)</span>
+<span id="cb3-182"><a href="#cb3-182"></a>  <span class="co"># Save sample list</span></span>
+<span id="cb3-183"><a href="#cb3-183"></a>  <span class="kw">write.table</span>(sampleIDsFromDartVCF,<span class="dt">file=</span><span class="kw">paste0</span>(outName,<span class="st">&quot;.samples&quot;</span>),</span>
+<span id="cb3-184"><a href="#cb3-184"></a>              <span class="dt">row.names =</span> F, <span class="dt">col.names =</span> F, <span class="dt">quote =</span> F)</span>
+<span id="cb3-185"><a href="#cb3-185"></a></span>
+<span id="cb3-186"><a href="#cb3-186"></a>  <span class="co"># BGzip</span></span>
+<span id="cb3-187"><a href="#cb3-187"></a>  <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;cat &quot;</span>,outName,<span class="st">&quot;.vcf &quot;</span>,</span>
+<span id="cb3-188"><a href="#cb3-188"></a>                <span class="st">&quot;| bgzip -c &gt; &quot;</span>,outName,<span class="st">&quot;.vcf.gz&quot;</span>))</span>
+<span id="cb3-189"><a href="#cb3-189"></a>  <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;rm &quot;</span>,outName,<span class="st">&quot;.vcf&quot;</span>))</span>
+<span id="cb3-190"><a href="#cb3-190"></a>}</span></code></pre></div>
 </div>
 <div id="run-conversion-function" class="section level1">
 <h1>Run conversion function</h1>
-<pre class="r"><code>source(here::here(&quot;code/&quot;,&quot;convertDart2vcf.R&quot;))
-convertDart2vcf(dartvcfInput,dartcountsInput,outName,
-                nskipvcf=2,nskipcounts=3,ncores)</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">source</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;code/&quot;</span>,<span class="st">&quot;convertDart2vcf.R&quot;</span>))</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">convertDart2vcf</span>(dartvcfInput,dartcountsInput,outName,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>                <span class="dt">nskipvcf=</span><span class="dv">2</span>,<span class="dt">nskipcounts=</span><span class="dv">3</span>,ncores)</span></code></pre></div>
 </div>
 <div id="genomewide-to-per-chrom-vcfs" class="section level1">
 <h1>Genomewide to per-chrom VCFs</h1>
 <p>Split the genome-wide VCF into per-chromosome VCFs for imputation.</p>
-<pre class="r"><code>require(furrr); options(mc.cores=18); plan(multiprocess)
-source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
-
-vcfIn&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;DCas20_5360.vcf.gz&quot;)
-filters&lt;-&quot;--minDP 4 --maxDP 50&quot; # because using GT not PL for impute (Beagle5)
-outPath&lt;-here::here(&quot;data/Report-DCas20-5360/&quot;)
-outSuffix&lt;-&quot;DCas20_5360&quot;
-
-future_map(1:18,
-           ~splitVCFbyChr(Chr=.,
-                          vcfIn=vcfIn,filters=filters,
-                          outPath=outPath,outSuffix=outSuffix))</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">require</span>(furrr); <span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>); <span class="kw">plan</span>(multiprocess)</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">source</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;code&quot;</span>,<span class="st">&quot;imputationFunctions.R&quot;</span>))</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a>vcfIn&lt;-here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/Report-DCas20-5360&quot;</span>,<span class="st">&quot;DCas20_5360.vcf.gz&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5"></a>filters&lt;-<span class="st">&quot;--minDP 4 --maxDP 50&quot;</span> <span class="co"># because using GT not PL for impute (Beagle5)</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>outPath&lt;-here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data/Report-DCas20-5360/&quot;</span>)</span>
+<span id="cb5-7"><a href="#cb5-7"></a>outSuffix&lt;-<span class="st">&quot;DCas20_5360&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="kw">future_map</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">18</span>,</span>
+<span id="cb5-10"><a href="#cb5-10"></a>           <span class="op">~</span><span class="kw">splitVCFbyChr</span>(<span class="dt">Chr=</span>.,</span>
+<span id="cb5-11"><a href="#cb5-11"></a>                          <span class="dt">vcfIn=</span>vcfIn,<span class="dt">filters=</span>filters,</span>
+<span id="cb5-12"><a href="#cb5-12"></a>                          <span class="dt">outPath=</span>outPath,<span class="dt">outSuffix=</span>outSuffix))</span></code></pre></div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -907,7 +1094,7 @@ future_map(1:18,
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
-<pre class="r"><code>sessionInfo()</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
 <pre><code>R version 4.0.2 (2020-06-22)
 Platform: x86_64-apple-darwin17.0 (64-bit)
 Running under: macOS Mojave 10.14.6
@@ -952,6 +1139,8 @@ footer is added to webpages before the MathJax javascript. -->
 </script>
 
 
+</div>
+</div>
 
 </div>
 
@@ -984,6 +1173,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
