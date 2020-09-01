@@ -1,13 +1,12 @@
 ---
 title: "Convert DCas20-5360 to VCF"
 site: workflowr::wflow_site
-author: "Marnin Wolfe"
 date: "2020-August-26"
-output: 
-  workflowr::wflow_html:
+output: workflowr::wflow_html
 editor_options:
   chunk_output_type: inline
 ---
+
 
 # Input Parameters
 ```{r, eval=F}
