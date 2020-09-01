@@ -13,7 +13,6 @@ This repository and website documents all analyses, summary, tables and figures 
 
 # Analyses
 
-
 **Imputation conducted in 2019:** Imputation of the L. America reference panel (GBS+DArTseqLD) and EMBRAPA GS C1 (DArTseqLD only) was done in October 2019. The codes for 2019 imputation were never published in a Git repository, though they were shared internally. The 2019 imputed VCFs will serve as imputation reference panel for 2020. Therefore, I am publishing the 2019 codes here _as is_ for reference.
 
   * [Convert DCas19-4403 report to VCF for imputation](convertDCas19_4403_ToVCF_102419.html): The report DCas19_4403 was converted to VCF and then included in the ImputationReferencePanel VCF and imputed along with the GBS/GBS+DArT samples.
@@ -56,9 +55,11 @@ The R package **workflowr** was used to document this study reproducibly.
 
 Much of the supporting data _and_ output from the analyses documented here are too large for GitHub. 
 
-The repository will be mirrored, here:  [ftp://ftp.cassavabase.org/marnin_datasets/](ftp://ftp.cassavabase.org/marnin_datasets/) with all data.
+The repository will be mirrored, here:  [ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/](ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/) with all data.
 
 # Directory structure of this repository
+
+**NOTICE:** `data/` and `output/` are empty on GitHub. Please see [ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/](ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/) for access.
 
 1. `data/`: raw data (e.g. unimputed SNP data)
 2. `output/`: outputs (e.g. imputed SNP data)
