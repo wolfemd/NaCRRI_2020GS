@@ -23,6 +23,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -333,7 +335,13 @@ $(document).ready(function () {
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/wolfemd/EMBRAPA_2020GS">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -370,7 +378,7 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-08-26
+<strong>Last updated:</strong> 2020-09-01
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -461,16 +469,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongbcd83b4"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> bcd83b4 </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStree6e27397c0be45b378cfb6a9c538ecd02f711b285targetblank6e27397a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/6e27397c0be45b378cfb6a9c538ecd02f711b285" target="_blank">6e27397</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongbcd83b4" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStree6e27397c0be45b378cfb6a9c538ecd02f711b285targetblank6e27397a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version bcd83b4. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/6e27397c0be45b378cfb6a9c538ecd02f711b285" target="_blank">6e27397</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -478,12 +486,15 @@ Note that you need to be careful to ensure that all relevant files for the analy
 <pre><code>
 Ignored files:
     Ignored:    .DS_Store
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
 
 Untracked files:
+    Untracked:  data/OrderAppendix_1_DCas20-5360/
     Untracked:  data/Report-DCas20-5360/
+    Untracked:  workflowr_log.R
 
 </code></pre>
 <p>
@@ -527,7 +538,58 @@ Message
 Rmd
 </td>
 <td>
-bcd83b4
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/6e27397c0be45b378cfb6a9c538ecd02f711b285/analysis/convertDCas20_5360_ToVCF.Rmd" target="_blank">6e27397</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-09-01
+</td>
+<td>
+EMBRAPA C2 has been imputed. Publish report and share to cassavabase
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/580efbc01bcf56fa84bf7caf3b0185591831dc62/analysis/convertDCas20_5360_ToVCF.Rmd" target="_blank">580efbc</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-08-30
+</td>
+<td>
+No longer need to rename VCF columns using readCounts thanks to new file from DArT.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/wolfemd/EMBRAPA_2020GS/ed70a5a88793ea93d4c2dd1e53323bbf076f84d3/docs/convertDCas20_5360_ToVCF.html" target="_blank">ed70a5a</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-08-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/bcd83b41fd6b0dc290c25ef0eab82d306d1f24ea/analysis/convertDCas20_5360_ToVCF.Rmd" target="_blank">bcd83b4</a>
 </td>
 <td>
 wolfemd
@@ -544,7 +606,7 @@ Initial publish (prior to running imputation). Debugging will be
 Rmd
 </td>
 <td>
-9d4dfab
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/9d4dfab83e5211b61386ae5ee55aa7abff8a3b86/analysis/convertDCas20_5360_ToVCF.Rmd" target="_blank">9d4dfab</a>
 </td>
 <td>
 wolfemd
@@ -574,22 +636,15 @@ Code organized into functions. Ready to run imputation of C2?
 #&#39; @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file
 
 library(tidyverse); library(magrittr)
-dartvcfInput&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;Report_DCas20-5360_SNP_VCF_Version_6.csv&quot;)
-dartcountsInput&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;Report_DCas20-5360_SNP_Counts_Version_6_final.csv&quot;)
+dartvcfInput&lt;-here::here(&quot;data/OrderAppendix_1_DCas20-5360&quot;,&quot;Report_5360_coanalysis_version6_VCF.txt&quot;)
+dartcountsInput&lt;-here::here(&quot;data/OrderAppendix_1_DCas20-5360&quot;,&quot;Report_5360_coanalysis_counts.csv&quot;)
 outName&lt;-here::here(&quot;data/Report-DCas20-5360&quot;,&quot;DCas20_5360&quot;)
 
 # From report to report, there has been minor (NOT SO MINOR?) variation
 # in format among files, requiring user input
-# rather frustrating
-# can&#39;t pipeline their stuff
 nskipvcf&lt;-2 
 nskipcounts&lt;-3
-ncores&lt;-75
-dartVars&lt;-read.csv(dartcountsInput, 
-                   stringsAsFactors = F,
-                   header = T,
-                   skip=nskipcounts,
-                   nrows = 1) %&gt;% colnames(.) %&gt;% .[1:26] </code></pre>
+ncores&lt;-10</code></pre>
 </div>
 <div id="prelim.-check-format" class="section level1">
 <h1>Prelim. check format</h1>
@@ -598,63 +653,37 @@ dartVars&lt;-read.csv(dartcountsInput,
                 stringsAsFactors = F,skip = nskipvcf, header = T, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
 readCounts&lt;-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
 
-# dim(vcf) 
+dim(vcf)
 # [1] 13603  3749
-# dim(readCounts) 
-# [1] 27206  4105
+dim(readCounts)
+# [1] 27206  3765
 
-# colnames(readCounts)[1:100]
- # [1] &quot;AlleleID&quot;                    &quot;CloneID&quot;                    
+colnames(readCounts)[1:100]
+ #  [1] &quot;AlleleID&quot;                    &quot;CloneID&quot;                    
  #  [3] &quot;AlleleSequence&quot;              &quot;TrimmedSequence&quot;            
  #  [5] &quot;TrimmedSequence_plus_Strand&quot; &quot;Chrom_Cassava_v61&quot;          
  #  [7] &quot;ChromPos_Cassava_v61&quot;        &quot;SNP_ChromPos_Cassava_v61&quot;   
  #  [9] &quot;AlnCnt_Cassava_v61&quot;          &quot;AlnEvalue_Cassava_v61&quot;      
- # [11] &quot;Strand_Cassava_v61&quot;          &quot;SeqDiff_Cassava_v61&quot;        
- # [13] &quot;SNP&quot;                         &quot;SnpPosition.on.Tag&quot;         
- # [15] &quot;CallRate&quot;                    &quot;OneRatioRef&quot;                
- # [17] &quot;OneRatioSnp&quot;                 &quot;FreqHomRef&quot;                 
- # [19] &quot;FreqHomSnp&quot;                  &quot;FreqHets&quot;                   
- # [21] &quot;PICRef&quot;                      &quot;PICSnp&quot;                     
- # [23] &quot;AvgPIC&quot;                      &quot;AvgCountRef&quot;                
- # [25] &quot;AvgCountSnp&quot;                 &quot;RepAvg&quot;                     
- # [27] &quot;X9624.09&quot;                    &quot;BGM.0004&quot; 
- # [29] &quot;BGM.0005&quot;                    &quot;BGM.0006&quot;                   
- # [31] &quot;BGM.0014&quot;                    &quot;BGM.0018&quot;                   
- # [33] &quot;BGM.0019&quot;                    &quot;BGM.0020&quot;                   
- # [35] &quot;BGM.0021&quot;                    &quot;BGM.0022&quot;                   
- # [37] &quot;BGM.0023&quot;                    &quot;BGM.0024&quot; 
-# colnames(vcf)[1:30]
-#  [1] &quot;X.CHROM&quot;            &quot;POS&quot;                &quot;ID&quot;                
-#  [4] &quot;REF&quot;                &quot;ALT&quot;                &quot;QUAL&quot;              
-#  [7] &quot;FILTER&quot;             &quot;INFO&quot;               &quot;FORMAT&quot;            
-# [10] &quot;X911118200001_A_1&quot;  &quot;X911118200001_A_10&quot; &quot;X911118200001_A_11&quot;
-# [13] &quot;X911118200001_A_12&quot; &quot;X911118200001_A_2&quot;  &quot;X911118200001_A_3&quot; 
-# [16] &quot;X911118200001_A_4&quot;  &quot;X911118200001_A_5&quot;  &quot;X911118200001_A_6&quot; 
-# [19] &quot;X911118200001_A_7&quot;  &quot;X911118200001_A_8&quot;  &quot;X911118200001_A_9&quot; 
-# [22] &quot;X911118200001_B_1&quot;  &quot;X911118200001_B_10&quot; &quot;X911118200001_B_11&quot;
-# [25] &quot;X911118200001_B_12&quot; &quot;X911118200001_B_2&quot;  &quot;X911118200001_B_3&quot; 
-# [28] &quot;X911118200001_B_4&quot;  &quot;X911118200001_B_5&quot;  &quot;X911118200001_B_6&quot; 
-
-
-colnames(vcf)[10:length(colnames(vcf))]&lt;-colnames(readCounts)[length(dartVars):length(colnames(readCounts))]
-
-vcf %&lt;&gt;% 
-    mutate(X.CHROM=gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)) %&gt;% 
-    rename(Pos=POS) %&gt;% 
-    mutate(Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,X.CHROM)),
-           Pos=as.numeric(Pos)) 
-
-
-# dim(readCounts)
-# readCounts %&gt;% .[,1:30] %&gt;% str
-# readCounts[1:5,1:30]
-# readCounts[1:10,] %&gt;% select(SNP,CloneID,AlleleID,Chrom_Cassava_v61,SNP_ChromPos_Cassava_v61)
-# vcf[1:10,1:5]
-# Note: The ID column in &quot;vcf&quot; is the value for the ALT allele in AlleleID of &quot;readCounts&quot;
-readCounts %&lt;&gt;% 
-  mutate(RefAlt=ifelse(SNP==&quot;&quot;,&quot;REF&quot;,&quot;ALT&quot;),
-         Chr=as.numeric(gsub(&quot;Chromosome&quot;,&quot;&quot;,Chrom_Cassava_v61)),
-         Pos=as.numeric(SNP_ChromPos_Cassava_v61))</code></pre>
+ # [11] &quot;Strand_Cassava_v61&quot;          &quot;SNP&quot;                        
+ # [13] &quot;SnpPosition&quot;                 &quot;CallRate&quot;                   
+ # [15] &quot;OneRatioRef&quot;                 &quot;OneRatioSnp&quot;                
+ # [17] &quot;FreqHomRef&quot;                  &quot;FreqHomSnp&quot;                 
+ # [19] &quot;FreqHets&quot;                    &quot;PICRef&quot;                     
+ # [21] &quot;PICSnp&quot;                      &quot;AvgPIC&quot;                     
+ # [23] &quot;AvgCountRef&quot;                 &quot;AvgCountSnp&quot;                
+ # [25] &quot;RepAvg&quot;                      &quot;X9624.09&quot;                   
+ # [27] &quot;BGM.0004&quot;                    &quot;BGM.0005&quot;                   
+ # [29] &quot;BGM.0006&quot;                    &quot;BGM.0014&quot;                   
+ # [31] &quot;BGM.0018&quot;                    &quot;BGM.0019&quot;                   
+ # [33] &quot;BGM.0020&quot;                    &quot;BGM.0021&quot;                   
+ # [35] &quot;BGM.0022&quot;                    &quot;BGM.0023&quot; 
+colnames(vcf)[1:30]
+#  [1] &quot;X.CHROM&quot;  &quot;POS&quot;      &quot;ID&quot;       &quot;REF&quot;      &quot;ALT&quot;      &quot;QUAL&quot;    
+#  [7] &quot;FILTER&quot;   &quot;INFO&quot;     &quot;FORMAT&quot;   &quot;X9624.09&quot; &quot;BGM.0022&quot; &quot;BGM.0023&quot;
+# [13] &quot;BGM.0024&quot; &quot;BGM.0004&quot; &quot;BGM.0005&quot; &quot;BGM.0006&quot; &quot;BGM.0014&quot; &quot;BGM.0018&quot;
+# [19] &quot;BGM.0019&quot; &quot;BGM.0020&quot; &quot;BGM.0021&quot; &quot;BGM.0025&quot; &quot;BGM.0040&quot; &quot;BGM.0042&quot;
+# [25] &quot;BGM.0044&quot; &quot;BGM.0027&quot; &quot;BGM.0028&quot; &quot;BGM.0029&quot; &quot;BGM.0030&quot; &quot;BGM.0032&quot;</code></pre>
+<p>Everything checks out!</p>
 </div>
 <div id="conversion-function" class="section level1">
 <h1>Conversion function</h1>
@@ -669,10 +698,6 @@ readCounts %&lt;&gt;%
   vcf&lt;-read.table(dartvcfInput,
                   stringsAsFactors = F,skip = nskipvcf, header = T, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
   readCounts&lt;-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
-
-  ## Liftover the sampleIDs from readCounts onto the VCF
-
-  colnames(vcf)[10:length(colnames(vcf))]&lt;-colnames(readCounts)[length(dartVars):length(colnames(readCounts))]
 
   ## Formatting chrom and position info
   vcf %&lt;&gt;%
@@ -871,10 +896,10 @@ filters&lt;-&quot;--minDP 4 --maxDP 50&quot; # because using GT not PL for imput
 outPath&lt;-here::here(&quot;data/Report-DCas20-5360/&quot;)
 outSuffix&lt;-&quot;DCas20_5360&quot;
 
-future_map(list(Chr=1:18),
-           ~splitVCFbyChr(Chr=.),
-           vcfIn=vcfIn,filters=filters,
-           outPath=outPath,outSuffix=outSuffix)</code></pre>
+future_map(1:18,
+           ~splitVCFbyChr(Chr=.,
+                          vcfIn=vcfIn,filters=filters,
+                          outPath=outPath,outSuffix=outSuffix))</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -901,14 +926,15 @@ other attached packages:
 [1] workflowr_1.6.2
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.5      whisker_0.4     knitr_1.29      magrittr_1.5   
- [5] here_0.1        R6_2.4.1        rlang_0.4.7     stringr_1.4.0  
- [9] tools_4.0.2     xfun_0.16       git2r_0.27.1    htmltools_0.5.0
-[13] ellipsis_0.3.1  yaml_2.2.1      digest_0.6.25   rprojroot_1.3-2
-[17] tibble_3.0.3    lifecycle_0.2.0 crayon_1.3.4    later_1.1.0.1  
-[21] vctrs_0.3.2     promises_1.1.1  fs_1.5.0        glue_1.4.1     
-[25] evaluate_0.14   rmarkdown_2.3   stringi_1.4.6   compiler_4.0.2 
-[29] pillar_1.4.6    backports_1.1.8 httpuv_1.5.4    pkgconfig_2.0.3</code></pre>
+ [1] Rcpp_1.0.5      rstudioapi_0.11 whisker_0.4     knitr_1.29     
+ [5] magrittr_1.5    here_0.1        R6_2.4.1        rlang_0.4.7    
+ [9] stringr_1.4.0   tools_4.0.2     xfun_0.16       git2r_0.27.1   
+[13] htmltools_0.5.0 ellipsis_0.3.1  rprojroot_1.3-2 yaml_2.2.1     
+[17] digest_0.6.25   tibble_3.0.3    lifecycle_0.2.0 crayon_1.3.4   
+[21] later_1.1.0.1   vctrs_0.3.2     promises_1.1.1  fs_1.5.0       
+[25] glue_1.4.1      evaluate_0.14   rmarkdown_2.3   stringi_1.4.6  
+[29] compiler_4.0.2  pillar_1.4.6    backports_1.1.9 httpuv_1.5.4   
+[33] pkgconfig_2.0.3</code></pre>
 </div>
 </div>
 

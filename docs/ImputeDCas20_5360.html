@@ -23,6 +23,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -333,7 +335,13 @@ $(document).ready(function () {
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/wolfemd/EMBRAPA_2020GS">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -370,7 +378,7 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-08-26
+<strong>Last updated:</strong> 2020-09-01
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -461,16 +469,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongbcd83b4"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> bcd83b4 </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStree6e27397c0be45b378cfb6a9c538ecd02f711b285targetblank6e27397a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/6e27397c0be45b378cfb6a9c538ecd02f711b285" target="_blank">6e27397</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongbcd83b4" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStree6e27397c0be45b378cfb6a9c538ecd02f711b285targetblank6e27397a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version bcd83b4. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/6e27397c0be45b378cfb6a9c538ecd02f711b285" target="_blank">6e27397</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -478,12 +486,15 @@ Note that you need to be careful to ensure that all relevant files for the analy
 <pre><code>
 Ignored files:
     Ignored:    .DS_Store
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
 
 Untracked files:
+    Untracked:  data/OrderAppendix_1_DCas20-5360/
     Untracked:  data/Report-DCas20-5360/
+    Untracked:  workflowr_log.R
 
 </code></pre>
 <p>
@@ -527,7 +538,41 @@ Message
 Rmd
 </td>
 <td>
-bcd83b4
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/6e27397c0be45b378cfb6a9c538ecd02f711b285/analysis/ImputeDCas20_5360.Rmd" target="_blank">6e27397</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-09-01
+</td>
+<td>
+EMBRAPA C2 has been imputed. Publish report and share to cassavabase
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/wolfemd/EMBRAPA_2020GS/ed70a5a88793ea93d4c2dd1e53323bbf076f84d3/docs/ImputeDCas20_5360.html" target="_blank">ed70a5a</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-08-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/bcd83b41fd6b0dc290c25ef0eab82d306d1f24ea/analysis/ImputeDCas20_5360.Rmd" target="_blank">bcd83b4</a>
 </td>
 <td>
 wolfemd
@@ -544,7 +589,7 @@ Initial publish (prior to running imputation). Debugging will be
 Rmd
 </td>
 <td>
-9d4dfab
+<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/9d4dfab83e5211b61386ae5ee55aa7abff8a3b86/analysis/ImputeDCas20_5360.Rmd" target="_blank">9d4dfab</a>
 </td>
 <td>
 wolfemd
@@ -575,8 +620,11 @@ Code organized into functions. Ready to run imputation of C2?
 <div id="impute-embrapa-gs-c2" class="section level1">
 <h1>Impute EMBRAPA GS C2</h1>
 <p>Copy the imputation reference panel from 2019 to the <code>data/</code> folder.</p>
-<pre class="bash"><code>cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz /workdir/EMBRAPA_2020GS/data/
-cp -r /home/jj332_cas/CassavaGenotypeData/CassavaGeneticMap /workdir/EMBRAPA_2020GS/data/</code></pre>
+<pre class="bash"><code>cp /home/jj332_cas/marnin/EMBRAPA_2020GS /workdir/mw489/
+cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz /workdir/mw489/EMBRAPA_2020GS/data/
+cp -r /home/jj332_cas/marnin/EMBRAPA_2020GS/code /workdir/mw489/EMBRAPA_2020GS/
+cp -r /home/jj332_cas/CassavaGenotypeData/CassavaGeneticMap /workdir/mw489/EMBRAPA_2020GS/data/
+cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_EMBRAPA_C1progeny_FromDCas19_4301_*  /workdir/mw489/EMBRAPA_2020GS/data/ </code></pre>
 <div id="refpanel-exclude-c1" class="section level2">
 <h2>RefPanel: Exclude C1</h2>
 <p>Impute with <a href="https://faculty.washington.edu/browning/beagle/b5_0.html">Beagle V5.0</a>.</p>
@@ -587,44 +635,267 @@ cp -r /home/jj332_cas/CassavaGenotypeData/CassavaGeneticMap /workdir/EMBRAPA_202
 refVCFpath&lt;-here::here(&quot;data/&quot;)
 mapPath&lt;-here::here(&quot;data/CassavaGeneticMap/&quot;)
 outPath&lt;-here::here(&quot;output/&quot;)
+samplesToExclude&lt;-here::here(&quot;data&quot;,&quot;samplesToExclude.txt&quot;)
 outSuffix&lt;-&quot;DCas20_5360&quot;</code></pre>
-<pre class="r"><code>source(imputationFunctions.R)
+<p>Found a sample “A.Preto.joselito” in target VCF that is already in the refpanel, so I must exclude it. Created a file <code>data/samplesToExclude.txt</code> to give to Beagle.</p>
+<pre class="bash"><code>bcftools query \
+  --list-samples /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz &gt; /home/jj332_cas/marnin/EMBRAPA_2020GS/data/chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.samples</code></pre>
+<pre class="r"><code>refpanel_samples&lt;-read.table(here::here(&quot;data&quot;,&quot;chr1_ImputationReferencePanel_EMBRAPA_Phased_102619.samples&quot;), 
+                             header=F, stringsAsFactors = F)$V1
+target_samples&lt;-read.table(here::here(&quot;data/Report-DCas20-5360/&quot;,&quot;DCas20_5360.samples&quot;), 
+                             header=F, stringsAsFactors = F)$V1
+samplesToExclude&lt;-target_samples[target_samples %in% refpanel_samples]
+length(samplesToExclude) # [1] 644
+write.table(samplesToExclude,file=here::here(&quot;data&quot;,&quot;samplesToExclude.txt&quot;),row.names = F, col.names = F, quote = F)</code></pre>
+<div id="impute-c2" class="section level3">
+<h3>Impute C2</h3>
+<pre class="r"><code>source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+
 purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,&quot;chr&quot;,.,&quot;_DCas20_5360.vcf.gz&quot;),
                             refVCF=paste0(refVCFpath,&quot;chr&quot;,.,&quot;_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz&quot;),
                             mapFile=paste0(mapPath,&quot;chr&quot;,.,&quot;_cassava_cM_pred.v6_91019.map&quot;),
                             outName=paste0(outPath,&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputed&quot;),
+                            samplesToExclude=samplesToExclude,
                             nthreads=112))</code></pre>
 <p>Clean up Beagle log files after run. Move to sub-directory <code>output/BeagleLogs/</code>.</p>
-<pre class="bash"><code>cd /workdir/EMBRAPA_2020GS/output/; 
+<pre class="bash"><code>cd /workdir/mw489/EMBRAPA_2020GS/output/; 
 mkdir BeagleLogs;
-cp *_DCas20_5360_REFimputed.log BeagleLogs/</code></pre>
+cp *_DCas20_5360_REFimputed.log BeagleLogs/
+cp -r BeagleLogs /home/jj332_cas/marnin/EMBRAPA_2020GS/output/
+cp *_DCas20_5360_REFimputed* /home/jj332_cas/marnin/EMBRAPA_2020GS/output/</code></pre>
 </div>
-<div id="post-impute-filter" class="section level2">
-<h2>Post-impute filter</h2>
+<div id="post-impute-filter" class="section level3">
+<h3>Post-impute filter</h3>
 <p>For now, the function will just do a fixed filter: AR2&gt;0.75 (DR2&gt;0.75 as of Beagle5.0), P_HWE&gt;1e-20, MAF&gt;0.005 [0.5%].</p>
 <p>It can easily be modified in the future to include parameters to vary the filter specifications.</p>
 <p>Input parameters</p>
 <pre class="r"><code>#&#39; @inPath path to input VCF-to-be-filtered, can be left null if path included in @inName . Must end in &quot;/&quot;
 #&#39; @inName name of input VCF file EXCLUDING file extension. Assumes .vcf.gz
 #&#39; @outPath path where filtered VCF and related are to be stored.Can be left null if path included in @outName . Must end in &quot;/&quot;.
-#&#39; @outName name desired for output EXCLUDING extension. Output will be .vcf.gz 
-inPath&lt;-here::here(&quot;output/&quot;)
-outPath&lt;-here::here(&quot;output/&quot;)</code></pre>
+#&#39; @outName name desired for output EXCLUDING extension. Output will be .vcf.gz </code></pre>
 <p>Loop to filter all 18 VCF files in parallel</p>
-<pre class="r"><code>source(imputationFunctions.R)
+<pre class="r"><code>inPath&lt;-here::here(&quot;output/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
 require(furrr); options(mc.cores=ncores); plan(multiprocess)
 future_map(1:18,~postImputeFilter(inPath=inPath,
                                   inName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputed&quot;),
                                   outPath=outPath,
-                                  outName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedAndFiltered&quot;)))</code></pre>
+                                  outName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedAndFiltered&quot;)))
+# [1] &quot;1068 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr1_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;437 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr2_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;559 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr3_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;207 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr4_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;783 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr5_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;447 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr6_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;238 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr7_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;409 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr8_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;474 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr9_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;243 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr10_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;272 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr11_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;361 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr12_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;393 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr13_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;755 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr14_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;712 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr15_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;280 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr16_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;674 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr17_DCas20_5360_REFimputedAndFiltered&quot;
+# [1] &quot;610 sites passing filter&quot;
+# [1] &quot;Filtering Complete: chr18_DCas20_5360_REFimputedAndFiltered&quot;</code></pre>
 <p>Check what’s left</p>
-<pre class="r"><code>purrr::map(list(Chr=1:18),~system(paste0(&quot;wc -l &quot;,here::here(&quot;output/&quot;),&quot;chr&quot;,.,&quot;_&quot;,outName,&quot;.vcf.gz&quot;)))</code></pre>
+<pre class="r"><code>purrr::map(1:18,~system(paste0(&quot;zcat &quot;,here::here(&quot;output/&quot;),&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedAndFiltered.vcf.gz | wc -l&quot;)))
+# 1078
+# 447
+# 569
+# 217
+# 793
+# 457
+# 248
+# 419
+# 484
+# 253
+# 282
+# 371
+# 403
+# 765
+# 722
+# 290
+# 684
+# 620</code></pre>
+<pre class="bash"><code>cd /workdir/mw489/EMBRAPA_2020GS/output/;
+cp *_DCas20_5360_REFimputedAndFiltered* /home/jj332_cas/marnin/EMBRAPA_2020GS/output/</code></pre>
 </div>
-<div id="refpanel-include-c1-filtered-sites-only" class="section level2">
-<h2>RefPanel: Include C1, filtered sites only</h2>
 </div>
 <div id="refpanel-include-c1-all-sites" class="section level2">
 <h2>RefPanel: Include C1, all sites</h2>
+<div id="merge-refpanel-and-c1" class="section level3">
+<h3>Merge RefPanel and C1</h3>
+<pre class="r"><code>inPath&lt;-here::here(&quot;data/&quot;)
+outPath&lt;-here::here(&quot;data/&quot;)
+source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~mergeVCFs(inPath=inPath,
+                           inVCF1=paste0(&quot;chr&quot;,.,&quot;_ImputationReferencePanel_EMBRAPA_Phased_102619&quot;),
+                           inVCF2=paste0(&quot;chr&quot;,.,&quot;_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619&quot;),
+                           outPath=outPath,
+                           outName=paste0(&quot;chr&quot;,.,&quot;_ImputationReferencePanel_C1progenyAdded_EMBRAPA&quot;)))</code></pre>
+<pre class="bash"><code>cd data/ 
+bcftools query --list-samples chr1_ImputationReferencePanel_C1progenyAdded_EMBRAPA.vcf.gz &gt; chr1_ImputationReferencePanel_C1progenyAdded_EMBRAPA.samples</code></pre>
+<pre class="r"><code>refpanel_samples&lt;-read.table(here::here(&quot;data&quot;,&quot;chr1_ImputationReferencePanel_C1progenyAdded_EMBRAPA.samples&quot;), 
+                             header=F, stringsAsFactors = F)$V1
+target_samples&lt;-read.table(here::here(&quot;data/Report-DCas20-5360/&quot;,&quot;DCas20_5360.samples&quot;), 
+                             header=F, stringsAsFactors = F)$V1
+samplesToExclude&lt;-target_samples[target_samples %in% refpanel_samples]
+length(samplesToExclude) # [1] 713
+write.table(samplesToExclude,file=here::here(&quot;data&quot;,&quot;samplesToExclude_RefPanelC1Added.txt&quot;),
+            row.names = F, col.names = F, quote = F)</code></pre>
+</div>
+<div id="impute-c2-1" class="section level3">
+<h3>Impute C2</h3>
+<pre class="r"><code>source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+targetVCFpath&lt;-here::here(&quot;data/Report-DCas20-5360/&quot;) # location of the targetVCF
+refVCFpath&lt;-here::here(&quot;data/&quot;)
+mapPath&lt;-here::here(&quot;data/CassavaGeneticMap/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+samplesToExclude&lt;-here::here(&quot;data&quot;,&quot;samplesToExclude_RefPanelC1Added.txt&quot;)
+
+purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,&quot;chr&quot;,.,&quot;_DCas20_5360.vcf.gz&quot;),
+                            refVCF=paste0(refVCFpath,&quot;chr&quot;,.,&quot;_ImputationReferencePanel_C1progenyAdded_EMBRAPA.vcf.gz&quot;),
+                            mapFile=paste0(mapPath,&quot;chr&quot;,.,&quot;_cassava_cM_pred.v6_91019.map&quot;),
+                            outName=paste0(outPath,&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1unfiltered&quot;),
+                            samplesToExclude=samplesToExclude,
+                            nthreads=112))</code></pre>
+<p>Clean up Beagle log files after run. Move to sub-directory <code>output/BeagleLogs/</code>.</p>
+<pre class="bash"><code>cd /workdir/mw489/EMBRAPA_2020GS/output/; 
+cp *_DCas20_5360_REFimputedWithC1unfiltered.log BeagleLogs/;
+cp -r BeagleLogs /home/jj332_cas/marnin/EMBRAPA_2020GS/output/;
+cp *_DCas20_5360_REFimputedWithC1unfiltered* /home/jj332_cas/marnin/EMBRAPA_2020GS/output/;
+
+cd /workdir/mw489/EMBRAPA_2020GS/data/;
+cp *_ImputationReferencePanel_C1progenyAdded_EMBRAPA* /home/jj332_cas/marnin/EMBRAPA_2020GS/data/;
+cp samplesToExclude_RefPanelC1Added.txt /home/jj332_cas/marnin/EMBRAPA_2020GS/data/;</code></pre>
+</div>
+<div id="post-impute-filter-1" class="section level3">
+<h3>Post-impute filter</h3>
+<pre class="r"><code>inPath&lt;-here::here(&quot;output/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~postImputeFilter(inPath=inPath,
+                                  inName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1unfiltered&quot;),
+                                  outPath=outPath,
+                                  outName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered&quot;)))</code></pre>
+<pre class="r"><code>purrr::map(1:18,~system(paste0(&quot;zcat &quot;,here::here(&quot;output/&quot;),&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered.vcf.gz | wc -l&quot;)))
+# 1568
+# 768
+# 917
+# 10
+# 1201
+# 748
+# 347
+# 716
+# 916
+# 450
+# 518
+# 545
+# 577
+# 1214
+# 1179
+# 406
+# 1008
+# 831</code></pre>
+<pre class="bash"><code>cd /workdir/mw489/EMBRAPA_2020GS/output/;
+cp *_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered* /home/jj332_cas/marnin/EMBRAPA_2020GS/output/</code></pre>
+</div>
+</div>
+<div id="refpanel-include-c1-filtered-sites-only" class="section level2">
+<h2>RefPanel: Include C1, filtered sites only</h2>
+<p>Keep only the sites in the RefPanel that passed post-imputation filter for the C1</p>
+<div id="filter-sites-from-refpanelc1-dataset" class="section level3">
+<h3>Filter sites from RefPanel+C1 dataset</h3>
+<pre class="r"><code>inPath&lt;-here::here(&quot;data/&quot;)
+outPath&lt;-here::here(&quot;data/&quot;)
+source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+require(furrr); options(mc.cores=18); plan(multiprocess)
+furrr::future_map(1:18,~filter_positions(inPath=inPath,
+                                         inVCF=paste0(&quot;chr&quot;,.,&quot;_ImputationReferencePanel_C1progenyAdded_EMBRAPA.vcf.gz&quot;),
+                                         positionFile=paste0(&quot;chr&quot;,.,&quot;_EMBRAPA_C1progeny_FromDCas19_4301_REFimputed_102619.sitesPassing&quot;),
+                                         outPath=outPath,
+                                         outName=paste0(&quot;chr&quot;,.,&quot;_ImputationReferencePanel_C1progenyAddedFilteredSites_EMBRAPA&quot;)))</code></pre>
+</div>
+<div id="impute-c2-2" class="section level3">
+<h3>Impute C2</h3>
+<pre class="r"><code>source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+targetVCFpath&lt;-here::here(&quot;data/Report-DCas20-5360/&quot;) # location of the targetVCF
+refVCFpath&lt;-here::here(&quot;data/&quot;)
+mapPath&lt;-here::here(&quot;data/CassavaGeneticMap/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+samplesToExclude&lt;-here::here(&quot;data&quot;,&quot;samplesToExclude_RefPanelC1Added.txt&quot;)
+
+purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,&quot;chr&quot;,.,&quot;_DCas20_5360.vcf.gz&quot;),
+                            refVCF=paste0(refVCFpath,&quot;chr&quot;,.,&quot;_ImputationReferencePanel_C1progenyAddedFilteredSites_EMBRAPA.vcf.gz&quot;),
+                            mapFile=paste0(mapPath,&quot;chr&quot;,.,&quot;_cassava_cM_pred.v6_91019.map&quot;),
+                            outName=paste0(outPath,&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1filtered&quot;),
+                            samplesToExclude=samplesToExclude,
+                            nthreads=112))</code></pre>
+<p>Clean up Beagle log files after run. Move to sub-directory <code>output/BeagleLogs/</code>.</p>
+<pre class="bash"><code>cd /workdir/mw489/EMBRAPA_2020GS/output/; 
+cp *_DCas20_5360_REFimputedWithC1filtered.log BeagleLogs/;
+cp -r BeagleLogs /home/jj332_cas/marnin/EMBRAPA_2020GS/output/;
+cp *_DCas20_5360_REFimputedWithC1filtered* /home/jj332_cas/marnin/EMBRAPA_2020GS/output/;
+
+cd /workdir/mw489/EMBRAPA_2020GS/data/;
+cp *_ImputationReferencePanel_C1progenyAddedFilteredSites_EMBRAPA* /home/jj332_cas/marnin/EMBRAPA_2020GS/data/;
+</code></pre>
+</div>
+<div id="post-impute-filter-2" class="section level3">
+<h3>Post-impute filter</h3>
+<pre class="r"><code>inPath&lt;-here::here(&quot;output/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+source(here::here(&quot;code&quot;,&quot;imputationFunctions.R&quot;))
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~postImputeFilter(inPath=inPath,
+                                  inName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1filtered&quot;),
+                                  outPath=outPath,
+                                  outName=paste0(&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1filtered_PostImputeFiltered&quot;)))</code></pre>
+<p>Check how many sites left</p>
+<pre class="r"><code>purrr::map(1:18,~system(paste0(&quot;zcat &quot;,here::here(&quot;output/&quot;),&quot;chr&quot;,.,&quot;_DCas20_5360_REFimputedWithC1filtered_PostImputeFiltered.vcf.gz | wc -l&quot;)))
+# 945
+# 367
+# 376
+# 212
+# 696
+# 385
+# 177
+# 451
+# 395
+# 198
+# 266
+# 369
+# 289
+# 611
+# 702
+# 253
+# 359
+# 514</code></pre>
+<pre class="bash"><code>cd /workdir/mw489/EMBRAPA_2020GS/output/;
+cp *_DCas20_5360_REFimputedWithC1filtered_PostImputeFiltered* /home/jj332_cas/marnin/EMBRAPA_2020GS/output/</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -633,6 +904,7 @@ future_map(1:18,~postImputeFilter(inPath=inPath,
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
+</div>
 </div>
 </div>
 </div>
