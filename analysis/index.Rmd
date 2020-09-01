@@ -22,19 +22,33 @@ This repository and website documents all analyses, summary, tables and figures 
 
 **Imputation 2020:** DArTseqLD (DCas20-5360) arrived on Aug. 22, 2020. Contains **GS C2** for EMBRAPA. 
 
-Last year's reference panel for imputation had ~64K SNP. The C1 progeny imputed by it had <9K SNP _after_ post-imputation filters.
-
-Two options to proceed with imputation of C2 (DCas20-5360):
-
-1. Last year's reference panel, without C1 (64K SNP)
-2. Last year's reference panel + C1 (reduce refpanel to sites passing post-impute filter in C1 = 9K SNP)
-3. Last year's ref. panel + C1 (include unfiltered C1 data = 64K refpanel SNP)
-
-If I can use Beagle5 or latest, should be possible (fast) to create all 3 and compare the results using PCA, prediction, correlation of kinship matrices, etc.
+Two main steps:  
 
   * [Convert DCas20-5360 report to VCF for imputation](convertDCas20_5360_ToVCF.html):
   * [Impute DCas20-5360](ImputeDCas20_5360.html):  
 
+Last year's reference panel for imputation had ~64K SNP. The C1 progeny imputed by it had <9K SNP _after_ post-imputation filters.
+
+Since imputation with Beagle5.0 is very fast, I imputed C2 (DCas20-5360) with three variants of the reference panel:
+
+1. Last year's reference panel, without C1 (64K SNP)
+  + **RefPanel VCF filename:** `chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz`
+  + **Imputed C2 filename:** `chr*_DCas20_5360_REFimputed.vcf.gz`
+  + **Post-impute filtered C2 filename:** `chr*_DCas20_5360_REFimputedAndFiltered.vcf.gz`
+  
+2. Last year's ref. panel + C1 (include unfiltered C1 data = 64K refpanel SNP)
+  + **RefPanel VCF filename:** `chr*_ImputationReferencePanel_C1progenyAdded_EMBRAPA.vcf.gz`
+  + **Imputed C2 filename:** `chr*_DCas20_5360_REFimputedWithC1unfiltered.vcf.gz`
+  + **Post-impute filtered C2 filename:** `chr*_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered.vcf.gz`
+  
+3. Last year's reference panel + C1 (reduce refpanel to sites passing post-impute filter in C1 = 9K SNP)
+
+  + **RefPanel VCF filename:** `chr*_ImputationReferencePanel_C1progenyAddedFilteredSites_EMBRAPA.vcf.gz`
+  + **Imputed C2 filename:** `chr*_DCas20_5360_REFimputedWithC1filtered.vcf.gz`
+  + **Post-impute filtered C2 filename:** `chr*_DCas20_5360_REFimputedWithC1filtered_PostImputeFiltered.vcf.gz`
+
+
+**SUGGESTION:** Use combination PCA, prediction, correlation of kinship matrices (off-diagonals and diagonals) to compare these datasets.
 
 # Data availability and reproducibility
 

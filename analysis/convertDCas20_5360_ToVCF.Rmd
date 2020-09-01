@@ -20,25 +20,15 @@ editor_options:
 #' @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file
 
 library(tidyverse); library(magrittr)
-# dartvcfInput<-here::here("data/Report-DCas20-5360","Report_DCas20-5360_SNP_VCF_Version_6.csv")
-# dartcountsInput<-here::here("data/Report-DCas20-5360","Report_DCas20-5360_SNP_Counts_Version_6_final.csv")
 dartvcfInput<-here::here("data/OrderAppendix_1_DCas20-5360","Report_5360_coanalysis_version6_VCF.txt")
 dartcountsInput<-here::here("data/OrderAppendix_1_DCas20-5360","Report_5360_coanalysis_counts.csv")
 outName<-here::here("data/Report-DCas20-5360","DCas20_5360")
 
 # From report to report, there has been minor (NOT SO MINOR?) variation
 # in format among files, requiring user input
-# rather frustrating
-# can't pipeline their stuff
 nskipvcf<-2 
 nskipcounts<-3
-ncores<-75
-# dartVars<-read.csv(dartcountsInput, 
-#                    stringsAsFactors = F,
-#                    header = T,
-#                    skip=nskipcounts,
-#                    nrows = 1) %>% colnames(.) %>% .[1:26] 
-
+ncores<-10
 ```
 
 # Prelim. check format
@@ -110,8 +100,8 @@ filters<-"--minDP 4 --maxDP 50" # because using GT not PL for impute (Beagle5)
 outPath<-here::here("data/Report-DCas20-5360/")
 outSuffix<-"DCas20_5360"
 
-future_map(list(Chr=1:18),
-           ~splitVCFbyChr(Chr=.),
-           vcfIn=vcfIn,filters=filters,
-           outPath=outPath,outSuffix=outSuffix)
+future_map(1:18,
+           ~splitVCFbyChr(Chr=.,
+                          vcfIn=vcfIn,filters=filters,
+                          outPath=outPath,outSuffix=outSuffix))
 ```
