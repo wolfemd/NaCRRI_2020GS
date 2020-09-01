@@ -1,10 +1,8 @@
 ---
 title: "Impute EMBRAPA GS C2 (DCas20_5360)"
 site: workflowr::wflow_site
-author: "Marnin Wolfe"
 date: "2020-August-26"
-output: 
-  workflowr::wflow_html:
+output: workflowr::wflow_html
 editor_options:
   chunk_output_type: inline
 ---
@@ -290,7 +288,7 @@ cp *_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered* /home/jj332_cas/
 Keep only the sites in the RefPanel that passed post-imputation filter for the C1
 
 ### Filter sites from RefPanel+C1 dataset
-```{r}
+```{r, eval=F}
 inPath<-here::here("data/")
 outPath<-here::here("data/")
 source(here::here("code","imputationFunctions.R"))
