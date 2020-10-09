@@ -1,0 +1,158 @@
+beagle.28Sep18.793.jar (version 5.0)
+Copyright (C) 2014-2018 Brian L. Browning
+Enter "java -jar beagle.28Sep18.793.jar" to list command line argument
+Start time: 02:24 PM EDT on 09 Oct 2020
+
+Command line: java -Xmx512000m -jar beagle.28Sep18.793.jar
+  gt=/local/workdir/mw489/NaCRRI_2020GS/data/Report-DCas20-5419/chr7_DCas20_5419.vcf.gz
+  map=/local/workdir/mw489/NaCRRI_2020GS/data/CassavaGeneticMap/chr7_cassava_cM_pred.v6_91019.map
+  ref=/local/workdir/mw489/NaCRRI_2020GS/data/chr7_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz
+  out=/local/workdir/mw489/NaCRRI_2020GS/output/chr7_DCas20_5419_LA_REFimputed
+  nthreads=112
+  impute=TRUE
+  ne=1e+05
+
+Reference samples:       4,101
+Study samples:           2,043
+
+Window 1 (7:14815-5051138)
+Reference markers:         967
+Study markers:              37
+
+Burnin  iteration 1:           1 second
+Burnin  iteration 2:           0 seconds
+Burnin  iteration 3:           0 seconds
+Burnin  iteration 4:           0 seconds
+Burnin  iteration 5:           2 seconds
+Burnin  iteration 6:           0 seconds
+
+Phasing iteration 1:           0 seconds
+Phasing iteration 2:           0 seconds
+Phasing iteration 3:           0 seconds
+Phasing iteration 4:           0 seconds
+Phasing iteration 5:           0 seconds
+Phasing iteration 6:           0 seconds
+Phasing iteration 7:           0 seconds
+Phasing iteration 8:           0 seconds
+Phasing iteration 9:           0 seconds
+Phasing iteration 10:          0 seconds
+Phasing iteration 11:          0 seconds
+Phasing iteration 12:          0 seconds
+
+Imputation time:               3 seconds
+
+Window 2 (7:4353223-13561367)
+Reference markers:         621
+Study markers:              22
+
+Burnin  iteration 1:           0 seconds
+Burnin  iteration 2:           0 seconds
+Burnin  iteration 3:           0 seconds
+Burnin  iteration 4:           0 seconds
+Burnin  iteration 5:           0 seconds
+Burnin  iteration 6:           0 seconds
+
+Phasing iteration 1:           0 seconds
+Phasing iteration 2:           0 seconds
+Phasing iteration 3:           0 seconds
+Phasing iteration 4:           0 seconds
+Phasing iteration 5:           0 seconds
+Phasing iteration 6:           0 seconds
+Phasing iteration 7:           0 seconds
+Phasing iteration 8:           0 seconds
+Phasing iteration 9:           0 seconds
+Phasing iteration 10:          0 seconds
+Phasing iteration 11:          0 seconds
+Phasing iteration 12:          0 seconds
+
+Imputation time:               2 seconds
+
+Window 3 (7:10028001-22499894)
+Reference markers:         610
+Study markers:              23
+
+Burnin  iteration 1:           0 seconds
+Burnin  iteration 2:           0 seconds
+Burnin  iteration 3:           0 seconds
+Burnin  iteration 4:           0 seconds
+Burnin  iteration 5:           0 seconds
+Burnin  iteration 6:           0 seconds
+
+Phasing iteration 1:           0 seconds
+Phasing iteration 2:           0 seconds
+Phasing iteration 3:           0 seconds
+Phasing iteration 4:           0 seconds
+Phasing iteration 5:           0 seconds
+Phasing iteration 6:           0 seconds
+Phasing iteration 7:           0 seconds
+Phasing iteration 8:           0 seconds
+Phasing iteration 9:           0 seconds
+Phasing iteration 10:          0 seconds
+Phasing iteration 11:          0 seconds
+Phasing iteration 12:          0 seconds
+
+Imputation time:               1 second
+
+Window 4 (7:22018124-26736940)
+Reference markers:         856
+Study markers:              53
+
+Burnin  iteration 1:           0 seconds
+Burnin  iteration 2:           0 seconds
+Burnin  iteration 3:           0 seconds
+Burnin  iteration 4:           0 seconds
+Burnin  iteration 5:           0 seconds
+Burnin  iteration 6:           0 seconds
+
+Phasing iteration 1:           0 seconds
+Phasing iteration 2:           0 seconds
+Phasing iteration 3:           0 seconds
+Phasing iteration 4:           0 seconds
+Phasing iteration 5:           0 seconds
+Phasing iteration 6:           0 seconds
+Phasing iteration 7:           0 seconds
+Phasing iteration 8:           0 seconds
+Phasing iteration 9:           0 seconds
+Phasing iteration 10:          0 seconds
+Phasing iteration 11:          0 seconds
+Phasing iteration 12:          0 seconds
+
+Imputation time:               1 second
+
+Window 5 (7:24900991-26891509)
+Reference markers:         322
+Study markers:              18
+
+Burnin  iteration 1:           0 seconds
+Burnin  iteration 2:           0 seconds
+Burnin  iteration 3:           0 seconds
+Burnin  iteration 4:           0 seconds
+Burnin  iteration 5:           0 seconds
+Burnin  iteration 6:           0 seconds
+
+Phasing iteration 1:           0 seconds
+Phasing iteration 2:           0 seconds
+Phasing iteration 3:           0 seconds
+Phasing iteration 4:           0 seconds
+Phasing iteration 5:           0 seconds
+Phasing iteration 6:           0 seconds
+Phasing iteration 7:           0 seconds
+Phasing iteration 8:           0 seconds
+Phasing iteration 9:           0 seconds
+Phasing iteration 10:          0 seconds
+Phasing iteration 11:          0 seconds
+Phasing iteration 12:          0 seconds
+
+Imputation time:               0 seconds
+
+Cumulative Statistics:
+
+Reference markers:       2,767
+Study markers:             119
+
+Haplotype phasing time:        8 seconds
+Imputation time:               0 seconds
+Total time:                    19 seconds
+
+End time: 02:24 PM EDT on 09 Oct 2020
+beagle.28Sep18.793.jar finished

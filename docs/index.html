@@ -14,6 +14,7 @@
 
 <title>NaCRRI 2020 GS and related procedures</title>
 
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
@@ -32,6 +33,8 @@ div.section {
   padding-top: 12px;
 }
 </style>
+
+
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -358,7 +361,7 @@ $(document).ready(function () {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -367,7 +370,7 @@ $(document).ready(function () {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -379,7 +382,7 @@ $(document).ready(function () {
 <strong>Last updated:</strong> 2020-10-09
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>NaCRRI_2020GS/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -395,28 +398,28 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStreebcbcec37ccc91d22f5e3ac898fbdc24c550b7ea4targetblankbcbcec3a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/bcbcec37ccc91d22f5e3ac898fbdc24c550b7ea4" target="_blank">bcbcec3</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStree7efdd906a57cdb11144754a3a818dbc8f2cadc1atargetblank7efdd90a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/7efdd906a57cdb11144754a3a818dbc8f2cadc1a" target="_blank">7efdd90</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStreebcbcec37ccc91d22f5e3ac898fbdc24c550b7ea4targetblankbcbcec3a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStree7efdd906a57cdb11144754a3a818dbc8f2cadc1atargetblank7efdd90a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/bcbcec37ccc91d22f5e3ac898fbdc24c550b7ea4" target="_blank">bcbcec3</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/7efdd906a57cdb11144754a3a818dbc8f2cadc1a" target="_blank">7efdd90</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -838,6 +841,7 @@ Unstaged changes:
     Deleted:    analysis/Verify_gbs2dart_sampleMatches_EMBRAPA_102419.Rmd
     Deleted:    analysis/convertDCas19_4403_ToVCF_102419.Rmd
     Deleted:    analysis/convertDCas20_5360_ToVCF.Rmd
+    Modified:   analysis/index.Rmd
 
 </code></pre>
 <p>
@@ -876,6 +880,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/7efdd906a57cdb11144754a3a818dbc8f2cadc1a/docs/index.html" target="_blank">7efdd90</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-10-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1112,7 +1133,7 @@ Start workflowr project.
 <li><strong>RefPanel VCF filename:</strong> <code>chr*_ImputationReferencePanel_StageVI_91119.vcf.gz</code></li>
 <li><strong>Imputed filename:</strong> <code>chr*_DCas20_5419_EA_REFimputed.vcf.gz</code></li>
 <li><strong>Post-impute filtered filename:</strong> <code>chr*_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz</code></li>
-<li><strong>Genome-wide dosage matrix format for use in R:</strong></li>
+<li><strong>Genome-wide dosage matrix format for use in R:</strong> <code>DosageMatrix_DCas20_5419_EA_REFimputedAndFiltered.rds</code></li>
 </ul>
 <ol start="2" style="list-style-type: decimal">
 <li>L. America ref panel</li>
@@ -1121,7 +1142,7 @@ Start workflowr project.
 <li><strong>RefPanel VCF filename:</strong> <code>chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz</code></li>
 <li><strong>Imputed filename:</strong> <code>chr*_DCas20_5419_LA_REFimputed.vcf.gz</code></li>
 <li><strong>Post-impute filtered filename:</strong> <code>chr*_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz</code></li>
-<li><strong>Genome-wide dosage matrix format for use in R:</strong></li>
+<li><strong>Genome-wide dosage matrix format for use in R:</strong> <code>DosageMatrix_DCas20_5419_LA_REFimputedAndFiltered.rds</code></li>
 </ul>
 <p><strong>SUGGESTION:</strong> Use combination PCA, prediction, correlation of kinship matrices (off-diagonals and diagonals) to compare these datasets.</p>
 </div>
@@ -1177,6 +1198,8 @@ footer is added to webpages before the MathJax javascript. -->
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
+
+
 
 
 

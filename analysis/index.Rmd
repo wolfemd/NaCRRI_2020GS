@@ -58,7 +58,7 @@ Specifically, I think it makes sense to impute it with variants of the reference
 -   **RefPanel VCF filename:** `chr*_ImputationReferencePanel_StageVI_91119.vcf.gz`
 -   **Imputed filename:** `chr*_DCas20_5419_EA_REFimputed.vcf.gz`
 -   **Post-impute filtered filename:** `chr*_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz`
--   **Genome-wide dosage matrix format for use in R:** 
+-   **Genome-wide dosage matrix format for use in R:** `DosageMatrix_DCas20_5419_EA_REFimputedAndFiltered.rds`
 
 
 2.  L. America ref panel
@@ -66,7 +66,7 @@ Specifically, I think it makes sense to impute it with variants of the reference
 -   **RefPanel VCF filename:** `chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz`
 -   **Imputed filename:** `chr*_DCas20_5419_LA_REFimputed.vcf.gz`
 -   **Post-impute filtered filename:** `chr*_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz`
--   **Genome-wide dosage matrix format for use in R:** 
+-   **Genome-wide dosage matrix format for use in R:** `DosageMatrix_DCas20_5419_LA_REFimputedAndFiltered.rds`
 
 **SUGGESTION:** Use combination PCA, prediction, correlation of kinship matrices (off-diagonals and diagonals) to compare these datasets.
 
