@@ -1,0 +1,269 @@
+---
+title: "Impute NaCRRI DCas20_5360"
+site: workflowr::wflow_site
+date: "2020-October-8"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+DArTseqLD (DCas20-5419). Contains pre-breeding materials of combined African and L. American descent. 
+
+1. 2019 East Africa Reference panel: 56250 SNP, 19136 clones included W. Africa landraces
+2. Latin America Ref (4101 cclones, 65886 SNP)
+
+Suggest comparing the results using PCA, prediction, correlation of kinship matrices, etc. 
+
+# Copy data
+
+Copy the imputation reference panel from 2019 to the `data/` folder. 
+
+```{bash,eval = FALSE}
+cp -r /home/jj332_cas/marnin/NaCRRI_2020GS /workdir/mw489/
+cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz /workdir/mw489/NaCRRI_2020GS/data/
+cp -r /home/jj332_cas/marnin/NaCRRI_2020GS/code /workdir/mw489/NaCRRI_2020GS/
+cp -r /home/jj332_cas/CassavaGenotypeData/CassavaGeneticMap /workdir/mw489/NaCRRI_2020GS/data/
+cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEMBRAPA_102419/chr*_ImputationReferencePanel_EMBRAPA_Ready2Phase_102419.vcf.gz /workdir/mw489/NaCRRI_2020GS/data/ 
+cp /home/jj332_cas/CassavaGenotypeData/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr*_ImputationReferencePanel_StageVI_91119.vcf.gz /workdir/mw489/NaCRRI_2020GS/data/
+```
+
+## With RefPanelEA
+
+Impute with [Beagle V5.0](https://faculty.washington.edu/browning/beagle/b5_0.html).
+
+Use the "imputation reference panel" dataset from 2019, e.g. `chr1_ImputationReferencePanel_StageVI_91119.vcf.gz` as reference.
+
+Used 1 large memory Cornell CBSU machine (e.g. [cbsulm16; 112 cores, 512 GB RAM](https://biohpc.cornell.edu/lab/hardware.aspx)), running 1 chromosome at a time.
+
+R functions are stored in the `code/` sub-directory. Functions sourced from e.g. **imputationFunctions.R** are wrappers around e.g. Beagle, and other command line programs.
+
+```{r,eval = FALSE}
+targetVCFpath<-here::here("data/Report-DCas20-5419/") # location of the targetVCF
+refVCFpath<-here::here("data/")
+mapPath<-here::here("data/CassavaGeneticMap/")
+outPath<-here::here("output/")
+outSuffix<-"DCas20_5419"
+```
+
+### Impute
+```{r,eval = FALSE}
+source(here::here("code","imputationFunctions.R"))
+
+purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,"chr",.,"_DCas20_5419.vcf.gz"),
+                            refVCF=paste0(refVCFpath,"chr",.,"_ImputationReferencePanel_StageVI_91119.vcf.gz"),
+                            mapFile=paste0(mapPath,"chr",.,"_cassava_cM_pred.v6_91019.map"),
+                            outName=paste0(outPath,"chr",.,"_DCas20_5419_EA_REFimputed"),
+                            nthreads=112))
+```
+
+Clean up Beagle log files after run. Move to sub-directory `output/BeagleLogs/`.
+```{bash,eval = FALSE}
+cd /workdir/mw489/NaCRRI_2020GS/output/; 
+mkdir BeagleLogs;
+cp *_DCas20_5419_EA_REFimputed.log BeagleLogs/
+cp -r BeagleLogs /home/jj332_cas/marnin/NaCRRI_2020GS/output/
+cp *_DCas20_5419_EA_REFimputed* /home/jj332_cas/marnin/NaCRRI_2020GS/output/
+
+```
+
+### Post-impute filter
+
+For now, the function will just do a fixed filter: AR2>0.75 (DR2>0.75 as of Beagle5.0), P_HWE>1e-20, MAF>0.005 [0.5%]. 
+
+It can easily be modified in the future to include parameters to vary the filter specifications.
+
+Input parameters
+```{r,eval = FALSE}
+#' @inPath path to input VCF-to-be-filtered, can be left null if path included in @inName . Must end in "/"
+#' @inName name of input VCF file EXCLUDING file extension. Assumes .vcf.gz
+#' @outPath path where filtered VCF and related are to be stored.Can be left null if path included in @outName . Must end in "/".
+#' @outName name desired for output EXCLUDING extension. Output will be .vcf.gz 
+```
+
+Loop to filter all 18 VCF files in parallel
+```{r,eval = FALSE}
+inPath<-here::here("output/")
+outPath<-here::here("output/")
+source(here::here("code","imputationFunctions.R"))
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~postImputeFilter(inPath=inPath,
+                                  inName=paste0("chr",.,"_DCas20_5419_EA_REFimputed"),
+                                  outPath=outPath,
+                                  outName=paste0("chr",.,"_DCas20_5419_EA_REFimputedAndFiltered")))
+```
+
+Check what's left
+```{r,eval = FALSE}
+purrr::map(1:18,~system(paste0("zcat ",here::here("output/"),"chr",.,"_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz | wc -l")))
+# 5913
+# 2353
+# 2428
+# 2437
+# 2553
+# 2258
+# 983
+# 2161
+# 2294
+# 1660
+# 1752
+# 2194
+# 1566
+# 3362
+# 2563
+# 1948
+# 1746
+# 1749
+```
+
+```{bash, eval=F}
+cd /workdir/mw489/NaCRRI_2020GS/output/;
+cp -r *_DCas20_5419_EA_REFimputed* /home/jj332_cas/marnin/NaCRRI_2020GS/output/
+```
+
+## With RefPanelLA
+
+### Impute
+```{r,eval = FALSE}
+targetVCFpath<-here::here("data/Report-DCas20-5419/") # location of the targetVCF
+refVCFpath<-here::here("data/")
+mapPath<-here::here("data/CassavaGeneticMap/")
+outPath<-here::here("output/")
+outSuffix<-"DCas20_5419"
+source(here::here("code","imputationFunctions.R"))
+
+purrr::map(1:18,~runBeagle5(targetVCF=paste0(targetVCFpath,"chr",.,"_DCas20_5419.vcf.gz"),
+                            refVCF=paste0(refVCFpath,"chr",.,"_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz"),
+                            mapFile=paste0(mapPath,"chr",.,"_cassava_cM_pred.v6_91019.map"),
+                            outName=paste0(outPath,"chr",.,"_DCas20_5419_LA_REFimputed"),
+                            nthreads=112))
+```
+
+Clean up Beagle log files after run. Move to sub-directory `output/BeagleLogs/`.
+```{bash,eval = FALSE}
+cd /workdir/mw489/NaCRRI_2020GS/output/; 
+#mkdir BeagleLogs;
+cp *_DCas20_5419_LA_REFimputed.log BeagleLogs/
+cp -r BeagleLogs /home/jj332_cas/marnin/NaCRRI_2020GS/output/
+cp *_DCas20_5419_LA_REFimputed* /home/jj332_cas/marnin/NaCRRI_2020GS/output/
+
+```
+
+### Post-impute filter
+
+For now, the function will just do a fixed filter: AR2>0.75 (DR2>0.75 as of Beagle5.0), P_HWE>1e-20, MAF>0.005 [0.5%]. It can easily be modified in the future to include parameters to vary the filter specifications.
+
+Input parameters
+```{r,eval = FALSE}
+#' @inPath path to input VCF-to-be-filtered, can be left null if path included in @inName . Must end in "/"
+#' @inName name of input VCF file EXCLUDING file extension. Assumes .vcf.gz
+#' @outPath path where filtered VCF and related are to be stored.Can be left null if path included in @outName . Must end in "/".
+#' @outName name desired for output EXCLUDING extension. Output will be .vcf.gz 
+```
+Loop to filter all 18 VCF files in parallel
+```{r,eval = FALSE}
+inPath<-here::here("output/")
+outPath<-here::here("output/")
+source(here::here("code","imputationFunctions.R"))
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~postImputeFilter(inPath=inPath,
+                                  inName=paste0("chr",.,"_DCas20_5419_LA_REFimputed"),
+                                  outPath=outPath,
+                                  outName=paste0("chr",.,"_DCas20_5419_LA_REFimputedAndFiltered")))
+```
+Check what's left
+```{r,eval = FALSE}
+purrr::map(1:18,~system(paste0("zcat ",here::here("output/"),"chr",.,"_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz | wc -l")))
+# 645
+# 358
+# 440
+# 124
+# 517
+# 354
+# 223
+# 337
+# 288
+# 198
+# 231
+# 368
+# 325
+# 492
+# 485
+# 257
+# 344
+# 501
+```
+Note that not nearly as many SNPs are passing filter after imputation of the germplasm with the L. America RefPanel, compared to the E. Africa Panel 
+
+```{bash, eval=F}
+cd /workdir/mw489/NaCRRI_2020GS/output/;
+cp *_DCas20_5419_LA_REFimputedAndFiltered* /home/jj332_cas/marnin/NaCRRI_2020GS/output/
+```
+
+
+## Formats for downstream analysis
+
+### EA
+```{r}
+# Make binary plink
+pathIn<-"/home/jj332_cas/marnin/NaCRRI_2020GS/output/"
+#pathIn<-"/workdir/mw489/NaCRRI_2020GS/output/"
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~system(paste0("export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;",
+                               "plink --vcf ",pathIn,"chr",.,
+                               "_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz ",
+                               "--make-bed --const-fid ",
+                               "--out ",pathIn,"chr",.,
+                               "_DCas20_5419_EA_REFimputedAndFiltered")))
+# Recode to dosage
+future_map(1:18,~system(paste0("export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;",
+                               "plink --bfile ",pathIn,"chr",.,
+                               "_DCas20_5419_EA_REFimputedAndFiltered ",
+                               "--recode A ",
+                               "--out ",pathIn,"chr",.,
+                               "_DCas20_5419_EA_REFimputedAndFiltered")))
+
+# Genome-wide dosage (for use in R)
+snps<-future_map(1:18,~read.table(paste0(pathIn,"chr",.,"_DCas20_5419_EA_REFimputedAndFiltered.raw"), stringsAsFactor=F, header = T) %>% 
+                   dplyr::select(-FID,-PAT,-MAT,-SEX,-PHENOTYPE) %>% 
+                   column_to_rownames(var = "IID") %>% 
+                   as.matrix()) %>% 
+  reduce(.,cbind)
+# dim(snps)
+# [1]  2043 41740
+saveRDS(snps,file = paste0(pathIn,"DosageMatrix_DCas20_5419_EA_REFimputedAndFiltered.rds"))
+```
+
+### LA
+```{r}
+# Make binary plink
+pathIn<-"/home/jj332_cas/marnin/NaCRRI_2020GS/output/"
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+future_map(1:18,~system(paste0("export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;",
+                               "plink --vcf ",pathIn,"chr",.,
+                               "_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz ",
+                               "--make-bed --const-fid ",
+                               "--out ",pathIn,"chr",.,
+                               "_DCas20_5419_LA_REFimputedAndFiltered")))
+# Recode to dosage
+future_map(1:18,~system(paste0("export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;",
+                               "plink --bfile ",pathIn,"chr",.,
+                               "_DCas20_5419_LA_REFimputedAndFiltered ",
+                               "--recode A ",
+                               "--out ",pathIn,"chr",.,
+                               "_DCas20_5419_LA_REFimputedAndFiltered")))
+
+# Genome-wide dosage (for use in R)
+snps<-future_map(1:18,~read.table(paste0(pathIn,"chr",.,"_DCas20_5419_LA_REFimputedAndFiltered.raw"), stringsAsFactor=F, header = T) %>% 
+                   dplyr::select(-FID,-PAT,-MAT,-SEX,-PHENOTYPE) %>% 
+                   column_to_rownames(var = "IID") %>% 
+                   as.matrix()) %>% 
+  reduce(.,cbind)
+dim(snps)
+# [1] 2043 6307
+saveRDS(snps,file = paste0(pathIn,"DosageMatrix_DCas20_5419_LA_REFimputedAndFiltered.rds"))
+```
+

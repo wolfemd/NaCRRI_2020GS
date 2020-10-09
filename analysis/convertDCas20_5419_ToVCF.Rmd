@@ -1,0 +1,121 @@
+---
+title: "Convert NaCRRI DCas20-5419 to VCF"
+site: workflowr::wflow_site
+date: "2020-October-7"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: inline
+---
+
+
+# Input Parameters
+```{r, eval=F}
+#' @dartvcfInput input name and path of "vcf" file from DArT
+#' @dartcountsInput input name and path of counts file from DArT
+#' @outName output path and name
+#' @nskipvcf number of "VCF" rows to skip on read-in
+#' @nskipcounts number of "counts file" rows to skip on read in
+#' @ncores number of cores to use, could be VERY memory intensive
+#' @dartVars chr vector, column names that _are not_ sample IDs in the read-counts file. I use this internally to assign the sampleIDs in the VCF file
+
+library(tidyverse); library(magrittr)
+dartvcfInput<-here::here("data/Report-DCas20-5419","Report_5419_VCF_Ref_Version6.txt")
+dartcountsInput<-here::here("data/Report-DCas20-5419","Report_5419_Counts_Ref_Version6.csv")
+outName<-here::here("data/Report-DCas20-5419","DCas20_5419")
+nskipvcf<-2 
+nskipcounts<-3
+ncores<-10
+```
+
+# Prelim. check format
+
+Start manual. Check that the files read in according to previous code. Adjust code if necessary. Make a function and apply it to the input files.
+
+```{r, eval=F}
+# vcf<-read.table(dartvcfInput,
+#                 stringsAsFactors = F,skip = nskipvcf, header = T, sep = "\t", comment.char = "")
+# readCounts<-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
+# 
+# dim(vcf)
+# # [1] 13603  2052
+# dim(readCounts)
+# # [1] 27206  2068
+# 
+# # the lenghts don't match?
+# 
+# # Initial look at names....
+# colnames(readCounts)[1:100]
+#  #  [1] "AlleleID"                      "CloneID"                      
+#  #  [3] "AlleleSequence"                "TrimmedSequence"              
+#  #  [5] "TrimmedSequence_plus_Strand"   "Chrom_Cassava_v61"            
+#  #  [7] "Tag_ChromPos_Cassava_v61"      "SNP_ChromPos_Cassava_v61"     
+#  #  [9] "AlnCnt_Cassava_v61"            "AlnEvalue_Cassava_v61"        
+#  # [11] "Strand_Cassava_v61"            "SNP"                          
+#  # [13] "SnpPosition"                   "CallRate"                     
+#  # [15] "OneRatioRef"                   "OneRatioSnp"                  
+#  # [17] "FreqHomRef"                    "FreqHomSnp"                   
+#  # [19] "FreqHets"                      "PICRef"                       
+#  # [21] "PICSnp"                        "AvgPIC"                       
+#  # [23] "AvgCountRef"                   "AvgCountSnp"                  
+#  # [25] "RepAvg"                        "GS_Prediction_NaCRRI_2019_2"  
+#  # [27] "GS_Prediction_NaCRRI_2019_1"   "GS_Prediction_NaCRRI_2019_26" 
+#  # [29] "GS_Prediction_NaCRRI_2019_28"  "GS_Prediction_NaCRRI_2019_64" 
+#  # [31] "GS_Prediction_NaCRRI_2019_77"  "GS_Prediction_NaCRRI_2019_92" 
+#  # [33] "GS_Prediction_NaCRRI_2019_80"  "GS_Prediction_NaCRRI_2019_3"  
+#  # [35] "GS_Prediction_NaCRRI_2019_14"  "GS_Prediction_NaCRRI_2019_52"
+# colnames(vcf)[1:30]
+# #  [1] "X.CHROM"                      "POS"                         
+# #  [3] "ID"                           "REF"                         
+# #  [5] "ALT"                          "QUAL"                        
+# #  [7] "FILTER"                       "INFO"                        
+# #  [9] "FORMAT"                       "GS_Prediction_NaCRRI_2019_2" 
+# # [11] "GS_Prediction_NaCRRI_2019_11" "GS_Prediction_NaCRRI_2019_12"
+# # [13] "GS_Prediction_NaCRRI_2019_13" "GS_Prediction_NaCRRI_2019_3" 
+# # [15] "GS_Prediction_NaCRRI_2019_4"  "GS_Prediction_NaCRRI_2019_5" 
+# # [17] "GS_Prediction_NaCRRI_2019_6"  "GS_Prediction_NaCRRI_2019_7" 
+# # [19] "GS_Prediction_NaCRRI_2019_8"  "GS_Prediction_NaCRRI_2019_9" 
+# # [21] "GS_Prediction_NaCRRI_2019_10" "GS_Prediction_NaCRRI_2019_1" 
+# # [23] "GS_Prediction_NaCRRI_2019_23" "GS_Prediction_NaCRRI_2019_24"
+# # [25] "GS_Prediction_NaCRRI_2019_25" "GS_Prediction_NaCRRI_2019_14"
+# # [27] "GS_Prediction_NaCRRI_2019_15" "GS_Prediction_NaCRRI_2019_17"
+# # [29] "GS_Prediction_NaCRRI_2019_18" "GS_Prediction_NaCRRI_2019_19"
+
+# Need to add a check in the conversion function 
+# that matches the names and reorders if necessary...
+
+#... turns out, the function already checks for that!!  
+# But seriously... the two outputs should come in the same order to avoid downstream problems.
+
+```
+
+# Conversion function
+
+Available and sourced from `code/` subdirectory: `convertDart2vcf.R`.
+
+# Run conversion function
+```{r, eval=F}
+source(here::here("code/","convertDart2vcf.R"))
+convertDart2vcf(dartvcfInput,dartcountsInput,outName,
+                nskipvcf=2,nskipcounts=3,ncores)
+```
+
+# Genomewide to per-chrom VCFs
+
+Split the genome-wide VCF into per-chromosome VCFs for imputation.
+
+```{r,eval = FALSE}
+require(furrr); options(mc.cores=18); plan(multiprocess)
+source(here::here("code","imputationFunctions.R"))
+
+vcfIn<-here::here("data/Report-DCas20-5419","DCas20_5419.vcf.gz")
+filters<-"--minDP 4 --maxDP 50" # because using GT not PL for impute (Beagle5)
+outPath<-here::here("data/Report-DCas20-5419/")
+outSuffix<-"DCas20_5419"
+
+future_map(1:18,
+           ~splitVCFbyChr(Chr=.,
+                          vcfIn=vcfIn,filters=filters,
+                          outPath=outPath,outSuffix=outSuffix))
+```
+
+2043 clones, 12981 SNP

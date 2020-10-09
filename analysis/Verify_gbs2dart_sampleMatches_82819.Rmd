@@ -1,0 +1,585 @@
+---
+title: "Verify GBS-DArT sample matches for DCas19_4459"
+site: workflowr::wflow_site
+date: "2019-August-28"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo =TRUE, eval = FALSE)
+# !diagnostics off
+```
+
+
+# Make a directory for output
+```{bash}
+# on cbsulm12
+mkdir /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819
+```
+# Input Parameters
+```{r}
+library(tidyverse); library(magrittr)
+dartvcfInput<-paste0("/workdir/mw489/DCas19_4459/SNP_4459_3822_4078_4433_VCF.csv")
+dartcountsInput<-paste0("/workdir/mw489/DCas19_4459/SNPs_counts_V6_4459_3822_4078_4433.csv")
+outName<-paste0("/workdir/mw489/DCas19_4459/DCas19_4459_82719")
+nskipvcf<-2
+nskipcounts<-3
+ncores<-90 # using more than a few could be VERY memory intensive
+```
+
+
+
+# Sample Lists
+
+Matches we could get:
+
+TARI TP
+NaCRRI C1/C2 parents
+
+```{r}
+library(tidyverse); library(magrittr);
+dcas4459samples<-read.table(file=paste0(outName,".samples"), stringsAsFactors = F, header = F)
+dcas4459samples$V1 %>% 
+  grep("TARI",.,value=T)
+dcas4459samples$V1 %>% 
+  grep("TARI",.,value=T,invert = T) %>% 
+  grep("Full_sib_Nigeria",.,value = T,invert = T) %>% 
+  grep("CycleOne|CycleTwo|GS_Cycle|UYT|RTB|Namulonge_C1",.,value = T,invert = T) %>% 
+  grep("UG11|UG12|UG13|UG14",.,value = T, ignore.case = T,invert = T) %>% 
+  grep("^UGC",.,value = T, ignore.case = T,invert = T)
+```
+```{r}
+system(paste0("bcftools query --list-samples ",
+              "/workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr1.vcf.gz ",
+              "> /workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr1.samples"))
+system(paste0("bcftools query --list-samples ",
+              "/workdir/mw489/TanzaniaData_June2017/vcfFIles/TanzaniaData_20170601_withRef_chr1.vcf.gz ",
+              "> /workdir/mw489/TanzaniaData_June2017/vcfFIles/TanzaniaData_20170601_withRef_chr1.samples"))
+
+system(paste0("bcftools query --list-samples ",
+              "/workdir/mw489/LV_paula_Jul2016/raw/LV_naCRRINextGen_paula_withRef_chr1.vcf ",
+              "> /workdir/mw489/LV_paula_Jul2016/raw/LV_naCRRINextGen_paula_withRef_chr1.samples"))
+
+system(paste0("bcftools query --list-samples ",
+              "/workdir/mw489/LV_paula_Jan2017/vcfFiles/paula_jan2017_4plates_withRef_chr1.vcf",
+              "> /workdir/mw489/LV_paula_Jan2017/vcfFiles/paula_jan2017_4plates_withRef_chr1.samples"))
+```
+
+
+```{r}
+june2016samples<-read.table(file="/workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr1.samples",
+                            stringsAsFactors = F, header = F)$V1
+tzsamples<-read.table(file="/workdir/mw489/TanzaniaData_June2017/vcfFIles/TanzaniaData_20170601_withRef_chr1.samples",
+                            stringsAsFactors = F, header = F)$V1
+paulaJuly16<-read.table(file="/workdir/mw489/LV_paula_Jul2016/raw/LV_naCRRINextGen_paula_withRef_chr1.samples",
+                            stringsAsFactors = F, header = F)$V1
+paulaJan17<-read.table(file="/workdir/mw489/LV_paula_Jan2017/vcfFiles/paula_jan2017_4plates_withRef_chr1.samples",
+                            stringsAsFactors = F, header = F)$V1
+```
+
+```{r}
+gbsSamples<-tibble(FullSampleName=c(tzsamples,june2016samples,paulaJan17,paulaJuly16)) %>% 
+  separate(FullSampleName,c("SampleID","GBS_ID"),":",extra = 'merge',remove = F)
+
+# UG11|UG12|UG13|UG14
+dart2gbs<-tibble(dartSampleName=dcas4459samples$V1 %>% 
+                   grep("TARI",.,value=T,invert = T) %>% 
+                   grep("Full_sib_Nigeria",.,value = T,invert = T) %>% 
+                   grep("UG11|UG12|UG13|UG14",.,value = T, ignore.case = T)) %>% 
+  inner_join(gbsSamples %>% 
+               mutate(dartSampleName=toupper(SampleID))) %>% 
+  select(dartSampleName,FullSampleName) %>% 
+  distinct %>% as.data.frame %>% 
+  bind_rows(
+    # UG15Fs (C1 CET, C0 UYT, C2 Parent)
+    tibble(dartSampleName=dcas4459samples$V1 %>% 
+             grep("TARI",.,value=T,invert = T) %>% 
+             grep("Full_sib_Nigeria",.,value = T,invert = T) %>% 
+             grep("CycleOne|CycleTwo|GS_Cycle|UYT|RTB|Namulonge_C1",.,value = T)) %>% 
+      inner_join(
+        bind_rows(readxl::read_xls("/workdir/mw489/GenotypingPlateMetaData/Plate18.xls"),
+                  readxl::read_xls("/workdir/mw489/GenotypingPlateMetaData/Plate19.xls")) %>% 
+          rename(dartSampleName=source_observation_unit_name,
+                 SampleID=ncbi_taxonomy_id) %>% 
+          select(dartSampleName,SampleID)
+      ) %>% distinct %>% 
+      inner_join(gbsSamples %>% 
+                   mutate(SampleID=toupper(SampleID))) %>% 
+      select(dartSampleName,FullSampleName) %>% distinct %>% as.data.frame 
+  ) %>% 
+  bind_rows(
+    # More UG15F? plus NASE14 and ORERA
+    tibble(dartSampleName=dcas4459samples$V1 %>% 
+             grep("TARI",.,value=T,invert = T) %>% 
+             grep("Full_sib_Nigeria",.,value = T,invert = T) %>% 
+             grep("CycleOne|CycleTwo|GS_Cycle|UYT|RTB|Namulonge_C1",.,value = T,invert = T) %>% 
+             grep("UG11|UG12|UG13|UG14",.,value = T, ignore.case = T,invert = T) %>% 
+             grep("^UGC",.,value = T, ignore.case = T,invert = T)) %>% 
+      inner_join(
+        bind_rows(
+          gbsSamples %>% 
+            mutate(dartSampleName=SampleID),
+          gbsSamples %>% 
+            mutate(dartSampleName=toupper(SampleID)))) %>% 
+      select(dartSampleName,FullSampleName) %>% as.data.frame %>% distinct
+  ) %>% 
+  bind_rows(
+    # TARI
+    tibble(dartSampleName=dcas4459samples$V1 %>% 
+             grep("TARI",.,value=T)) %>% 
+      separate(dartSampleName,c("PlateIDandPos","SampleID"),"\\.\\.\\.",remove = F) %>% 
+      inner_join(
+        bind_rows(
+          gbsSamples,
+          gbsSamples %>% 
+            mutate(SampleID=toupper(SampleID)))) %>% 
+      select(dartSampleName,FullSampleName) %>% as.data.frame %>% distinct
+  ) %>% 
+  bind_rows(
+    # TARI TP UKGs and KBHs
+    tibble(dartSampleName=dcas4459samples$V1 %>% 
+             grep("TARI",.,value=T)) %>% 
+      separate(dartSampleName,c("PlateIDandPos","SampleID"),"\\.\\.\\.",remove = F) %>% 
+      anti_join(
+        bind_rows(
+          gbsSamples,
+          gbsSamples %>% 
+            mutate(SampleID=toupper(SampleID)))) %>% 
+      mutate(SampleID=gsub("TZUKG","UKG",SampleID),
+             SampleID=gsub("TZKBH","KBH20",SampleID)) %>% 
+      inner_join(
+        bind_rows(
+          gbsSamples,
+          gbsSamples %>% 
+            mutate(SampleID=toupper(SampleID)))) %>% 
+      select(dartSampleName,FullSampleName) %>% as.data.frame %>% distinct
+  ) %>% 
+  distinct
+dim(dart2gbs)
+```
+
+
+```{r}
+saveRDS(dart2gbs,file="/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/dart2gbs_NameMatchesToVerifyByIBD_82819.rds")
+write.table(unique(dart2gbs$dartSampleName),
+            file=paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                        "dartSamples_toVerifyAgainstGBS_82819.txt"),
+            row.names = F, col.names = F, quote = F)
+write.table(unique(dart2gbs$FullSampleName),
+            file=paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                        "gbsSamples_toVerifyAgainstDArT_82819.txt"),
+            row.names = F, col.names = F, quote = F)
+```
+
+# Site Lists
+
+## Get sitesWithAlleles lists
+
+```{r}
+options(mc.cores=18)
+plan(multiprocess)
+june2016vcf_sites<-tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){ 
+    system(paste0("zcat /workdir/mw489/June2016_VCF/",
+                  "cassavaGBSbuild_June2016_withRef_chr",Chr,".vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "cassavaGBSbuild_June2016_withRef_chr",Chr,".sitesWithAlleles"))
+    sites<-read.table(file = paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                    "cassavaGBSbuild_June2016_withRef_chr",Chr,".sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }))
+
+options(mc.cores=18)
+plan(multiprocess)
+tzvcf_sites<-tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){ 
+    system(paste0("zcat /workdir/mw489/TanzaniaData_June2017/vcfFIles/",
+                  "TanzaniaData_20170601_withRef_chr",Chr,".vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "TanzaniaData_20170601_withRef_chr",Chr,".sitesWithAlleles"))
+    sites<-read.table(file = paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                    "TanzaniaData_20170601_withRef_chr",Chr,".sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }))
+
+options(mc.cores=18)
+plan(multiprocess)
+paulaJul2016vcf_sites<-tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){ 
+    system(paste0("cat /workdir/mw489/LV_paula_Jul2016/raw/",
+                  "LV_naCRRINextGen_paula_withRef_chr",Chr,".vcf ",
+                  "| cut -f1-5 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "LV_naCRRINextGen_paula_withRef_chr",Chr,".sitesWithAlleles"))
+    sites<-read.table(file = paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                    "LV_naCRRINextGen_paula_withRef_chr",Chr,".sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }))
+
+options(mc.cores=18)
+plan(multiprocess)
+paulaJan2017vcf_sites<-tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){ 
+    system(paste0("cat /workdir/mw489/LV_paula_Jan2017/vcfFiles/",
+                  "paula_jan2017_4plates_withRef_chr",Chr,".vcf ",
+                  "| cut -f1-5 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "paula_jan2017_4plates_withRef_chr",Chr,".sitesWithAlleles"))
+    sites<-read.table(file = paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                    "paula_jan2017_4plates_withRef_chr",Chr,".sitesWithAlleles"),
+                      stringsAsFactors = F, header = F) }))
+
+dart_sites<-read.table(paste0("/workdir/mw489/DCas19_4459/",
+                              "DCas19_4459_82719.sitesWithAlleles"),
+                       stringsAsFactors = F, header = T)
+```
+```{r}
+june2016vcf_sites %>% 
+  unnest() %$% table(c(V4,V5)) 
+tzvcf_sites %>% 
+  unnest() %$% table(c(V4,V5))
+paulaJul2016vcf_sites %>% 
+  unnest() %$% table(c(V4,V5))
+paulaJan2017vcf_sites %>% 
+  unnest() %$% table(c(V4,V5))
+dart_sites %>% 
+  unnest() %$% table(c(REF,ALT))
+```
+## Sites common to all GBS sources
+```{r}
+snpsCommonToAllGBS<-june2016vcf_sites %>% 
+  unnest() %>% 
+  semi_join(tzvcf_sites %>% 
+              unnest()) %>% 
+  semi_join(paulaJul2016vcf_sites %>% 
+              unnest()) %>% 
+  semi_join(paulaJan2017vcf_sites %>% 
+              unnest()) %>% 
+  filter(!grepl(",",V4),
+         !grepl(",",V5),
+         V4!=".",
+         V5!=".") %>% 
+  select(-Chr) #%$% table(c(V4,V5))
+dim(snpsCommonToAllGBS) # [1] 178128      5
+head(snpsCommonToAllGBS)
+
+saveRDS(snpsCommonToAllGBS,file=paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                       "snpsCommonToAllGBS_82819.rds"))
+```
+
+## DArT-GBS intersection
+```{r}
+dart_gbs_intersection<-snpsCommonToAllGBS %>% 
+  rename(CHROM=V1,
+         POS=V2,
+         ID=V3,
+         REF=V4,
+         ALT=V5) %>% 
+  semi_join(dart_sites)
+dart_gbs_intersection %>% dim # 402
+saveRDS(dart_gbs_intersection,file=paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                          "dart_gbs_intersection_82819.rds"))
+```
+
+# Extract from raw VCFs
+```{r}
+library(tidyverse); library(magrittr)
+gbs_sites<-readRDS(paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                       "snpsCommonToAllGBS_82819.rds"))
+dart_gbs_isect_sites<-readRDS(paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                                          "dart_gbs_intersection_82819.rds"))
+dart_sites<-read.table(paste0("/workdir/mw489/DCas19_4459/",
+                              "DCas19_4459_82719.sitesWithAlleles"),
+                       stringsAsFactors = F, header = T)
+```
+
+```{r}
+library(tidyverse); library(magrittr); require(furrr)
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(write_isect_sites=future_map(Chr,function(Chr){
+    isect_thischr<-dart_gbs_isect_sites %>% 
+      filter(CHROM==Chr) %>% 
+      select(CHROM,POS)
+    write.table(isect_thischr,
+                file=paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                            Chr,"_gbs_dart_isect_sites_82819.sites"),
+                row.names = F, col.names = F, quote = F) }))
+
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr",Chr,".vcf.gz ",
+                  "--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "gbsSamples_toVerifyAgainstDArT_82819.txt ",
+                  "--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbs_dart_isect_sites_82819.sites ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_june2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz")) }))
+# 180 samples
+
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/mw489/TanzaniaData_June2017/vcfFIles/",
+                  "TanzaniaData_20170601_withRef_chr",Chr,".vcf.gz ",
+                  "--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "gbsSamples_toVerifyAgainstDArT_82819.txt ",
+                  "--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbs_dart_isect_sites_82819.sites ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_tzvcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz")) }))
+# 480 samples
+
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --vcf /workdir/mw489/LV_paula_Jul2016/raw/",
+                  "LV_naCRRINextGen_paula_withRef_chr",Chr,".vcf ",
+                  "--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "gbsSamples_toVerifyAgainstDArT_82819.txt ",
+                  "--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbs_dart_isect_sites_82819.sites ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_paulaJul2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz")) }))
+## NOTE: NO SAMPLES EXTRACTED!!!
+
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --vcf /workdir/mw489/LV_paula_Jan2017/vcfFiles/",
+                  "paula_jan2017_4plates_withRef_chr",Chr,".vcf ",
+                    "--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "gbsSamples_toVerifyAgainstDArT_82819.txt ",
+                  "--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbs_dart_isect_sites_82819.sites ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_paulaJan2017vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz")) }))
+## 19 samples extracted
+
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_dartSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/mw489/DCas19_4459/",
+                  "DCas19_4459_82719.vcf.gz ",
+                  "--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                  "dartSamples_toVerifyAgainstGBS_82819.txt ",
+                  "--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbs_dart_isect_sites_82819.sites ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_dartSamples_toVerifyAgainstGBS_gbsDartIntersectingSites_82819.vcf.gz")) }))
+# 629 samples
+```
+
+# Index
+```{r}
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_june2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz")) 
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_tzvcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_paulaJul2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_paulaJan2017vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz"))
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_dartSamples_toVerifyAgainstGBS_gbsDartIntersectingSites_82819.vcf.gz")) }))
+
+```
+# Merge GBS
+```{r}
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(Merge=future_map(Chr,function(Chr){ 
+    system(paste0("bcftools merge ",
+                  "--output /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllgbsSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz ",
+                  "--merge snps --output-type z --threads 6 ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_june2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_tzvcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_gbsSamples_paulaJan2017vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz")) }))
+
+```
+
+# Merge GBS-DArT
+```{r}
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(Merge=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllgbsSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz")) 
+    
+    system(paste0("bcftools merge ",
+                  "--output /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz ",
+                  "--merge snps --output-type z --threads 6 ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllgbsSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_dartSamples_toVerifyAgainstGBS_gbsDartIntersectingSites_82819.vcf.gz")) }))
+
+```
+
+
+# Pre-analysis filter
+```{r}
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(PreAnalysisFilter=future_map(Chr,function(Chr){ 
+    system(paste0("vcftools --gzvcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz ",
+                  "--min-alleles 2 --max-alleles 2 --minDP 4 --maxDP 50 ", 
+                  "--recode --stdout | bgzip -c -@ 24 > ",
+                  "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz"))}))
+
+```
+# Concat chroms
+```{r}
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",
+                  Chr,"_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz"))
+  }))
+
+system(paste0("bcftools concat --allow-overlaps ",
+              "--output /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+              "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz ",
+              "--output-type z --threads 6 ",
+              paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr",1:18,
+                     "_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz",collapse = " ")))
+system(paste0("vcftools --gzvcf ",
+              "/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+              "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz"))
+```
+After filtering, kept 1308 out of 1308 Individuals
+After filtering, kept 402 out of a possible 402 Sites
+ 
+# Make binary blink (bed/bim/fam)
+```{r}
+system(paste0("export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;",
+                      "plink --vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                      "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz ", 
+                      "--make-bed --const-fid ",
+                      "--out /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/", 
+                      "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819")) 
+```
+
+# PLINK IBD
+```{r}
+system(paste0("export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;",
+              "plink --bfile /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+              "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819 ",
+              "--genome --out /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+              "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819;"))
+```
+
+# Choose DArT-GBS matching records
+```{r}
+library(tidyverse); library(magrittr); library(data.table)
+genome<-fread(paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                     "AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.genome"),
+              stringsAsFactors = F, header = T) %>%
+  as_tibble
+  
+dart2gbs<-readRDS(file="/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/dart2gbs_NameMatchesToVerifyByIBD_82819.rds")
+
+```
+
+# Make "official" matches
+```{r}
+IBDmatches<-dart2gbs %>% 
+  left_join(
+    genome %>% 
+      filter(DST>=0.9 | PI_HAT>=0.65) %>% 
+      select(IID1,IID2,DST,PI_HAT) %>% 
+      rename(FullSampleName=IID1,
+             dartSampleName=IID2)
+    ) %>% 
+  filter(!is.na(DST)) %>% # 564 pass
+  arrange(FullSampleName,desc(PI_HAT)) %>% 
+  group_by(dartSampleName) %>% 
+  slice(1) %>% 
+  group_by(FullSampleName) %>% 
+  slice(1) %>% 
+  ungroup() # 455 unique dart-gbs matches!
+IBDmatches %>% count(FullSampleName) %>% arrange(desc(n))
+IBDmatches %>% count(dartSampleName) %>% arrange(desc(n))
+```
+455 unique pairs of FullSampleName (GBS) and dartName (DArTseqLD)
+```{r}
+saveRDS(IBDmatches,file="/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/gbs2dart_SamplesVerifiedByIBD_82819.rds")
+```
+
+# Check if any were in RefPanel3
+```{r}
+refpanel3_samples<-read.table(paste0("/workdir/mw489/ImputationStageIII_72619/",
+                  "chr2_RefPanelAndGSprogeny_ReadyForGP_72719.fam"),
+           stringsAsFactors = F, header = F)$V2
+
+table(IBDmatches$FullSampleName %in% refpanel3_samples)
+```
+FALSE  TRUE 
+  398    57 
+```{r}
+IBDmatches$FullSampleName[IBDmatches$FullSampleName %in% refpanel3_samples]
+```
+Of those, were any imputed as GBS+DArT?
+```{r}
+gbsPlusDart_refpanel3_samples<-read.table(paste0("/workdir/mw489/ImputationStageI_71119/",
+                                                 "samplesWithVerifiedGBSandDart_71119.txt"),
+                                          stringsAsFactors = F, header = F)$V1
+table(IBDmatches$FullSampleName %in% gbsPlusDart_refpanel3_samples)
+```
+FALSE  TRUE 
+  413    42
+
+# Lists for imputation
+Make a list for later use: samples imputed in RefPanel3 as GBS only, which now have matches
+Exclude those from RefPanel3 when imputed target (since now include in target)
+```{r}
+refpanel3samples_prevImputedAsGBSonly_nowWithVerifiedDart<-IBDmatches$FullSampleName %>% 
+  .[. %in% refpanel3_samples] %>% 
+  .[!. %in% gbsPlusDart_refpanel3_samples] # 15 of them
+write.table(refpanel3samples_prevImputedAsGBSonly_nowWithVerifiedDart,
+            file=paste0("/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/",
+                        "refpanel3samples_prevImputedAsGBSonly_nowWithVerifiedDart_82819.txt"),
+            row.names = F, col.names = F, quote = F)
+
+```
+
+Finally, make a list of the 413 GBS-DArT matches that _weren't_ imputed as GBS+DArT samples previously in RefPanelI (i.e. exclude the 42 referenced above)...
+```{r}
+IBDmatches %<>% 
+  filter(!FullSampleName %in% gbsPlusDart_refpanel3_samples)
+saveRDS(IBDmatches,file="/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/gbs2dart_SamplesVerifiedByIBD_toImpute_82819.rds")
+```
+

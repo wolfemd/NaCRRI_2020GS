@@ -1,0 +1,1695 @@
+---
+title: "East Africa Imputation 2019 - Stage II"
+site: workflowr::wflow_site
+date: "2019-September-10"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo =TRUE, eval = FALSE)
+# !diagnostics off
+```
+
+# Make Directory (@ cbsurobbins) 
+```{r}
+mkdir /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+```
+
+```{r}
+MapforBeagle
+tibble(CHR=1:18) %>% 
+  mutate(CHROMdata=map(CHR,~read.table(file=paste0("~/Google Drive/NextGenGS/nextgenImputation2019/",
+                                                   "CassavaGeneticMap/chr",.,"_cassava_cM_pred.v6_90619.map"),
+                                        stringsAsFactors = F, header = F))) %>% 
+  unnest() %>% dim
+  ggplot(.,aes(x=V4,y=V3)) + geom_point() + facet_wrap(~CHR)
+```
+
+
+# Prepare imputation target: Samples with GBS-only
+
+GBS-only samples from NaCRRI and TARI
+Mostly will include NaCRRI C1 but also might be some TARI TP (those whose new samples weren't verified).
+Use previously REF imputed data in order to only require Beagle 5.1
+
+## Get data
+Get Tanzania imputed data from:
+```{bash}
+ssh -p 8022 mw489@login.sgn.cornell.edu
+scp -r /export/species/Manihot_esculenta_old/gbs/IGDbuildNewWithV6/genotypeFiles_VCFformat_filtered_imputed/beagle_GBS_june17 mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/
+
+```
+
+## Samples
+
+Samples NOT in RefPanelIV from 
+1) /workdir/marnin/beagle_GBS_june17 (imputed Tz data)
+2) /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/ (NaCRRI C1)
+
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+system(paste0("bcftools query --list-samples /workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+              "TanzaniaData_20170601_withRef_chr1.filt2.imputed.vcf.gz ",
+              "> /workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+              "TanzaniaData_20170601_withRef_chr1.filt2.imputed.samples"))
+system(paste0("bcftools query --list-samples /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+              "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr1.imputed.vcf.gz ",
+              "> /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+              "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr1.imputed.samples"))
+system(paste0("bcftools query --list-samples /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/",
+              "chr1_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+              "> /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/",
+              "chr1_ImputationReferencePanel_StageIV_82819.samples"))
+```
+```{r}
+refpanelIV<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/",
+                              "chr1_ImputationReferencePanel_StageIV_82819.samples"),
+                       stringsAsFactors = F, header = F)$V1
+
+ugC1<-read.table(paste0("/workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                        "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr1.imputed.samples"),
+                 stringsAsFactors = F, header = F)$V1
+tzTP<-read.table(paste0("/workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                        "TanzaniaData_20170601_withRef_chr1.filt2.imputed.samples"),
+                 stringsAsFactors = F, header = F)$V1
+table(ugC1 %in% tzTP) # false
+table(ugC1 %in% refpanelIV)
+# FALSE  TRUE 
+#  1915   175 
+table(tzTP %in% refpanelIV)
+# FALSE  TRUE 
+#  1016   328 
+
+gbsOnlySamplesToImpute<-union(ugC1,tzTP) %>% .[!. %in% refpanelIV]
+gbsOnlySamplesToImpute_ugC1<-ugC1 %>% .[!. %in% refpanelIV]
+gbsOnlySamplesToImpute_tzTP<-tzTP %>% .[!. %in% refpanelIV]
+write.table(gbsOnlySamplesToImpute_ugC1,
+            file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                        "gbsOnlySamplesToImpute_ugC1_90919.txt"),
+            row.names = F, col.names = F, quote = F)
+write.table(gbsOnlySamplesToImpute_tzTP,
+            file=paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                        "gbsOnlySamplesToImpute_tzTP_90919.txt"),
+            row.names = F, col.names = F, quote = F)
+
+```
+
+## Sites
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat /workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                  "TanzaniaData_20170601_withRef_chr",Chr,".filt2.imputed.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                  "TanzaniaData_20170601_withRef_chr",Chr,".filt2.imputed.sitesWithAlleles"))}))
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                  "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",Chr,".imputed.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                  "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",Chr,".imputed.sitesWithAlleles"))}))
+
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.sitesWithAlleles"))}))
+
+
+tibble(Chr=1:18) %>% 
+  mutate(GetINFO=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                           "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",Chr,".imputed.vcf.gz ")
+            fileOut<-paste0("--out /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                            "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",Chr,".imputed")
+            system(paste0(fileIn,"--get-INFO AR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+tibble(Chr=1:18) %>% 
+  mutate(GetINFO=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf /workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                           "TanzaniaData_20170601_withRef_chr",Chr,".filt2.imputed.vcf.gz ")
+            fileOut<-paste0("--out /workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                            "TanzaniaData_20170601_withRef_chr",Chr,".filt2.imputed")
+            system(paste0(fileIn,"--get-INFO AR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+
+```{r}
+stats2filterOn_ugC1<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0("/workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                                                  "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",.,
+                                                  ".imputed.INFO"), 
+                                           stringsAsFactors = F, header = T)),
+           hwe=future_map(Chr,~read.table(paste0("/workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                                                 "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",.,
+                                                 ".imputed.hwe"), 
+                                          stringsAsFactors = F, header = T)))
+stats2filterOn_ugC1 %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn_ugC1 %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn_ugC1 %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          AR2=as.numeric(AR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(AR2),
+                           !is.na(AF))))
+stats2filterOn_ugC1 %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+stats2filterOn_ugC1 %>% unnest()
+```
+ Chr INFO                       NotNumDR2
+   <int> <list>                     <lgl>    
+ 1     1 <data.frame [32,789 x 12]> FALSE    
+ 2     2 <data.frame [25,770 x 12]> FALSE    
+ 3     3 <data.frame [23,542 x 12]> FALSE    
+ 4     4 <data.frame [19,718 x 12]> FALSE    
+ 5     5 <data.frame [22,094 x 12]> FALSE    
+ 6     6 <data.frame [21,505 x 12]> FALSE    
+ 7     7 <data.frame [13,097 x 12]> FALSE    
+ 8     8 <data.frame [19,177 x 12]> FALSE    
+ 9     9 <data.frame [19,279 x 12]> FALSE    
+10    10 <data.frame [16,185 x 12]> FALSE    
+11    11 <data.frame [20,176 x 12]> FALSE    
+12    12 <data.frame [16,877 x 12]> FALSE    
+13    13 <data.frame [16,892 x 12]> FALSE    
+14    14 <data.frame [22,189 x 12]> FALSE    
+15    15 <data.frame [21,376 x 12]> FALSE    
+16    16 <data.frame [16,423 x 12]> FALSE    
+17    17 <data.frame [16,515 x 12]> FALSE    
+18    18 <data.frame [16,188 x 12]> FALSE 
+```{r}
+stats2filterOn_tzTP<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0("/workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                                                  "TanzaniaData_20170601_withRef_chr",.,".filt2.imputed.INFO"), 
+                                           stringsAsFactors = F, header = T)),
+           hwe=future_map(Chr,~read.table(paste0("/workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                                                  "TanzaniaData_20170601_withRef_chr",.,".filt2.imputed.hwe"), 
+                                          stringsAsFactors = F, header = T)))
+stats2filterOn_tzTP %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn_tzTP %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn_tzTP %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          AR2=as.numeric(AR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(AR2),
+                           !is.na(AF))))
+stats2filterOn_tzTP %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+stats2filterOn_tzTP %>% unnest()
+```
+Chr INFO                       NotNumDR2
+   <int> <list>                     <lgl>    
+ 1     1 <data.frame [32,789 x 12]> FALSE    
+ 2     2 <data.frame [25,770 x 12]> FALSE    
+ 3     3 <data.frame [23,542 x 12]> FALSE    
+ 4     4 <data.frame [19,718 x 12]> FALSE    
+ 5     5 <data.frame [22,094 x 12]> FALSE    
+ 6     6 <data.frame [21,505 x 12]> FALSE    
+ 7     7 <data.frame [13,097 x 12]> FALSE    
+ 8     8 <data.frame [19,177 x 12]> FALSE    
+ 9     9 <data.frame [19,279 x 12]> FALSE    
+10    10 <data.frame [16,185 x 12]> FALSE    
+11    11 <data.frame [20,176 x 12]> FALSE    
+12    12 <data.frame [16,877 x 12]> FALSE    
+13    13 <data.frame [16,892 x 12]> FALSE    
+14    14 <data.frame [22,189 x 12]> FALSE    
+15    15 <data.frame [21,376 x 12]> FALSE    
+16    16 <data.frame [16,423 x 12]> FALSE    
+17    17 <data.frame [16,515 x 12]> FALSE    
+18    18 <data.frame [16,188 x 12]> FALSE  
+```{r}
+refpanelIV_sites<-tibble(Chr=1:18) %>%
+  mutate(SiteList=future_map(Chr,function(Chr){ 
+    refpanel4<-read.table(file = paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/chr",
+                                        Chr,"_ImputationReferencePanel_StageIV_82819.sitesWithAlleles"),
+                          stringsAsFactors = F, header = F) 
+    return(refpanel4)})) %>% 
+  unnest() %>% 
+  rename(CHROM=V1,
+         POS=V2,
+         ID=V3,
+         REF=V4,
+         ALT=V5)
+dim(refpanelIV_sites) # [1] 65509     6
+head(refpanelIV_sites)
+```
+
+After poor results on 9/09/19, this time, I want to treat tzTP and ugC1 separately, with emphasis on ugC1...
+
+
+Keep sites that have:
+  1. Matching chrom, pos and alleles in _both_ imputed GBS datasets (*ugC1* and *tzTP*), 
+  2. Passing pre-imputation filters in the GBS datasets (*ugC1* and *tzTP*)
+    + AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+  3. Intersect the *refpanelIV* sitesWithAlleles
+
+```{r}
+stats2filterOn_tzTP %<>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,AR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS,REF,ALT)))
+stats2filterOn_ugC1 %<>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,AR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS,REF,ALT)))
+
+sitesPassingFilters_tzTP<-stats2filterOn_tzTP %>% 
+  unnest(allSitesPassing) %>% 
+  semi_join(refpanelIV_sites) %>% 
+  group_by(Chr) %>% 
+  nest(.key = "allSitesPassing")
+sitesPassingFilters_ugC1<-stats2filterOn_ugC1 %>% 
+  unnest(allSitesPassing) %>% 
+  semi_join(refpanelIV_sites) %>% 
+  group_by(Chr) %>% 
+  nest(.key = "allSitesPassing")
+sitesPassingFilters_tzTP %>% unnest() %>% nrow() # 48996
+sitesPassingFilters_ugC1 %>% unnest() %>% nrow() # 8170
+sitesPassingFilters_tzTP
+sitesPassingFilters_ugC1
+```
+     Chr allSitesPassing     
+   <int> <list>              
+ 1     1 <tibble [5,985 x 4]>
+ 2     2 <tibble [2,980 x 4]>
+ 3     3 <tibble [3,144 x 4]>
+ 4     4 <tibble [2,860 x 4]>
+ 5     5 <tibble [2,781 x 4]>
+ 6     6 <tibble [2,794 x 4]>
+ 7     7 <tibble [1,476 x 4]>
+ 8     8 <tibble [2,767 x 4]>
+ 9     9 <tibble [2,492 x 4]>
+10    10 <tibble [2,218 x 4]>
+11    11 <tibble [2,421 x 4]>
+12    12 <tibble [2,108 x 4]>
+13    13 <tibble [2,079 x 4]>
+14    14 <tibble [3,290 x 4]>
+15    15 <tibble [2,933 x 4]>
+16    16 <tibble [2,135 x 4]>
+17    17 <tibble [2,109 x 4]>
+18    18 <tibble [2,424 x 4]>
+     Chr allSitesPassing     
+   <int> <list>              
+ 1     1 <tibble [2,985 x 4]>
+ 2     2 <tibble [332 x 4]>  
+ 3     3 <tibble [372 x 4]>  
+ 4     4 <tibble [597 x 4]>  
+ 5     5 <tibble [322 x 4]>  
+ 6     6 <tibble [321 x 4]>  
+ 7     7 <tibble [204 x 4]>  
+ 8     8 <tibble [152 x 4]>  
+ 9     9 <tibble [376 x 4]>  
+10    10 <tibble [186 x 4]>  
+11    11 <tibble [301 x 4]>  
+12    12 <tibble [187 x 4]>  
+13    13 <tibble [263 x 4]>  
+14    14 <tibble [326 x 4]>  
+15    15 <tibble [242 x 4]>  
+16    16 <tibble [263 x 4]>  
+17    17 <tibble [486 x 4]>  
+18    18 <tibble [255 x 4]>
+
+
+```{r}
+sitesPassingFilters_ugC1 %>% 
+    mutate(WriteSiteList=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+        #pathIn<-"/workdir/mw489/ImputationEastAfrica_StageI_82819/"
+        sitesPassing_thisChr<-allSitesPassing %>% 
+          select(CHROM,POS) %>% 
+          arrange(CHROM,POS)
+        write.table(sitesPassing_thisChr,
+                    file = paste0(pathIn,"chr",Chr,
+                                  "_ugC1_ImputedGBS_91019.sitesPassing"),
+                    row.names = F, col.names = F, quote = F)}))
+sitesPassingFilters_tzTP %>% 
+    mutate(WriteSiteList=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+        #pathIn<-"/workdir/mw489/ImputationEastAfrica_StageI_82819/"
+        sitesPassing_thisChr<-allSitesPassing %>% 
+          select(CHROM,POS) %>% 
+          arrange(CHROM,POS)
+        write.table(sitesPassing_thisChr,
+                    file = paste0(pathIn,"chr",Chr,
+                                  "_tzTP_ImputedGBS_91019.sitesPassing"),
+                    row.names = F, col.names = F, quote = F)}))
+```
+
+## Extract REFimputed data tzTP
+```{r}
+library(tidyverse); library(magrittr); require(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/beagle_GBS_june17/TanzaniaData_20170601_withRef/",
+                  "TanzaniaData_20170601_withRef_chr",Chr,".filt2.imputed.vcf.gz ",
+                  "--keep /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                  "gbsOnlySamplesToImpute_tzTP_90919.txt ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTP_ImputedGBS_91019.sitesPassing ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz")) }))
+```
+
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz"))
+    }))
+
+```
+
+## Extract REFimputed data ugC1
+```{r}
+library(tidyverse); library(magrittr); require(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/beagle_GBS_october2016/CYCLE_NACRRI_june16/vcf/",
+                  "Subset_cassavaGBSbuild_June2016_withRef_NACCRI_CYCLE_chr",Chr,".imputed.vcf.gz ",
+                  "--keep /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                  "gbsOnlySamplesToImpute_ugC1_90919.txt ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1_ImputedGBS_91019.sitesPassing ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz")) }))
+
+tibble(Chr=1:18) %>%
+  mutate(Index=future_map(Chr,function(Chr){ 
+    system(paste0("tabix -f -p vcf /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz"))
+    }))
+
+```
+
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageI_82819/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageI_82819;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/ mw489@cbsulm16.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageI_82819;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/ mw489@cbsulm14.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageI_82819;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/ mw489@cbsulm13.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageI_82819;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageI_82819;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/ mw489@cbsulm07.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageI_82819;
+
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm16.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm14.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm13.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm07.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+```
+
+# Impute tzTP samples @ ungenotyped sites (REF impute, GT mode, Beagle 5.0) 
+
+## cbsulm17 (112) [1,2,3,5]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1,2,3,5)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## cbsulm16 (112) [4,6,7,8]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(4,6,7,8)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+## cbsulm14 (112) [9,10,11,12]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(9,10,11,12)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## cbsulm13 (96) [13,14,15]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(13,14,15)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## cbsulm12 (96) [16,17,18]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(16,17,18)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEastAfrica_StageII_90919; 
+#mkdir BeagleLogs;
+cp *_tzTPsamples_AllSitesREFimputedAndPhased_91019.log BeagleLogs/
+```
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+```
+
+## Post-impute filter
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>% 
+  mutate(PostImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"chr",
+                            Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019")
+            system(paste0(fileIn,"--get-INFO DR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_tzTPsamples_AllSitesREFimputedAndPhased_91019.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_tzTPsamples_AllSitesREFimputedAndPhased_91019.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          DR2=as.numeric(DR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(DR2),
+                           !is.na(AF))))
+
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,DR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+stats2filterOn %>% unnest() %>% nrow() # 65451
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # 65130
+stats2filterOn
+sitesPassingFilters
+#         Chr allSitesPassing         
+#    <int> <list>                  
+#  1     1 <data.frame [8,201 x 2]>
+#  2     2 <data.frame [3,854 x 2]>
+#  3     3 <data.frame [4,102 x 2]>
+#  4     4 <data.frame [3,773 x 2]>
+#  5     5 <data.frame [3,807 x 2]>
+#  6     6 <data.frame [3,594 x 2]>
+#  7     7 <data.frame [1,959 x 2]>
+#  8     8 <data.frame [3,628 x 2]>
+#  9     9 <data.frame [3,449 x 2]>
+# 10    10 <data.frame [2,901 x 2]>
+# 11    11 <data.frame [3,297 x 2]>
+# 12    12 <data.frame [2,893 x 2]>
+# 13    13 <data.frame [2,773 x 2]>
+# 14    14 <data.frame [4,172 x 2]>
+# 15    15 <data.frame [3,959 x 2]>
+# 16    16 <data.frame [2,875 x 2]>
+# 17    17 <data.frame [2,775 x 2]>
+# 18    18 <data.frame [3,118 x 2]>
+```
+
+
+```{r}
+sitesPassingFilters %>% 
+    mutate(PostImputePrePhaseFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+        sitesPassing_thisChr<-allSitesPassing %>% 
+          select(CHROM,POS)
+        write.table(sitesPassing_thisChr,
+                    file = paste0(pathIn,"chr",Chr,
+                                  "_tzTPsamples_AllSitesREFimputedAndPhased_91019.sitesPassing"),
+                    row.names = F, col.names = F, quote = F)}))
+sitesPassingFilters %>% 
+    mutate(PostImputePrePhaseFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+        system(paste0("vcftools --gzvcf ",pathIn,"chr",Chr,
+                      "_tzTPsamples_AllSitesREFimputedAndPhased_91019.vcf.gz ",
+                      "--positions ",pathIn,"chr",Chr,
+                      "_tzTPsamples_AllSitesREFimputedAndPhased_91019.sitesPassing ",
+                      "--recode --stdout | ",
+                      "bgzip -c -@ 24 > ",
+                      pathIn,"chr",Chr,
+                      "_tzTPsamples_AllSitesREFimputedAndPhased_ReadyToMergeWithRefPanel_91019.vcf.gz"))}))
+
+system(paste0("bcftools query --list-samples /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+              "chr1_tzTPsamples_AllSitesREFimputedAndPhased_ReadyToMergeWithRefPanel_91019.vcf.gz ",
+              "> /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+              "chr1_tzTPsamples_AllSitesREFimputedAndPhased_ReadyToMergeWithRefPanel_91019.samples"))
+
+```
+
+# Impute ugC1 samples @ ungenotyped sites (REF impute, GT mode, Beagle 5.0) 
+
+## cbsulm17 (112) [1,2,3,5]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1,2,3,5)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## cbsulm16 (112) [4,6,7,8]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(4,6,7,8)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+## cbsulm14 (112) [9,10,11,12]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(9,10,11,12)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## cbsulm13 (96) [13,14,15]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(13,14,15)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## cbsulm12 (96) [16,17,18]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(16,17,18)) %>% 
+  mutate(REFimpute_UnGenotypedSites_GBSonlySamples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_REFimputedGBSsites_91019.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEastAfrica_StageII_90919; 
+#mkdir BeagleLogs;
+cp *_ugC1samples_AllSitesREFimputedAndPhased_91019.log BeagleLogs/
+```
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+```
+
+## Post-impute filter
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>% 
+  mutate(PostImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"chr",
+                            Chr,"_ugC1samples_AllSitesREFimputedAndPhased_91019")
+            system(paste0(fileIn,"--get-INFO DR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_ugC1samples_AllSitesREFimputedAndPhased_91019.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_ugC1samples_AllSitesREFimputedAndPhased_91019.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          DR2=as.numeric(DR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(DR2),
+                           !is.na(AF))))
+
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,DR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+stats2filterOn %>% unnest() %>% nrow() # 65451
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # 24426
+stats2filterOn
+sitesPassingFilters
+#         Chr allSitesPassing         
+#    <int> <list>                  
+#  1     1 <data.frame [8,201 x 2]>
+#  2     2 <data.frame [3,854 x 2]>
+#  3     3 <data.frame [4,102 x 2]>
+#  4     4 <data.frame [3,773 x 2]>
+#  5     5 <data.frame [3,807 x 2]>
+#  6     6 <data.frame [3,594 x 2]>
+#  7     7 <data.frame [1,959 x 2]>
+#  8     8 <data.frame [3,628 x 2]>
+#  9     9 <data.frame [3,449 x 2]>
+# 10    10 <data.frame [2,901 x 2]>
+# 11    11 <data.frame [3,297 x 2]>
+# 12    12 <data.frame [2,893 x 2]>
+# 13    13 <data.frame [2,773 x 2]>
+# 14    14 <data.frame [4,172 x 2]>
+# 15    15 <data.frame [3,959 x 2]>
+# 16    16 <data.frame [2,875 x 2]>
+# 17    17 <data.frame [2,775 x 2]>
+# 18    18 <data.frame [3,118 x 2]>
+```
+
+
+# Form Imputation RefPanelV for UgC1
+
+Exclude IITA samples from C1-C4 unless they have GBS+DArT. This is to save memory. Should retain the key haplotypes.
+
+## Apply filter to RefPanelIV VCF
+```{r}
+refpanelIV<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/",
+                              "chr1_ImputationReferencePanel_StageIV_82819.samples"),
+                       stringsAsFactors = F, header = F)$V1
+
+tzTP<-read.table(paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                              "chr1_tzTPsamples_AllSitesREFimputedAndPhased_ReadyToMergeWithRefPanel_91019.samples"),
+                       stringsAsFactors = F, header = F)$V1
+samplesWithVerifiedGBSandDart<-read.table(file=paste0("/workdir/marnin/nextgenImputation2019/ImputationStageI_71119/",
+                                                      "samplesWithVerifiedGBSandDart_71119.txt"), 
+                                          stringsAsFactors = F, header = F)$V1
+
+table(refpanelIV %in% tzTP)
+table(refpanelIV %in% samplesWithVerifiedGBSandDart)
+
+iitaSamples2remove<-refpanelIV %>% 
+  grep("TMS13F|TMS14F|TMS15F|TMS16F|TMS17F|TMS18F|2013_",.,value = T) %>% 
+  .[!. %in% samplesWithVerifiedGBSandDart]
+
+refpanelIV %>% 
+  .[!. %in% iitaSamples2remove] %>% 
+  c(.,tzTP) %>% length # 13100... reasonable!
+
+iitaSamples2remove %>% #length # 10170 to remove
+  write.table(.,paste0("/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                       "iitaSamples2remove_fromUgC1RefPanel_91019.txt"),
+              row.names = F, col.names = F, quote = F)
+
+
+tibble(Chr=1:18) %>%
+  mutate(ExtractRefPanelIVsamplesForStageV=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819/chr",
+                  Chr,"_ImputationReferencePanel_StageIV_82819.vcf.gz ",
+                  "--remove /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                  "iitaSamples2remove_fromUgC1RefPanel_91019.txt ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_tzTPsamples_AllSitesREFimputedAndPhased_91019.sitesPassing ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  " /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ImputationReferencePanel_StageIVsamples_ReadyToMergeAndFormStageV_91019.vcf.gz")) }))
+```
+## Merge RefPanelIV and tzTP samples
+```{r}
+library(tidyverse); library(magrittr);
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>%
+    mutate(Index=future_map(Chr,function(Chr){
+        system(paste0("tabix -f -p vcf ",pathIn,"chr",Chr,
+                      "_ImputationReferencePanel_StageIVsamples_ReadyToMergeAndFormStageV_91019.vcf.gz"))
+        system(paste0("tabix -f -p vcf ",pathIn,"chr",Chr,
+                      "_tzTPsamples_AllSitesREFimputedAndPhased_ReadyToMergeWithRefPanel_91019.vcf.gz")) }))
+    
+tibble(Chr=1:18) %>%
+    mutate(Merge=future_map(Chr,function(Chr){
+        system(paste0("bcftools merge ",
+                      "--output ",pathIn,"chr",Chr,
+                      "_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "--merge snps --output-type z --threads 24 ",
+                      pathIn,"chr",Chr,
+                      "_ImputationReferencePanel_StageIVsamples_ReadyToMergeAndFormStageV_91019.vcf.gz ",
+                      pathIn,"chr",Chr,
+                      "_tzTPsamples_AllSitesREFimputedAndPhased_ReadyToMergeWithRefPanel_91019.vcf.gz"))}))
+
+```
+
+# Impute ugC1 samples @ genotyped sites (REF impute, GL mode, Beagle 4.1) 
+
+## Extract unimputed UgC1 from GBS source VCFs
+
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat ",pathIn,"chr",Chr,
+                  "_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  pathIn,"chr",Chr,"_ImputationReferencePanel_StageV_91019.sitesWithAlleles"))}))
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat /workdir/marnin/June2016_VCF/",
+                  "cassavaGBSbuild_June2016_withRef_chr",Chr,".vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr",Chr,".sitesWithAlleles"))}))
+
+gbs_sites<-tibble(Chr=1:18) %>%
+  mutate(sites=future_map(Chr,~read.table(paste0("/workdir/marnin/June2016_VCF/",
+                                                     "cassavaGBSbuild_June2016_withRef_chr",.,".sitesWithAlleles"),
+                                         stringsAsFactors = F, header = F)))
+refpanelV_sites<-tibble(Chr=1:18) %>%
+  mutate(sites=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                 "_ImputationReferencePanel_StageV_91019.sitesWithAlleles"),
+                                          stringsAsFactors = F, header = F)))
+gbs_sites %>% unnest() %>% str()
+refpanelV_sites %>% unnest() %>% str()
+
+refpanelV_sites %>% 
+  unnest() %>% 
+  semi_join(gbs_sites %>% unnest()) %>% 
+  group_by(Chr) %>% 
+  nest(.key = "allSitesPassing") %>% 
+  mutate(Sites2Keep=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+        sitesPassing_thisChr<-allSitesPassing %>% 
+          select(V1,V2)
+        write.table(sitesPassing_thisChr,
+                    file = paste0(pathIn,"chr",Chr,
+                                  "_ugC1samples_sitesInRefPanelVtoImpute_91019.sites2keep"),
+                    row.names = F, col.names = F, quote = F)}))
+  
+  
+```
+
+```{r}
+library(tidyverse); library(magrittr); require(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/June2016_VCF/",
+                  "cassavaGBSbuild_June2016_withRef_chr",Chr,".vcf.gz ",
+                  "--keep /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                  "gbsOnlySamplesToImpute_ugC1_90919.txt ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_sitesInRefPanelVtoImpute_91019.sites2keep ",
+                  "--recode --stdout | ",
+                  "awk '$4 != \"-\" {print}' | awk '$5 != \"-\" {print}' | grep -v 'INFO=' | ",
+                  "bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz")) }))
+```
+```{bash}
+vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr1_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz
+zcat /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr1_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz | head -n40 | cut -f1-12
+```
+1:29425054 [-]
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageI_82819/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm16.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm14.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm13.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm07.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+
+```
+
+## cbsulm17 (112) [1 @iter4...,2,3]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1,2,3)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle41/beagle41.jar ",
+                      "gl=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz ",
+                      "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019 ",
+                      "nthreads=",nthreads," niterations=10"))}))
+
+
+```
+Window=1 Iteration=1
+Time for building model:         16 minutes 29 seconds
+Time for sampling (singles):     31 hours 32 minutes 39 seconds
+Window=1 Iteration=2
+Time for building model:         23 minutes 59 seconds
+Time for sampling (singles):     28 hours 8 minutes 5 seconds
+Window=1 Iteration=3
+Time for building model:         24 minutes 58 seconds
+Time for sampling (singles):     30 hours 24 minutes 33 seconds
+Window=1 Iteration=4
+Time for building model:         24 minutes 16 seconds
+Time for sampling (singles):     27 hours 31 minutes 15 seconds
+
+## cbsulm16 (112) [4 done,5 @iter5,6]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(4,5,6)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle41/beagle41.jar ",
+                      "gl=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz ",
+                      "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019 ",
+                      "nthreads=",nthreads," niterations=10"))}))
+# Window=1 Iteration=2
+# Time for building model:         7 minutes 9 seconds
+# Time for sampling (singles):     6 hours 24 minutes 54 seconds
+# Window=1 Iteration=5
+# Time for building model:         7 minutes 5 seconds
+# Time for sampling (singles):     6 hours 56 minutes 43 seconds
+# Window=1 Iteration=8
+# Time for building model:         7 minutes 53 seconds
+# Time for sampling (singles):     7 hours 13 minutes 27 seconds
+```
+
+## cbsulm14 (112) [REZ ENDING TODAY] [7 done,8 @iter8,9 cancelled ]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(7,8,9)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle41/beagle41.jar ",
+                      "gl=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz ",
+                      "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019 ",
+                      "nthreads=",nthreads," niterations=10"))}))
+# Chr 7
+# Window=1 Iteration=10
+# Time for building model:         1 minute 57 seconds
+# Time for sampling (singles):     1 hour 37 minutes 59 seconds
+# Window=1 Iteration=11
+# Time for building model:         1 minute 48 seconds
+# Time for sampling (singles):     7 minutes 36 seconds
+# 
+# Chr 8
+# Window=1 Iteration=3
+# Time for building model:         4 minutes 58 seconds
+# Time for sampling (singles):     5 hours 32 minutes 27 seconds
+# Window=1 Iteration=7
+# Time for building model:         4 minutes 58 seconds
+# Time for sampling (singles):     5 hours 40 minutes 3 seconds
+```
+
+
+```{r}
+rm chr9_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019*
+```
+
+
+## cbsulm13 (96) [10 done,11 done,12 @iter0]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(10,11,12)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle41/beagle41.jar ",
+                      "gl=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz ",
+                      "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019 ",
+                      "nthreads=",nthreads," niterations=10"))}))
+# Chr. 10
+# Window=1 Iteration=4
+# Time for building model:         4 minutes 19 seconds
+# Time for sampling (singles):     3 hours 45 minutes 9 seconds
+# Window=1 Iteration=9
+# Time for building model:         4 minutes 48 seconds
+# Time for sampling (singles):     4 hours 30 minutes 56 seconds
+# Number of markers:                2786
+# Total time for building model: 1 hour 27 minutes 48 seconds
+# Total time for sampling:       41 hours 38 minutes 45 seconds
+# Total run time:                43 hours 6 minutes 49 seconds
+# 
+# Chr. 11
+# Window=1 Iteration=1
+# Time for building model:         4 minutes 14 seconds
+# Time for sampling (singles):     8 hours 48 minutes 18 seconds
+# Window=1 Iteration=2
+# Time for building model:         5 minutes 16 seconds
+# Time for sampling (singles):     7 hours 33 minutes 32 seconds
+# Window=1 Iteration=5
+# Time for building model:         5 minutes 50 seconds
+# Time for sampling (singles):     10 hours 9 minutes 35 seconds
+# Number of markers:                3173
+# Total time for building model: 2 hours 18 minutes 26 seconds
+# Total time for sampling:       87 hours 44 minutes 39 seconds
+# Total run time:                90 hours 3 minutes 23 seconds
+```
+
+
+
+## cbsulm12 (96) [14 FAILED,13 @iter1,15]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(14,13,15)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle41/beagle41.jar ",
+                      "gl=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz ",
+                      "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019 ",
+                      "nthreads=",nthreads," niterations=10"))}))
+# Chr. 14
+# Window=1 Iteration=2
+# Time for building model:         14 minutes 3 seconds
+# Time for sampling (singles):     16 hours 9 minutes 24 seconds
+# Window=1 Iteration=3
+# Time for building model:         10 minutes 38 seconds
+# Time for sampling (singles):     19 hours 23 minutes 21 seconds
+# Window=1 Iteration=4
+# Time for building model:         11 minutes 57 seconds
+# Time for sampling (singles):     16 hours 35 minutes 9 seconds
+# 
+# Window=1 Iteration=7
+# Time for building model:         10 minutes 0 seconds
+# Time for sampling (singles):     20 hours 10 minutes 9 seconds
+# DAG statistics
+# mean edges/level: 651    max edges/level: 1150
+# mean edges/node:  1.054  mean count/edge: 46
+# Java HotSpot(TM) 64-Bit Server VM warning: INFO: os::commit_memory(0x00007eca31400000, 71757725696, 0) failed; error='Cannot allocate memory' (errno=12)
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 71757725696 bytes for committing reserved memory.
+# An error report file with more information is saved as:
+# /local/workdir/mw489/hs_err_pid42464.log
+# 
+# Chr. 13
+# Window=1 Iteration=1
+# Time for building model:         3 minutes 34 seconds
+# Time for sampling (singles):     5 hours 3 minutes 50 seconds
+
+```
+
+## cbsulm07 (64) [16 done] [17 and 18?]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(16)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-64
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle41/beagle41.jar ",
+                      "gl=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz ",
+                      "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                      "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                      Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019 ",
+                      "nthreads=",nthreads," niterations=10"))}))
+# Window=1 Iteration=1
+# Time for building model:         5 minutes 15 seconds
+# Time for sampling (singles):     12 hours 36 minutes 47 seconds
+# Window=1 Iteration=2
+# Time for building model:         6 minutes 2 seconds
+# Time for sampling (singles):     12 hours 7 minutes 51 seconds
+# Window=1 Iteration=3
+# Time for building model:         6 minutes 38 seconds
+# Time for sampling (singles):     10 hours 50 minutes 41 seconds
+# Window=1 Iteration=5
+# Time for building model:         9 minutes 28 seconds
+# Time for sampling (singles):     10 hours 52 minutes 11 seconds
+# Number of markers:                2778
+# Total time for building model: 2 hours 41 minutes 47 seconds
+# Total time for sampling:       125 hours 32 minutes 28 seconds
+# Total run time:                128 hours 14 minutes 42 seconds
+```
+
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEastAfrica_StageII_90919; 
+cp *_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019.log BeagleLogs/
+```
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+
+```
+
+## Post-impute filter
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>% 
+  mutate(PostImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"chr",
+                            Chr,"_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019")
+            system(paste0(fileIn,"--get-INFO AR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_tzTPsamples_AllSitesREFimputedAndPhased_91019.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_tzTPsamples_AllSitesREFimputedAndPhased_91019.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          DR2=as.numeric(DR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(DR2),
+                           !is.na(AF))))
+
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,DR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+stats2filterOn %>% unnest() %>% nrow() # 65451
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # 65130
+stats2filterOn
+sitesPassingFilters
+```
+        Chr allSitesPassing         
+   <int> <list>  
+
+Apply filter
+```{r}
+sitesPassingFilters %>% 
+  mutate(PostImputePrePhaseFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+    sitesPassing_thisChr<-allSitesPassing %>% 
+      select(CHROM,POS)
+    write.table(sitesPassing_thisChr,
+                file = paste0(pathIn,"chr",Chr,
+                              "_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019.sitesPassing"),
+                row.names = F, col.names = F, quote = F)
+    system(paste0("vcftools --gzvcf ",pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019.vcf.gz ",
+                  "--positions ",pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_REFimputedGLmode_91019.sitesPassing ",
+                  "--recode --stdout | ",
+                  "bgzip -c -@ 24 > ",
+                  pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_ReadyToPhaseAndImputeUngenotypedSites_91119.vcf.gz"))}))
+
+```
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageI_82819/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm16.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm14.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm13.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm07.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+
+```
+
+# Impute ugC1 samples @ genotyped sites (REF impute, GT mode, Beagle 5) 
+
+I realized I can try Beagle5 using carefully filtered TASSEL GT calls on the unimputed data. Maybe the phasing screwed stuff up on the previous UgC1 imputation. I had thought Beagle5 required the genotyped sites in a target dataset to bet phased and not contain missing. However, suggests that missingness and lack-of-phase is handled, just GL are not handled. 
+
+## Extract unimputed UgC1 from GBS source VCFs
+
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat ",pathIn,"chr",Chr,
+                  "_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  pathIn,"chr",Chr,"_ImputationReferencePanel_StageV_91019.sitesWithAlleles"))}))
+tibble(Chr=1:18) %>%
+  mutate(ExtractSiteList=future_map(Chr,function(Chr){
+    system(paste0("zcat /workdir/marnin/June2016_VCF/",
+                  "cassavaGBSbuild_June2016_withRef_chr",Chr,".vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/marnin/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr",Chr,".sitesWithAlleles"))}))
+
+gbs_sites<-tibble(Chr=1:18) %>%
+  mutate(sites=future_map(Chr,~read.table(paste0("/workdir/marnin/June2016_VCF/",
+                                                     "cassavaGBSbuild_June2016_withRef_chr",.,".sitesWithAlleles"),
+                                         stringsAsFactors = F, header = F)))
+refpanelV_sites<-tibble(Chr=1:18) %>%
+  mutate(sites=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                 "_ImputationReferencePanel_StageV_91019.sitesWithAlleles"),
+                                          stringsAsFactors = F, header = F)))
+gbs_sites %>% unnest() %>% str()
+refpanelV_sites %>% unnest() %>% str()
+
+refpanelV_sites %>% 
+  unnest() %>% 
+  semi_join(gbs_sites %>% unnest()) %>% 
+  group_by(Chr) %>% 
+  nest(.key = "allSitesPassing") %>% 
+  mutate(Sites2Keep=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+        sitesPassing_thisChr<-allSitesPassing %>% 
+          select(V1,V2)
+        write.table(sitesPassing_thisChr,
+                    file = paste0(pathIn,"chr",Chr,
+                                  "_ugC1samples_sitesInRefPanelVtoImpute_91019.sites2keep"),
+                    row.names = F, col.names = F, quote = F)}))
+  
+  
+```
+
+```{r}
+library(tidyverse); library(magrittr); require(furrr); options(mc.cores=18); plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(ExtractRaw_gbsSamples=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/June2016_VCF/",
+                  "cassavaGBSbuild_June2016_withRef_chr",Chr,".vcf.gz ",
+                  "--keep /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/",
+                  "gbsOnlySamplesToImpute_ugC1_90919.txt ",
+                  "--chr ",Chr," ",
+                  "--minDP 4 --maxDP 50 ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_sitesInRefPanelVtoImpute_91019.sites2keep ",
+                  "--recode --stdout | ",
+                  "awk '$4 != \"-\" {print}' | awk '$5 != \"-\" {print}' | grep -v 'INFO=' | ",
+                  "bgzip -c -@ 24 > ",
+                  "/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_Ready2GTimputeWithBeagle5_91119.vcf.gz")) }))
+```
+```{bash}
+vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr1_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz
+zcat /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr1_ugC1samples_FromJune2016vcf_Ready2REFimpute_91019.vcf.gz | head -n40 | cut -f1-12
+```
+1:29425054 [-]
+
+## Rsync
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageI_82819/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageI_82819
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm15.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+
+
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm17.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm16.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm14.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm13.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm07.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+
+```
+## Copy Genetic Map to server
+```{bash}
+cp -r ~/CassavaGeneticMap /workdir/mw489/; screen -r
+```
+
+## cbsulm15 (112) [1-18]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1:18)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_Ready2GTimputeWithBeagle5_91119.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+
+```
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEastAfrica_StageII_90919; 
+#mkdir BeagleLogs;
+cp *_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.log BeagleLogs/
+```
+
+## Rsync to cbsurobbins
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+```
+
+## Post-impute filter
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>% 
+  mutate(PostImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"chr",
+                            Chr,"_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119")
+            system(paste0(fileIn,"--get-INFO DR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          DR2=as.numeric(DR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(DR2),
+                           !is.na(AF))))
+
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,DR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+stats2filterOn %>% unnest() %>% nrow() # 65120
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # 51152
+stats2filterOn
+sitesPassingFilters
+```
+Apply filter
+```{r}
+sitesPassingFilters %>% 
+  mutate(PostImputePrePhaseFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+    sitesPassing_thisChr<-allSitesPassing %>% 
+      select(CHROM,POS)
+    write.table(sitesPassing_thisChr,
+                file = paste0(pathIn,"chr",Chr,
+                              "_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.sitesPassing"),
+                row.names = F, col.names = F, quote = F)
+    system(paste0("vcftools --gzvcf ",pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.vcf.gz ",
+                  "--positions ",pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_REFimputedGTmodeGenotypedSites_91119.sitesPassing ",
+                  "--recode --stdout | ",
+                  "bgzip -c -@ 24 > ",
+                  pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_ReadyToPhaseAndImputeUngenotypedSites_91119.vcf.gz"))}))
+
+```
+
+# Impute ugC1 samples @ ungenotyped sites (REF impute, GT mode, Beagle 5) 
+Second round of impute for these samples. See if we come out with more markers passing filters...?
+## Rsync to cbsulm15
+```{r}
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm15.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+```
+
+## cbsulm15 (112) [1-18]
+```{r}
+library(tidyverse); library(magrittr);
+tibble(Chr=c(1:18)) %>% 
+  mutate(REFimpute_GenotypedSites_GBSonly_ugC1samples=map(Chr,function(Chr){
+    nthreads<-112
+    system(paste0("java -Xms2g -Xmx500g -jar /programs/beagle/beagle.jar ",
+                  "gt=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_ReadyToPhaseAndImputeUngenotypedSites_91119.vcf.gz ",
+                  "map=/workdir/mw489/CassavaGeneticMap/chr",
+                  Chr,"_cassava_cM_pred.v6_91019.map ",
+                  "ref=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                  "out=/workdir/mw489/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119 ",
+                  "nthreads=",nthreads," impute=true ne=100000"))}))
+```
+
+## BeagleLogs
+```{r}
+cd /workdir/mw489/ImputationEastAfrica_StageII_90919; 
+cp *_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.log BeagleLogs/
+```
+
+## Rsync to cbsurobbins
+```{r}
+# cbsulm__ --> cbsurobbins
+rsync --update --archive --verbose /workdir/mw489/ImputationEastAfrica_StageII_90919/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919
+```
+
+## Post-impute filter
+AR2>0.75, P_HWE>1e-20, MAF>0.005 [0.5%]
+```{r}
+library(tidyverse); library(magrittr); library(furrr); options(mc.cores=18); plan(multiprocess)
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>% 
+  mutate(PostImputeFilter=future_map(Chr,function(Chr){ 
+            fileIn<-paste0("vcftools --gzvcf ",pathIn,"chr",
+                           Chr,"_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.vcf.gz ")
+            fileOut<-paste0("--out ",pathIn,"chr",
+                            Chr,"_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119")
+            system(paste0(fileIn,"--get-INFO DR2 --get-INFO AF ",fileOut))
+            system(paste0(fileIn,"--hardy ",fileOut)) }))
+```
+```{r}
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+stats2filterOn<-tibble(Chr=1:18) %>%
+    mutate(INFO=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                                "_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.INFO"), 
+                                         stringsAsFactors = F, header = T)),
+         hwe=future_map(Chr,~read.table(paste0(pathIn,"chr",.,
+                                               "_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.hwe"), 
+                                        stringsAsFactors = F, header = T)))
+stats2filterOn %<>% 
+  select(Chr,INFO,hwe) %>% 
+  mutate(INFO=map2(INFO,hwe,~left_join(.x,(.y %>% 
+                                             rename(CHROM=CHR))))) %>% 
+  select(-hwe)
+stats2filterOn %>% 
+  mutate(NotNumDR2=map_lgl(INFO,~is.numeric(.$DR2)))
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,
+                  ~mutate(.,
+                          DR2=as.numeric(DR2),
+                          AF=as.numeric(AF)) %>% 
+                    filter(!is.na(DR2),
+                           !is.na(AF))))
+
+stats2filterOn %<>% 
+  mutate(INFO=map(INFO,~mutate(.,MAF=ifelse(AF>0.5,1-AF,AF))))
+```
+Check what's left
+```{r}
+sitesPassingFilters<-stats2filterOn %>% 
+  mutate(allSitesPassing=map(INFO,
+                             ~filter(.,DR2>=0.75,
+                                     P_HWE>1e-20,
+                                     MAF>0.005) %>% 
+                               select(CHROM,POS))) %>%  
+  select(-INFO)
+stats2filterOn %>% unnest() %>% nrow() # 65113
+sitesPassingFilters %>% unnest(allSitesPassing) %>% nrow() # 56250
+stats2filterOn %>% left_join(sitesPassingFilters)
+#  Chr INFO                      allSitesPassing         
+#    <int> <list>                    <list>                  
+#  1     1 <data.frame [8,201 x 13]> <data.frame [7,254 x 2]>
+#  2     2 <data.frame [3,854 x 13]> <data.frame [3,131 x 2]>
+#  3     3 <data.frame [4,102 x 13]> <data.frame [3,536 x 2]>
+#  4     4 <data.frame [3,756 x 13]> <data.frame [3,422 x 2]>
+#  5     5 <data.frame [3,807 x 13]> <data.frame [3,424 x 2]>
+#  6     6 <data.frame [3,594 x 13]> <data.frame [2,861 x 2]>
+#  7     7 <data.frame [1,959 x 13]> <data.frame [1,538 x 2]>
+#  8     8 <data.frame [3,628 x 13]> <data.frame [3,144 x 2]>
+#  9     9 <data.frame [3,449 x 13]> <data.frame [2,902 x 2]>
+# 10    10 <data.frame [2,901 x 13]> <data.frame [2,486 x 2]>
+# 11    11 <data.frame [3,297 x 13]> <data.frame [2,702 x 2]>
+# 12    12 <data.frame [2,893 x 13]> <data.frame [2,604 x 2]>
+# 13    13 <data.frame [2,773 x 13]> <data.frame [2,378 x 2]>
+# 14    14 <data.frame [4,172 x 13]> <data.frame [3,830 x 2]>
+# 15    15 <data.frame [3,959 x 13]> <data.frame [3,284 x 2]>
+# 16    16 <data.frame [2,875 x 13]> <data.frame [2,519 x 2]>
+# 17    17 <data.frame [2,775 x 13]> <data.frame [2,545 x 2]>
+# 18    18 <data.frame [3,118 x 13]> <data.frame [2,690 x 2]>
+```
+
+
+
+Apply filter
+```{r}
+sitesPassingFilters %>% 
+  mutate(PostImputePrePhaseFilter=future_map2(Chr,allSitesPassing,function(Chr,allSitesPassing){ 
+        pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+    sitesPassing_thisChr<-allSitesPassing %>% 
+      select(CHROM,POS)
+    write.table(sitesPassing_thisChr,
+                file = paste0(pathIn,"chr",Chr,
+                              "_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.sitesPassing"),
+                row.names = F, col.names = F, quote = F)
+    system(paste0("vcftools --gzvcf ",pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.vcf.gz ",
+                  "--positions ",pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.sitesPassing ",
+                  "--recode --stdout | ",
+                  "bgzip -c -@ 24 > ",
+                  pathIn,"chr",Chr,
+                  "_ugC1samples_FromJune2016vcf_ReadyToMergeWithRefPanel_91119.vcf.gz"))}))
+
+```
+
+# Form Imputation RefPanelVI
+
+## Apply filter to RefPanelV VCF 
+```{r}
+tibble(Chr=1:18) %>%
+  mutate(ExtractRefPanelIVsamplesForStageV=future_map(Chr,function(Chr){
+    system(paste0("vcftools --gzvcf /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ImputationReferencePanel_StageV_91019.vcf.gz ",
+                  "--chr ",Chr," ",
+                  "--positions /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ugC1samples_FromJune2016vcf_AllSitesREFimputedAndPhased_91119.sitesPassing ",
+                  "--recode ",
+                  "--stdout | bgzip -c -@ 24 > ",
+                  " /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/chr",
+                  Chr,"_ImputationReferencePanel_StageVsamples_ReadyToMergeAndFormStageVI_91119.vcf.gz")) }))
+
+```
+
+## Merge RefPanelV and ugC1 samples
+```{r}
+library(tidyverse); library(magrittr);
+pathIn<-"/workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/"
+tibble(Chr=1:18) %>%
+    mutate(Index=future_map(Chr,function(Chr){
+        system(paste0("tabix -f -p vcf ",pathIn,"chr",Chr,
+                      "_ImputationReferencePanel_StageVsamples_ReadyToMergeAndFormStageVI_91119.vcf.gz"))
+        system(paste0("tabix -f -p vcf ",pathIn,"chr",Chr,
+                      "_ugC1samples_FromJune2016vcf_ReadyToMergeWithRefPanel_91119.vcf.gz")) }))
+    
+tibble(Chr=1:18) %>%
+    mutate(Merge=future_map(Chr,function(Chr){
+        system(paste0("bcftools merge ",
+                      "--output ",pathIn,"chr",Chr,
+                      "_ImputationReferencePanel_StageVI_91119.vcf.gz ",
+                      "--merge snps --output-type z --threads 24 ",
+                      pathIn,"chr",Chr,
+                      "_ImputationReferencePanel_StageVsamples_ReadyToMergeAndFormStageVI_91119.vcf.gz ",
+                      pathIn,"chr",Chr,
+                      "_ugC1samples_FromJune2016vcf_ReadyToMergeWithRefPanel_91119.vcf.gz"))}))
+
+```
+
+## Rsync to cbsulm15
+```{r}
+# cbsurobbins --> cbsulm__
+rsync --update --archive --verbose /workdir/marnin/nextgenImputation2019/ImputationEastAfrica_StageII_90919/ mw489@cbsulm15.biohpc.cornell.edu:/workdir/mw489/ImputationEastAfrica_StageII_90919;
+```

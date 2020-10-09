@@ -1,0 +1,658 @@
+---
+title: "Convert DCas20-4459 to VCF"
+site: workflowr::wflow_site
+date: "2019-August-27"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo =TRUE, eval=FALSE)
+# !diagnostics off
+```
+
+# Is 4459 actually on V7?
+
+```{r}
+library(tidyverse); library(magrittr);
+system(paste0("cat /workdir/marnin/DCas19_4459/SNP_4459_3822_4078_4433_VCF.csv ",
+              "| cut -f1-5 > ",
+              "/workdir/marnin/DCas19_4459/SNP_4459_3822_4078_4433_VCF.sitesWithAlleles"))
+
+dcas4459_sites<-read.table(paste0("/workdir/marnin/DCas19_4459/",
+                                  "SNP_4459_3822_4078_4433_VCF.sitesWithAlleles"),
+                           stringsAsFactors = F, header = F, skip = 3, sep = c("\t"))
+
+dcas4351_sites<-read.table(paste0("~/DCas19_4351/DCas19_4351_SEQ_SNPs_blast_v6_VCF.sitesWithAlleles"),
+                           stringsAsFactors = F, header = F, sep = c("\t"))
+
+dim(dcas4459_sites) # [1] 13603     5
+dim(dcas4351_sites) # [1] 13406     5
+dcas4459_sites %>% 
+  select(V3) %>% 
+  semi_join(dcas4351_sites %>% select(V3)) %>% 
+  dim # 5608 match based on the ID column...
+dcas4459_sites %>% semi_join(dcas4351_sites) 
+dcas4459_sites %>% 
+  select(V1,V2,V4,V5) %>% 
+  semi_join(dcas4351_sites %>% select(V1,V2,V4,V5)) %>% 
+  dim # essentially none match based on chr, pos, ref, alt
+ 
+# So 4459 is probably reported on V7 even though Andrzej said it was V6
+
+dcas4459_sites %<>% 
+  separate(V3,c("CloneID","Rest"),"[|]",extra = 'merge',remove = F) %>% 
+  select(-Rest) %>% 
+  dplyr::rename(CHROM=V1,
+                POSv7=V2,
+                ID=V3,
+                REF=V4,
+                ALT=V5) %>% 
+  mutate(CHROM=as.numeric(gsub("Chromosome","",CHROM)),
+         POSv7=as.numeric(POSv7)) %>% 
+  select(CHROM,POSv7,ID,REF,ALT,CloneID)
+
+dcas4351_sites %<>% 
+  separate(V3,c("CloneID","Rest"),"[|]",extra = 'merge',remove = F) %>% 
+  select(-Rest) %>% 
+  rename(CHROM=V1,
+         POSv6=V2,
+         ID=V3,
+         REF=V4,
+         ALT=V5) %>% 
+  mutate(CHROM=as.numeric(gsub("Chromosome","",CHROM)),
+         POSv6=as.numeric(POSv6)) %>% 
+  select(CHROM,POSv6,ID,REF,ALT,CloneID)
+
+str(dcas4459_sites)
+str(dcas4351_sites)
+```
+Intersection between 4459 (V7?) and 4351 (V6) using CloneID.
+```{r}
+dcas4459_sites %>% 
+  inner_join(dcas4351_sites) %>% str # 5592
+```
+
+## Intersection with ImputationRefPanelII sites
+Of the 4459 sites I can liftover to V6 positions, which intersect the RefPanelII SNPs?
+```{r}
+library(furrr)
+options(mc.cores=18)
+plan(multiprocess)
+sitesWithAlleles<-tibble(Chr=1:18) %>%
+  mutate(SiteList=future_map(Chr,function(Chr){ 
+        refpanel2part1<-read.table(file = paste0("/workdir/marnin/nextgenImputation2019/ImputationStageII_71219/chr",Chr,
+                                        "_ImputationReferencePanel_StageIIpartI_72219.sitesWithAlleles"),
+                           stringsAsFactors = F, header = F) 
+    return(refpanel2part1)}))
+sitesWithAlleles %<>% 
+    unnest() %>% 
+    rename(CHROM=V1,
+           POS=V2,
+           REF=V4,
+           ALT=V5)
+```
+```{r}
+dcas4459_sites %>% 
+  inner_join(dcas4351_sites) %>% 
+  rename(POS=POSv6) %>% 
+  semi_join(sitesWithAlleles) %>% #dim # 1808
+  count(CHROM)
+
+```
+CHROM     n
+   <dbl> <int>
+ 1     1   199
+ 2     2   115
+ 3     3   138
+ 4     4   112
+ 5     5   125
+ 6     6    93
+ 7     7    60
+ 8     8    80
+ 9     9    99
+10    10    79
+11    11    89
+12    12    75
+13    13    89
+14    14   101
+15    15    93
+16    16    70
+17    17    97
+18    18    94
+
+# DCas19_4459 to VCF (custom / mod job)
+
+## Data to cbsulm12
+```{bash}
+scp -r DCas19_4459 mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489
+scp -r /workdir/marnin/nextgenImputation2019/ImputationStageII_71219  mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489
+scp -r /workdir/marnin/nextgenImputation2019/ImputationStageIII_72619  mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489
+scp -r /workdir/marnin/nextgenImputation2019/DCas19_4301_DArTseqLD_AllSites_AllChrom_raw_70819* mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489
+scp -r /workdir/marnin/nextgenImputation2019/DCas19_4301_SEQ_SNPs_blast_v6_* mw489@cbsulm12.biohpc.cornell.edu:/workdir/mw489
+
+```
+
+## Site Lists
+### RefPanel
+```{r}
+library(tidyverse); library(magrittr);
+library(furrr)
+options(mc.cores=18)
+plan(multiprocess)
+tibble(Chr=1:18) %>%
+  mutate(sitesWithAlleles=future_map(Chr,function(Chr){ 
+    system(paste0("zcat /workdir/mw489/ImputationStageIII_72619/chr",
+                  Chr,"_RefPanelAndGSprogeny_ReadyForGP_72719.vcf.gz ",
+                  "| cut -f1-5 > ",
+                  "/workdir/mw489/ImputationStageIII_72619/chr",
+                  Chr,"_RefPanelAndGSprogeny_ReadyForGP_72719.sitesWithAlleles"))}))
+
+```
+
+```{r}
+library(tidyverse); library(magrittr);
+library(furrr)
+options(mc.cores=18)
+plan(multiprocess)
+refpanel3_sites<-tibble(Chr=1:18) %>%
+  mutate(SiteList=future_map(Chr,function(Chr){ 
+        refpanel3<-read.table(file = paste0("/workdir/mw489/ImputationStageIII_72619/chr",Chr,
+                                        "_RefPanelAndGSprogeny_ReadyForGP_72719.sitesWithAlleles"),
+                           stringsAsFactors = F, header = F) 
+    return(refpanel3)}))
+refpanel3_sites %<>% 
+    unnest() %>% 
+    rename(CHROM=V1,
+           POS=V2,
+           REF=V4,
+           ALT=V5)
+dim(refpanel3_sites) # [1] 68814     6
+```
+### 4301 
+```{r}
+dcas4301sites<-read.csv(paste0("/workdir/mw489/",
+                                "DCas19_4301_SEQ_SNPs_blast_v6_counts.csv"), 
+                         stringsAsFactors = F,header = T) %>% 
+    mutate(RefAlt=ifelse(SNP=="","REF","ALT"),
+           Chr=as.numeric(gsub("Chromosome","",Chrom_Cassava_v61)),
+           Pos=SNP_ChromPos_Cassava_v61) %>% 
+  select(RefAlt,SNP,CloneID,AlleleID,Chr,Pos)
+table(is.na(dcas4301sites$Chr))
+dcas4301sites %<>% 
+  separate(AlleleID,c("tmp","Alleles"),sep=-3,remove = F) %>% 
+  select(-tmp) %>% #slice(1:40) %>% 
+  group_by(CloneID,Pos,Alleles) %>% 
+  nest() %>% 
+  mutate(data=map(data,function(data){
+    # I checked that there are only two rows per CloneID-Pos-Alleles combo
+    # In some cases, noticed that Chr was NA for only one of the rows, 
+    # but position and alleles were all identical. 
+    # In those cases, replace NA with the Chr val. in the other row for that SNP
+    x<-which(!is.na(data$Chr))
+    if(length(x)==1){ 
+      chr<-data$Chr[which(!is.na(data$Chr))]
+      data %<>% mutate(Chr=chr)
+    }
+    return(data)
+  })) %>% 
+  unnest()
+table(is.na(dcas4301sites$Chr))
+which(is.na(dcas4301sites$Chr))[1:30]
+dcas4301sites[c(136:139,141:145),]
+dcas4301sites %<>% filter(!is.na(Chr))
+```
+
+### 4351
+```{r}
+dcas4351sites<-read.csv(paste0("~/DCas19_4351/",
+                                "DCas19_4351_SEQ_SNPs_blast_v6_counts.csv"), 
+                         stringsAsFactors = F,header = T) %>% 
+    mutate(RefAlt=ifelse(SNP=="","REF","ALT"),
+           Chr=as.numeric(gsub("Chromosome","",Chrom_Cassava_v61)),
+           Pos=SNP_ChromPos_Cassava_v61) %>% 
+  select(RefAlt,SNP,CloneID,AlleleID,Chr,Pos)
+table(is.na(dcas4351sites$Chr))
+dcas4351sites %<>% 
+  separate(AlleleID,c("tmp","Alleles"),sep=-3,remove = F) %>% 
+  select(-tmp) %>% #slice(1:40) %>% 
+  group_by(CloneID,Pos,Alleles) %>% 
+  nest() %>% 
+  mutate(data=map(data,function(data){
+    # In some cases, noticed that Chr was NA for only one of the rows, 
+    # but position and alleles were all identical. 
+    # Replace NA with the Chr val. in the other row for that SNP
+   x<-which(!is.na(data$Chr))
+    if(length(x)==1){
+      chr<-data$Chr[which(!is.na(data$Chr))]
+      data %<>% mutate(Chr=chr)
+    }
+    return(data)
+  })) %>% 
+  unnest()
+table(is.na(dcas4351sites$Chr))
+dcas4351sites %<>% filter(!is.na(Chr))
+
+```
+```{r}
+dcas4351sites %>% 
+  filter(RefAlt=="REF") %>% 
+  select(-SNP) %>% 
+  separate(Alleles,c("REF","ALT"),">") %>% 
+  inner_join(
+    dcas4301sites %>% 
+      filter(RefAlt=="REF") %>% 
+      select(-SNP) %>% 
+      separate(Alleles,c("REF","ALT"),">")) %>% 
+  semi_join(refpanel3_sites) %>% #dim # [1] 10860     7
+  count(Chr)
+```
+     Chr     n
+   <dbl> <int>
+ 1     1  1133
+ 2     2   664
+ 3     3   684
+ 4     4   698
+ 5     5   641
+ 6     6   662
+ 7     7   421
+ 8     8   517
+ 9     9   505
+10    10   634
+11    11   600
+12    12   484
+13    13   534
+14    14   751
+15    15   503
+16    16   438
+17    17   513
+18    18   478
+
+
+## Input Parameters
+```{r}
+library(tidyverse); library(magrittr)
+dartvcfInput<-paste0("/workdir/mw489/DCas19_4459/SNP_4459_3822_4078_4433_VCF.csv")
+dartcountsInput<-paste0("/workdir/mw489/DCas19_4459/SNPs_counts_V6_4459_3822_4078_4433.csv")
+outName<-paste0("/workdir/mw489/DCas19_4459/DCas19_4459_82719")
+nskipvcf<-2
+nskipcounts<-3
+ncores<-90 # using more than a few could be VERY memory intensive
+```
+
+## Components of function
+### Read and format the 4459 counts/vcf files
+```{r}
+# convertDart2vcf<-function(dartvcfInput,dartcountsInput,outName,
+#                           nskipvcf=2,nskipcounts=3,ncores){
+#rm(vcf,readCounts); gc()
+vcf<-read.table(dartvcfInput,
+                stringsAsFactors = F,skip = nskipvcf, header = T, sep = "\t", comment.char = "")
+dim(vcf) # [1] 13603  4543
+vcf %<>% 
+  rename(Pos=POS) %>% 
+  mutate(Chr=as.numeric(gsub("Chromosome","",X.CHROM)),
+         Pos=as.numeric(Pos)) 
+  # filter(X.CHROM != ".",
+  #        POS != ".") %>% 
+ #  mutate_at(vars(Chr,POS),as.numeric)
+
+readCounts<-read.csv(dartcountsInput, stringsAsFactors = F,header = T,skip=nskipcounts)
+# readCounts[1:10,] %>% select(SNP,CloneID,AlleleID,Chrom_Cassava_v61,SNP_ChromPos_Cassava_v61)
+# vcf[1:10,1:5]
+# Note: The ID column in "vcf" is the value for the ALT allele in AlleleID of "readCounts"
+readCounts %<>% 
+  mutate(RefAlt=ifelse(SNP=="","REF","ALT"),
+         Chr=as.numeric(gsub("Chromosome","",Chrom_Cassava_v61)),
+         Pos=as.numeric(SNP_ChromPos_Cassava_v61))
+```
+### Add a SNPindex
+Add a unique value "SNPindex" to each SNP in the vcf and readCounts df's
+For readCounts, this is going to be the best way to keep track of pairs of rows. Since in many cases, multiple CloneID can point to same Chr-Pos-Alleles and it's otherwise unclear which pair of rows should go together when subsetting downstream.
+```{r}
+#readCounts %>% select(RefAlt,Chr,Pos,SNP)
+dim(vcf) # [1] 13603  4543
+dim(readCounts) # [1] 27206  4579
+vcf %>% 
+  mutate(SNPindex=1:nrow(.)) %>% 
+  select(X.CHROM:ALT,SNPindex) %>% head
+readCounts %>% 
+  mutate(SNPindex=sort(rep(1:(nrow(.)/2),2))) %>% 
+  select(SNPindex,SNP,CloneID,AlleleID,Chrom_Cassava_v61,SNP_ChromPos_Cassava_v61) %>% head
+
+vcf %<>% 
+  mutate(SNPindex=1:nrow(.))
+readCounts %<>% 
+  mutate(SNPindex=sort(rep(1:(nrow(.)/2),2)))
+```
+
+### Remove non-mapped SNPs / alleles
+```{r}
+readCounts %>% 
+  count(Chr,Pos,CloneID,SNPindex) %>% arrange(desc(n)) %$% table(n)
+ #    1     2 
+ # 2504 12351
+readCounts %>% 
+  count(Chr,Pos,CloneID,SNPindex) %>% 
+  filter(n==1) %>% head
+```
+I was hoping that using "Chr,Pos,CloneID,SNPindex" would uniquify the readCounts such that there would be 2 rows for each unique combo. 
+Instead, there were 2501 with only 1...
+```{r}
+vcf %>% 
+  select(Chr,Pos,ID,REF,ALT,SNPindex) %>% 
+  filter(SNPindex==8419)
+readCounts %>% 
+  select(Chr,Pos,RefAlt,SNPindex,SNP,CloneID,AlleleID) %>% 
+  filter(SNPindex==8419)
+```
+After inspecting a bunch of them: sometimes "Chrom_Cassava_v61" maps to a Chr for one row, but a scaffold for another. Or in others, one of them is simply NA and actually both Chr and Pos are NA in the VCF. 
+
+Going to exclude anything like this. 
+```{r}
+removeThese<-readCounts %>% 
+  count(Chr,Pos,CloneID,SNPindex) %>% 
+  filter(n==1) %$% SNPindex
+removeTheseToo<-vcf$SNPindex[is.na(vcf$Chr)]
+
+readCounts %<>% filter(!SNPindex %in% union(removeThese,removeTheseToo))
+vcf %<>% filter(!SNPindex %in% union(removeThese,removeTheseToo))
+dim(vcf) # [1] 11911  4545
+dim(readCounts) # [1] 23822  4580
+
+```
+
+### Add the "Pos" from 4301/4351
+```{r}
+readCounts %<>% 
+  separate(AlleleID,c("tmp","Alleles"),sep=-3,remove = F) %>% select(-tmp)
+vcf %<>%
+  separate(ID,c("tmp","Alleles"),sep=-3,remove = F) %>% select(-tmp)
+```
+
+Now I think I can add the 4301/4351 positions and subset to unique, RefPanel3 intersection _before_ doing further manipulation of readCounts/vcf...
+```{r}
+readCounts %>% 
+  count(Chr,AlleleID) %>% arrange(desc(n))
+vcf %>% 
+  count(Chr,ID) %>% arrange(desc(n))
+table(readCounts$AlleleID %in% dcas4351sites$AlleleID)
+readCounts %>% 
+  rename(Chr4459=Chr,
+         Pos4459=Pos) %>% 
+  select(Chr4459,Pos4459,SNPindex,RefAlt,CloneID,AlleleID) %>% head
+vcf %>% 
+  rename(Chr4459=Chr,
+         Pos4459=Pos) %>% 
+  select(Chr4459,Pos4459,SNPindex,ID,REF,ALT) %>% head
+
+alleles2keep<-dcas4351sites %>% 
+  select(Chr,Pos,RefAlt,CloneID,AlleleID) %>% #dim
+  bind_rows(
+    dcas4301sites %>% 
+      select(Chr,Pos,RefAlt,CloneID,AlleleID)
+  ) %>% #dim [1] 26244     5
+  distinct #%>% #dim # [1] 26392     5
+  # 
+  # filter(RefAlt=="ALT") %>% # Choose ALT because it's AlleleID will match the VCF (see above)
+  # select(-SNP) %>% 
+  # separate(Alleles,c("REF","ALT"),">",remove=F)
+
+readCounts %>% 
+  rename(Chr4459=Chr,
+         Pos4459=Pos) %>% 
+  inner_join(alleles2keep) %>% #dim 
+  select(Chr4459,Pos4459,Chr,Pos,SNPindex,RefAlt,CloneID,AlleleID) -> x 
+table(x$Chr4459==x$Chr)
+table(x$Pos4459==x$Pos)
+rm(x)
+
+readCounts %>% 
+  rename(Pos4459=Pos) %>% 
+  inner_join(alleles2keep) %>% #dim 
+  select(Chr,Pos,Pos4459,SNPindex,RefAlt,CloneID,AlleleID) %>% dim
+
+vcf %>% 
+  rename(Pos4459=Pos,
+         AlleleID=ID) %>% 
+  inner_join(alleles2keep %>% filter(RefAlt=="ALT") %>% select(-RefAlt)) %>% 
+  select(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID) %>% dim
+
+readCounts %<>% 
+  rename(Pos4459=Pos) %>% 
+  inner_join(alleles2keep)
+
+vcf %<>% 
+  rename(Pos4459=Pos,
+         AlleleID=ID) %>% 
+  inner_join(alleles2keep %>% filter(RefAlt=="ALT") %>% select(-RefAlt))
+dim(readCounts) # [1] 12162  4582
+dim(vcf) # [1] 6081 4548
+```
+### Remove non-unique Chr-Pos
+Some Chr, Pos are duplicated. Doesn't matter the reason, remove them.
+```{r}
+vcf %>% 
+  select(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID,REF,ALT) %>% 
+  count(Chr,Pos) %>% arrange(desc(n)) %$% table(n)
+# 1    2    3 
+# 6002   38    1 
+
+vcf %>% 
+  select(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID,REF,ALT) %>% 
+  semi_join(
+    vcf %>% 
+      count(Chr,Pos) %>% 
+      filter(n==1) %>% 
+      select(-n)
+  ) %>% dim # [1] 6002    8
+vcf %<>% 
+  semi_join(
+    vcf %>% 
+      count(Chr,Pos) %>% 
+      filter(n==1) %>% 
+      select(-n)
+  )
+readCounts %<>%
+  filter(SNPindex %in% vcf$SNPindex)
+dim(vcf) # [1] 6002 4548
+dim(readCounts) # [1] 12004  4582
+```
+###Subset to isect with RefPanel3 SNPs
+Now check the intersection with RefPanel3 and subset to only those SNPs
+```{r}
+vcf %>% 
+  select(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID,REF,ALT) %>% 
+  semi_join(refpanel3_sites %>% 
+              rename(Pos=POS) %>% 
+              select(Chr,Pos,REF,ALT)) %>% dim # [1] 1786    8
+
+vcf %<>% 
+  semi_join(
+    refpanel3_sites %>% 
+              rename(Pos=POS) %>% 
+              select(Chr,Pos,REF,ALT)
+  )
+readCounts %<>%
+  filter(SNPindex %in% vcf$SNPindex)
+dim(vcf) # [1] 1786 4548
+dim(readCounts) # [[1] 3572 4582
+readCounts %>% 
+  count(Chr,Pos,SNPindex) %>% arrange(desc(n))
+readCounts %>% 
+  count(Chr,Pos) %>% arrange(desc(n))
+```
+### readCounts and vcf long by sample
+```{r}
+# Add required VCF fields
+## First have to do some data transformation and 
+## create some of the meta-data fields in a VCF, e.g. QUAL, FILTER INFO. 
+readCounts %<>%
+  arrange(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID,RefAlt) %>% 
+  mutate(QUAL=".",
+         FILTER=".",
+         INFO=".",
+         FORMAT="GT:AD:DP:PL",
+         SNP_ID=paste0("S",Chr,"_",Pos))
+vcf %<>%
+  arrange(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID) %>% 
+  mutate(QUAL=".",
+         FILTER=".",
+         INFO=".",
+         FORMAT="GT:AD:DP:PL",
+         SNP_ID=paste0("S",Chr,"_",Pos))
+vcf %>% 
+  select(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID,Alleles,REF,ALT,QUAL,FILTER,INFO,FORMAT,SNP_ID) %>% head
+readCounts %>% filter(RefAlt=="ALT") %>% 
+  select(Chr,Pos,Pos4459,SNPindex,CloneID,AlleleID,Alleles) %>% slice(1:10)
+
+table((readCounts %>% filter(RefAlt=="ALT") %$% SNPindex)==vcf$SNPindex)
+
+sampleIDsFromDartVCF<-colnames(vcf) %>% 
+  .[!. %in% c("X.CHROM","Pos4459","AlleleID","Alleles","REF","ALT","QUAL","FILTER","INFO","FORMAT",
+              "Chr","SNPindex","Pos","CloneID","SNP_ID")]
+head(sampleIDsFromDartVCF); tail(sampleIDsFromDartVCF)
+
+tmp <-readCounts %>% 
+  .[,c("Chr","Pos","Pos4459","SNPindex","SNP_ID",
+       "CloneID","AlleleID","RefAlt","Alleles","QUAL","FILTER","INFO","FORMAT",sampleIDsFromDartVCF)]
+tmp %<>%
+  gather(FullSampleName,ReadCount,sampleIDsFromDartVCF)
+dim(tmp) # [1] 16195448       15
+# tmp %>% 
+#   count(Chr,Pos,Pos4459,SNPindex,SNP_ID,CloneID,AlleleID,RefAlt,Alleles) %>% arrange(desc(n)) %$% table(n)
+tmp %<>%
+  select(-AlleleID) %>% 
+  spread(RefAlt,ReadCount) 
+dim(tmp) # [1] 8097724      14
+head(tmp)
+tmp %<>%
+  rename(AltCount=ALT,
+         RefCount=REF)
+dim(tmp) # [1] 8097724      14
+
+vcf_long<-vcf %>% 
+    .[,c("Chr","Pos","Pos4459","SNPindex","SNP_ID",
+         "CloneID","Alleles","REF","ALT","QUAL","FILTER","INFO","FORMAT",sampleIDsFromDartVCF)] %>% 
+    gather(FullSampleName,GT,sampleIDsFromDartVCF)
+dim(vcf_long) # [1] 8097724      15
+```
+
+### Add GT from vcf to the counts
+I use the DArT genotype call (GT) for the PLINK IBD step.  
+PLINK requires genotype calls.  
+Later, I impute in GL mode, so GTs are ignored.
+```{r}
+tmp %<>%
+  left_join(vcf_long)
+tmp %>% head
+```
+
+### Standard Pipeline code should work from here 
+```{r}
+# AD+DP fields
+## Now we can calc DP and formate the VCF field "AD" (e.g. "21,0" for 21 reference reads and 0 alt. allele reads)
+tmp %<>% 
+  mutate(DP=AltCount+RefCount,
+         AD=paste0(RefCount,",",AltCount))
+tmp %>% head
+
+tmp %>% 
+  select(Chr,Pos,Pos4459,SNPindex,SNP_ID,CloneID,Alleles) %>% 
+  distinct %>% 
+  semi_join(refpanel3_sites %>% select(-CHROM) %>% rename(SNP_ID=V3)) %>% dim # [1] 1786    7
+
+# Calc. genotype likelihoods
+
+## Genotype likelihoods calculated according to: 
+### http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1000862#s4
+## Converted to Normalized Phred Scores according to: 
+### https://gatkforums.broadinstitute.org/gatk/discussion/5913/math-notes-how-pl-is-calculated-in-haplotypecaller
+## Truncate low Phred probabilities (high Phred scores) to 
+### 255 max according to TASSEL's convention (Jeff Glaubitz, pers. communication).
+
+#ref<-171; alt<-171; error<-0.001
+calcPL<-function(ref,alt,error=0.001){
+    # ref and alt arguments are read counts for ref and alt allele, repsectively
+    dp<-ref+alt
+    # for values >170, factorial() returns 'inf'
+    # Since it means essentially 100% probability of a genotype... 
+    # set DP to 169 cieling, ref/alt to equiv. allele proportions
+    if(dp>=170){ ref<-169*(ref/dp); alt<-169*(alt/dp); dp<-169 }
+    gl_RefRef<-(factorial(dp)/(factorial(ref)*factorial(alt)))*(1-(0.75*error))^ref*(error/4)^(alt)
+    gl_RefAlt<-(factorial(dp)/(factorial(ref)*factorial(alt)))*(0.5-(0.25*error))^(ref+alt)*(error/4)^(0)
+    gl_AltAlt<-(factorial(dp)/(factorial(ref)*factorial(alt)))*(1-(0.75*error))^alt*(error/4)^(ref)
+    phredScale<--10*log10(c(gl_RefRef,gl_RefAlt,gl_AltAlt))
+    minPhred<-min(phredScale)    
+    normPhred<-round(phredScale-minPhred,0)
+    normPhred[which(normPhred>=255)]<-255
+    normPhred<-paste0(normPhred,collapse = ",")
+    if(dp==0){ normPhred<-"." }
+    return(normPhred)
+  }
+require(furrr)
+options(mc.cores=ncores)
+plan(multiprocess)
+tmp %<>% 
+  mutate(PL=future_map2_chr(RefCount,AltCount,~calcPL(ref=.x,alt=.y)))
+tmp %>% head 
+dim(tmp) # [1] 8097724      20
+
+# Final VCF format
+tmp %<>% 
+  mutate(FORMATfields=paste(GT,AD,DP,PL,sep=":")) %>% 
+  select(Chr,Pos,SNP_ID,REF,ALT,QUAL,FILTER,INFO,FORMAT,FullSampleName,FORMATfields) %>% 
+  spread(FullSampleName,FORMATfields) %>% 
+  arrange(Chr,Pos) %>% 
+  rename(`#CHROM`=Chr,
+         POS=Pos,ID=SNP_ID)
+dim(tmp) # [1] 21554636       15
+tmp[1:5,1:20] 
+
+# Header
+header<-c("##fileformat=VCFv4.0",
+            "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+            "##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">",
+            "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth (only filtered reads used for calling)\">",
+            "##FORMAT=<ID=PL,Number=3,Type=Float,Description=\"Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\">")
+  
+  # Write to disk
+
+options("scipen"=1000, "digits"=4) 
+# for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)
+write_lines(header,
+            path=paste0(outName,".vcf"))
+write.table(tmp,
+            paste0(outName,".vcf"),
+            append = T,sep = "\t",row.names=F, col.names=T, quote=F)
+# Save sitesWithAlleles
+tmp %>% 
+  rename(CHROM=`#CHROM`) %>% 
+  select(CHROM:ALT) %>% 
+  write.table(.,file=paste0(outName,".sitesWithAlleles"),
+              row.names=F)
+# Save sample list
+write.table(sampleIDsFromDartVCF,file=paste0(outName,".samples"),
+            row.names = F, col.names = F, quote = F)
+
+# BGzip
+system(paste0("cat ",outName,".vcf ",
+              "| bgzip -c > ",outName,".vcf.gz"))
+system(paste0("rm ",outName,".vcf"))
+
+```
+```{r}
+tmp[,1:5] %>% head
+tmp[,1:5] %>% 
+  semi_join(refpanel3_sites %>% 
+              rename(`#CHROM`=CHROM,
+                     ID=V3) %>% 
+              select(-Chr))
+```
+
+## Rsync to cbsurobbins
+```{bash}
+rsync --update --archive --verbose /workdir/mw489/DCas19_4459/ mw489@cbsurobbins.biohpc.cornell.edu:/workdir/marnin/DCas19_4459;
+```
+
