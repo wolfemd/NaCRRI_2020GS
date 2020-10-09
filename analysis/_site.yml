@@ -32,7 +32,7 @@ navbar:
   right:
   - icon: fa-github
     text: Source code
-    href: https://github.com/wolfemd/NaCRRI_2020GS
+    href: https://github.com/wolfemd/.
 output:
   workflowr::wflow_html:
     toc: yes
