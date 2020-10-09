@@ -1,4 +1,4 @@
-# EMBRAPA_2020GS
+# NaCRRI_2020GS
 
 A [workflowr][] project.
 
