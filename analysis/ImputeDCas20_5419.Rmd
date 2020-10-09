@@ -207,7 +207,7 @@ cp *_DCas20_5419_LA_REFimputedAndFiltered* /home/jj332_cas/marnin/NaCRRI_2020GS/
 ## Formats for downstream analysis
 
 ### EA
-```{r}
+```{r, eval=F}
 # Make binary plink
 pathIn<-"/home/jj332_cas/marnin/NaCRRI_2020GS/output/"
 #pathIn<-"/workdir/mw489/NaCRRI_2020GS/output/"
@@ -238,7 +238,7 @@ saveRDS(snps,file = paste0(pathIn,"DosageMatrix_DCas20_5419_EA_REFimputedAndFilt
 ```
 
 ### LA
-```{r}
+```{r, eval=F}
 # Make binary plink
 pathIn<-"/home/jj332_cas/marnin/NaCRRI_2020GS/output/"
 require(furrr); options(mc.cores=ncores); plan(multiprocess)
