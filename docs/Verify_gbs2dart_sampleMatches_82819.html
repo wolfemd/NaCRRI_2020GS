@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Verify GBS-DArT sample matches for DCas19_4459</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      code.sourceCode > span { display: inline-block; line-height: 1.25; }
+  code.sourceCode > span { color: inherit; text-decoration: inherit; }
+  code.sourceCode > span:empty { height: 1.2em; }
+  .sourceCode { overflow: visible; }
+  code.sourceCode { white-space: pre; position: relative; }
+  div.sourceCode { margin: 1em 0; }
+  pre.sourceCode { margin: 0; }
+  @media screen {
+  div.sourceCode { overflow: auto; }
+  }
+  @media print {
+  code.sourceCode { white-space: pre-wrap; }
+  code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+  }
+  pre.numberSource code
+    { counter-reset: source-line 0; }
+  pre.numberSource code > span
+    { position: relative; left: -4em; counter-increment: source-line; }
+  pre.numberSource code > span > a:first-child::before
+    { content: counter(source-line);
+      position: relative; left: -1em; text-align: right; vertical-align: baseline;
+      border: none; display: inline-block;
+      -webkit-touch-callout: none; -webkit-user-select: none;
+      -khtml-user-select: none; -moz-user-select: none;
+      -ms-user-select: none; user-select: none;
+      padding: 0 4px; width: 4em;
+      color: #aaaaaa;
+    }
+  pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+  div.sourceCode
+    {  background-color: #f8f8f8; }
+  @media screen {
+  code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+  }
+  code span.al { color: #ef2929; } /* Alert */
+  code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+  code span.at { color: #c4a000; } /* Attribute */
+  code span.bn { color: #0000cf; } /* BaseN */
+  code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+  code span.ch { color: #4e9a06; } /* Char */
+  code span.cn { color: #000000; } /* Constant */
+  code span.co { color: #8f5902; font-style: italic; } /* Comment */
+  code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+  code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+  code span.dt { color: #204a87; } /* DataType */
+  code span.dv { color: #0000cf; } /* DecVal */
+  code span.er { color: #a40000; font-weight: bold; } /* Error */
+  code span.ex { } /* Extension */
+  code span.fl { color: #0000cf; } /* Float */
+  code span.fu { color: #000000; } /* Function */
+  code span.im { } /* Import */
+  code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+  code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+  code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+  code span.ot { color: #8f5902; } /* Other */
+  code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+  code span.sc { color: #000000; } /* SpecialChar */
+  code span.ss { color: #4e9a06; } /* SpecialString */
+  code span.st { color: #4e9a06; } /* String */
+  code span.va { color: #000000; } /* Variable */
+  code span.vs { color: #4e9a06; } /* VerbatimString */
+  code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NaCRRI_2020GS</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Imputation 2019
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="convertDArTseqLD_to_VCF_82719.html">Conversion DArT report to VCF</a>
+    </li>
+    <li>
+      <a href="Verify_gbs2dart_sampleMatches_82819.html">Verify GBS-to-DArTseqLD sample matches</a>
+    </li>
+    <li>
+      <a href="Imputation_EastAfrica_StageI_82819.html">Imputation Stage I</a>
+    </li>
+    <li>
+      <a href="Imputation_EastAfrica_StageII_91019.html">Imputation Stage II</a>
+    </li>
+    <li>
+      <a href="Imputation_EastAfrica_StageIII_91119.html">Imputation Stage III</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Imputation 2020
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="convertDCas20_5419_ToVCF.html">Conversion DArT report DCas20_5419 to VCF</a>
+    </li>
+    <li>
+      <a href="ImputeDCas20_5419.html">Impute DCas20_5419</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Other
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="about.html">About</a>
+    </li>
+    <li>
+      <a href="license.html">License</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/wolfemd/NaCRRI_2020GS">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Verify GBS-DArT sample matches for DCas19_4459</h1>
+<h4 class="date">2019-August-28</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-10-09
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>NaCRRI_2020GS/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200826code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200826)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200826code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200826)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStree4f8a229950ea3e4858b03edda1b13894dcdec908targetblank4f8a229a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/4f8a229950ea3e4858b03edda1b13894dcdec908" target="_blank">4f8a229</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStree4f8a229950ea3e4858b03edda1b13894dcdec908targetblank4f8a229a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/4f8a229950ea3e4858b03edda1b13894dcdec908" target="_blank">4f8a229</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/.DS_Store
+
+Untracked files:
+    Untracked:  data/Report-DCas20-5419/
+    Untracked:  output/BeagleLogs/
+    Untracked:  output/DosageMatrix_DCas20_5419_EA_REFimputedAndFiltered.rds
+    Untracked:  output/DosageMatrix_DCas20_5419_LA_REFimputedAndFiltered.rds
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr10_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  workflowr_log.R
+
+Unstaged changes:
+    Deleted:    EMBRAPA_2020GS.Rproj
+    Deleted:    analysis/Imputation_EMBRAPA_102419.Rmd
+    Deleted:    analysis/ImputeDCas20_5360.Rmd
+    Modified:   analysis/ImputeDCas20_5419.Rmd
+    Deleted:    analysis/Verify_gbs2dart_sampleMatches_EMBRAPA_102419.Rmd
+    Deleted:    analysis/convertDCas19_4403_ToVCF_102419.Rmd
+    Deleted:    analysis/convertDCas20_5360_ToVCF.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/Verify_gbs2dart_sampleMatches_82819.Rmd</code>) and HTML (<code>docs/Verify_gbs2dart_sampleMatches_82819.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/4f8a229950ea3e4858b03edda1b13894dcdec908/analysis/Verify_gbs2dart_sampleMatches_82819.Rmd" target="_blank">4f8a229</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-10-09
+</td>
+<td>
+Publish imputations for 2020 of DCAs20_5360 (and 2019 code too) for
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="make-a-directory-for-output" class="section level1">
+<h1>Make a directory for output</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># on cbsulm12</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">mkdir</span> /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819</span></code></pre></div>
+</div>
+<div id="input-parameters" class="section level1">
+<h1>Input Parameters</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(magrittr)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>dartvcfInput&lt;-<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/SNP_4459_3822_4078_4433_VCF.csv&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>dartcountsInput&lt;-<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/SNPs_counts_V6_4459_3822_4078_4433.csv&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>outName&lt;-<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/DCas19_4459_82719&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a>nskipvcf&lt;-<span class="dv">2</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>nskipcounts&lt;-<span class="dv">3</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>ncores&lt;-<span class="dv">90</span> <span class="co"># using more than a few could be VERY memory intensive</span></span></code></pre></div>
+</div>
+<div id="sample-lists" class="section level1">
+<h1>Sample Lists</h1>
+<p>Matches we could get:</p>
+<p>TARI TP NaCRRI C1/C2 parents</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(magrittr);</span>
+<span id="cb3-2"><a href="#cb3-2"></a>dcas4459samples&lt;-<span class="kw">read.table</span>(<span class="dt">file=</span><span class="kw">paste0</span>(outName,<span class="st">&quot;.samples&quot;</span>), <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="st">  </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="st">  </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">  </span><span class="kw">grep</span>(<span class="st">&quot;Full_sib_Nigeria&quot;</span>,.,<span class="dt">value =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">  </span><span class="kw">grep</span>(<span class="st">&quot;CycleOne|CycleTwo|GS_Cycle|UYT|RTB|Namulonge_C1&quot;</span>,.,<span class="dt">value =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="st">  </span><span class="kw">grep</span>(<span class="st">&quot;UG11|UG12|UG13|UG14&quot;</span>,.,<span class="dt">value =</span> T, <span class="dt">ignore.case =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="st">  </span><span class="kw">grep</span>(<span class="st">&quot;^UGC&quot;</span>,.,<span class="dt">value =</span> T, <span class="dt">ignore.case =</span> T,<span class="dt">invert =</span> T)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools query --list-samples &quot;</span>,</span>
+<span id="cb4-2"><a href="#cb4-2"></a>              <span class="st">&quot;/workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr1.vcf.gz &quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>              <span class="st">&quot;&gt; /workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr1.samples&quot;</span>))</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools query --list-samples &quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5"></a>              <span class="st">&quot;/workdir/mw489/TanzaniaData_June2017/vcfFIles/TanzaniaData_20170601_withRef_chr1.vcf.gz &quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6"></a>              <span class="st">&quot;&gt; /workdir/mw489/TanzaniaData_June2017/vcfFIles/TanzaniaData_20170601_withRef_chr1.samples&quot;</span>))</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools query --list-samples &quot;</span>,</span>
+<span id="cb4-9"><a href="#cb4-9"></a>              <span class="st">&quot;/workdir/mw489/LV_paula_Jul2016/raw/LV_naCRRINextGen_paula_withRef_chr1.vcf &quot;</span>,</span>
+<span id="cb4-10"><a href="#cb4-10"></a>              <span class="st">&quot;&gt; /workdir/mw489/LV_paula_Jul2016/raw/LV_naCRRINextGen_paula_withRef_chr1.samples&quot;</span>))</span>
+<span id="cb4-11"><a href="#cb4-11"></a></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools query --list-samples &quot;</span>,</span>
+<span id="cb4-13"><a href="#cb4-13"></a>              <span class="st">&quot;/workdir/mw489/LV_paula_Jan2017/vcfFiles/paula_jan2017_4plates_withRef_chr1.vcf&quot;</span>,</span>
+<span id="cb4-14"><a href="#cb4-14"></a>              <span class="st">&quot;&gt; /workdir/mw489/LV_paula_Jan2017/vcfFiles/paula_jan2017_4plates_withRef_chr1.samples&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>june2016samples&lt;-<span class="kw">read.table</span>(<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr1.samples&quot;</span>,</span>
+<span id="cb5-2"><a href="#cb5-2"></a>                            <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)<span class="op">$</span>V1</span>
+<span id="cb5-3"><a href="#cb5-3"></a>tzsamples&lt;-<span class="kw">read.table</span>(<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/TanzaniaData_June2017/vcfFIles/TanzaniaData_20170601_withRef_chr1.samples&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4"></a>                            <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)<span class="op">$</span>V1</span>
+<span id="cb5-5"><a href="#cb5-5"></a>paulaJuly16&lt;-<span class="kw">read.table</span>(<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/LV_paula_Jul2016/raw/LV_naCRRINextGen_paula_withRef_chr1.samples&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>                            <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)<span class="op">$</span>V1</span>
+<span id="cb5-7"><a href="#cb5-7"></a>paulaJan17&lt;-<span class="kw">read.table</span>(<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/LV_paula_Jan2017/vcfFiles/paula_jan2017_4plates_withRef_chr1.samples&quot;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>                            <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)<span class="op">$</span>V1</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>gbsSamples&lt;-<span class="kw">tibble</span>(<span class="dt">FullSampleName=</span><span class="kw">c</span>(tzsamples,june2016samples,paulaJan17,paulaJuly16)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="st">  </span><span class="kw">separate</span>(FullSampleName,<span class="kw">c</span>(<span class="st">&quot;SampleID&quot;</span>,<span class="st">&quot;GBS_ID&quot;</span>),<span class="st">&quot;:&quot;</span>,<span class="dt">extra =</span> <span class="st">&#39;merge&#39;</span>,<span class="dt">remove =</span> F)</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># UG11|UG12|UG13|UG14</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>dart2gbs&lt;-<span class="kw">tibble</span>(<span class="dt">dartSampleName=</span>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="st">                   </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="st">                   </span><span class="kw">grep</span>(<span class="st">&quot;Full_sib_Nigeria&quot;</span>,.,<span class="dt">value =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="st">                   </span><span class="kw">grep</span>(<span class="st">&quot;UG11|UG12|UG13|UG14&quot;</span>,.,<span class="dt">value =</span> T, <span class="dt">ignore.case =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="st">  </span><span class="kw">inner_join</span>(gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="st">               </span><span class="kw">mutate</span>(<span class="dt">dartSampleName=</span><span class="kw">toupper</span>(SampleID))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="st">  </span><span class="kw">select</span>(dartSampleName,FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="st">  </span>distinct <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="st">  </span><span class="kw">bind_rows</span>(</span>
+<span id="cb6-14"><a href="#cb6-14"></a>    <span class="co"># UG15Fs (C1 CET, C0 UYT, C2 Parent)</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>    <span class="kw">tibble</span>(<span class="dt">dartSampleName=</span>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;Full_sib_Nigeria&quot;</span>,.,<span class="dt">value =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;CycleOne|CycleTwo|GS_Cycle|UYT|RTB|Namulonge_C1&quot;</span>,.,<span class="dt">value =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="st">      </span><span class="kw">inner_join</span>(</span>
+<span id="cb6-20"><a href="#cb6-20"></a>        <span class="kw">bind_rows</span>(readxl<span class="op">::</span><span class="kw">read_xls</span>(<span class="st">&quot;/workdir/mw489/GenotypingPlateMetaData/Plate18.xls&quot;</span>),</span>
+<span id="cb6-21"><a href="#cb6-21"></a>                  readxl<span class="op">::</span><span class="kw">read_xls</span>(<span class="st">&quot;/workdir/mw489/GenotypingPlateMetaData/Plate19.xls&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="st">          </span><span class="kw">rename</span>(<span class="dt">dartSampleName=</span>source_observation_unit_name,</span>
+<span id="cb6-23"><a href="#cb6-23"></a>                 <span class="dt">SampleID=</span>ncbi_taxonomy_id) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="st">          </span><span class="kw">select</span>(dartSampleName,SampleID)</span>
+<span id="cb6-25"><a href="#cb6-25"></a>      ) <span class="op">%&gt;%</span><span class="st"> </span>distinct <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="st">      </span><span class="kw">inner_join</span>(gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="st">                   </span><span class="kw">mutate</span>(<span class="dt">SampleID=</span><span class="kw">toupper</span>(SampleID))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="st">      </span><span class="kw">select</span>(dartSampleName,FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span>distinct <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame </span>
+<span id="cb6-29"><a href="#cb6-29"></a>  ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="st">  </span><span class="kw">bind_rows</span>(</span>
+<span id="cb6-31"><a href="#cb6-31"></a>    <span class="co"># More UG15F? plus NASE14 and ORERA</span></span>
+<span id="cb6-32"><a href="#cb6-32"></a>    <span class="kw">tibble</span>(<span class="dt">dartSampleName=</span>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;Full_sib_Nigeria&quot;</span>,.,<span class="dt">value =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;CycleOne|CycleTwo|GS_Cycle|UYT|RTB|Namulonge_C1&quot;</span>,.,<span class="dt">value =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;UG11|UG12|UG13|UG14&quot;</span>,.,<span class="dt">value =</span> T, <span class="dt">ignore.case =</span> T,<span class="dt">invert =</span> T) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;^UGC&quot;</span>,.,<span class="dt">value =</span> T, <span class="dt">ignore.case =</span> T,<span class="dt">invert =</span> T)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="st">      </span><span class="kw">inner_join</span>(</span>
+<span id="cb6-39"><a href="#cb6-39"></a>        <span class="kw">bind_rows</span>(</span>
+<span id="cb6-40"><a href="#cb6-40"></a>          gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">dartSampleName=</span>SampleID),</span>
+<span id="cb6-42"><a href="#cb6-42"></a>          gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">dartSampleName=</span><span class="kw">toupper</span>(SampleID)))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-44"><a href="#cb6-44"></a><span class="st">      </span><span class="kw">select</span>(dartSampleName,FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span><span class="st"> </span>distinct</span>
+<span id="cb6-45"><a href="#cb6-45"></a>  ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-46"><a href="#cb6-46"></a><span class="st">  </span><span class="kw">bind_rows</span>(</span>
+<span id="cb6-47"><a href="#cb6-47"></a>    <span class="co"># TARI</span></span>
+<span id="cb6-48"><a href="#cb6-48"></a>    <span class="kw">tibble</span>(<span class="dt">dartSampleName=</span>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-49"><a href="#cb6-49"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-50"><a href="#cb6-50"></a><span class="st">      </span><span class="kw">separate</span>(dartSampleName,<span class="kw">c</span>(<span class="st">&quot;PlateIDandPos&quot;</span>,<span class="st">&quot;SampleID&quot;</span>),<span class="st">&quot;</span><span class="ch">\\</span><span class="st">.</span><span class="ch">\\</span><span class="st">.</span><span class="ch">\\</span><span class="st">.&quot;</span>,<span class="dt">remove =</span> F) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-51"><a href="#cb6-51"></a><span class="st">      </span><span class="kw">inner_join</span>(</span>
+<span id="cb6-52"><a href="#cb6-52"></a>        <span class="kw">bind_rows</span>(</span>
+<span id="cb6-53"><a href="#cb6-53"></a>          gbsSamples,</span>
+<span id="cb6-54"><a href="#cb6-54"></a>          gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-55"><a href="#cb6-55"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">SampleID=</span><span class="kw">toupper</span>(SampleID)))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-56"><a href="#cb6-56"></a><span class="st">      </span><span class="kw">select</span>(dartSampleName,FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span><span class="st"> </span>distinct</span>
+<span id="cb6-57"><a href="#cb6-57"></a>  ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-58"><a href="#cb6-58"></a><span class="st">  </span><span class="kw">bind_rows</span>(</span>
+<span id="cb6-59"><a href="#cb6-59"></a>    <span class="co"># TARI TP UKGs and KBHs</span></span>
+<span id="cb6-60"><a href="#cb6-60"></a>    <span class="kw">tibble</span>(<span class="dt">dartSampleName=</span>dcas4459samples<span class="op">$</span>V1 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-61"><a href="#cb6-61"></a><span class="st">             </span><span class="kw">grep</span>(<span class="st">&quot;TARI&quot;</span>,.,<span class="dt">value=</span>T)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-62"><a href="#cb6-62"></a><span class="st">      </span><span class="kw">separate</span>(dartSampleName,<span class="kw">c</span>(<span class="st">&quot;PlateIDandPos&quot;</span>,<span class="st">&quot;SampleID&quot;</span>),<span class="st">&quot;</span><span class="ch">\\</span><span class="st">.</span><span class="ch">\\</span><span class="st">.</span><span class="ch">\\</span><span class="st">.&quot;</span>,<span class="dt">remove =</span> F) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-63"><a href="#cb6-63"></a><span class="st">      </span><span class="kw">anti_join</span>(</span>
+<span id="cb6-64"><a href="#cb6-64"></a>        <span class="kw">bind_rows</span>(</span>
+<span id="cb6-65"><a href="#cb6-65"></a>          gbsSamples,</span>
+<span id="cb6-66"><a href="#cb6-66"></a>          gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-67"><a href="#cb6-67"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">SampleID=</span><span class="kw">toupper</span>(SampleID)))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-68"><a href="#cb6-68"></a><span class="st">      </span><span class="kw">mutate</span>(<span class="dt">SampleID=</span><span class="kw">gsub</span>(<span class="st">&quot;TZUKG&quot;</span>,<span class="st">&quot;UKG&quot;</span>,SampleID),</span>
+<span id="cb6-69"><a href="#cb6-69"></a>             <span class="dt">SampleID=</span><span class="kw">gsub</span>(<span class="st">&quot;TZKBH&quot;</span>,<span class="st">&quot;KBH20&quot;</span>,SampleID)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-70"><a href="#cb6-70"></a><span class="st">      </span><span class="kw">inner_join</span>(</span>
+<span id="cb6-71"><a href="#cb6-71"></a>        <span class="kw">bind_rows</span>(</span>
+<span id="cb6-72"><a href="#cb6-72"></a>          gbsSamples,</span>
+<span id="cb6-73"><a href="#cb6-73"></a>          gbsSamples <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-74"><a href="#cb6-74"></a><span class="st">            </span><span class="kw">mutate</span>(<span class="dt">SampleID=</span><span class="kw">toupper</span>(SampleID)))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-75"><a href="#cb6-75"></a><span class="st">      </span><span class="kw">select</span>(dartSampleName,FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span><span class="st"> </span>distinct</span>
+<span id="cb6-76"><a href="#cb6-76"></a>  ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-77"><a href="#cb6-77"></a><span class="st">  </span>distinct</span>
+<span id="cb6-78"><a href="#cb6-78"></a><span class="kw">dim</span>(dart2gbs)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">saveRDS</span>(dart2gbs,<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/dart2gbs_NameMatchesToVerifyByIBD_82819.rds&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">write.table</span>(<span class="kw">unique</span>(dart2gbs<span class="op">$</span>dartSampleName),</span>
+<span id="cb7-3"><a href="#cb7-3"></a>            <span class="dt">file=</span><span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4"></a>                        <span class="st">&quot;dartSamples_toVerifyAgainstGBS_82819.txt&quot;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5"></a>            <span class="dt">row.names =</span> F, <span class="dt">col.names =</span> F, <span class="dt">quote =</span> F)</span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="kw">write.table</span>(<span class="kw">unique</span>(dart2gbs<span class="op">$</span>FullSampleName),</span>
+<span id="cb7-7"><a href="#cb7-7"></a>            <span class="dt">file=</span><span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8"></a>                        <span class="st">&quot;gbsSamples_toVerifyAgainstDArT_82819.txt&quot;</span>),</span>
+<span id="cb7-9"><a href="#cb7-9"></a>            <span class="dt">row.names =</span> F, <span class="dt">col.names =</span> F, <span class="dt">quote =</span> F)</span></code></pre></div>
+</div>
+<div id="site-lists" class="section level1">
+<h1>Site Lists</h1>
+<div id="get-siteswithalleles-lists" class="section level2">
+<h2>Get sitesWithAlleles lists</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb8-3"><a href="#cb8-3"></a>june2016vcf_sites&lt;-<span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractSiteList=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;zcat /workdir/mw489/June2016_VCF/&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6"></a>                  <span class="st">&quot;cassavaGBSbuild_June2016_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf.gz &quot;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7"></a>                  <span class="st">&quot;| cut -f1-5 &gt; &quot;</span>,</span>
+<span id="cb8-8"><a href="#cb8-8"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9"></a>                  <span class="st">&quot;cassavaGBSbuild_June2016_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>))</span>
+<span id="cb8-10"><a href="#cb8-10"></a>    sites&lt;-<span class="kw">read.table</span>(<span class="dt">file =</span> <span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11"></a>                                    <span class="st">&quot;cassavaGBSbuild_June2016_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>),</span>
+<span id="cb8-12"><a href="#cb8-12"></a>                      <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F) }))</span>
+<span id="cb8-13"><a href="#cb8-13"></a></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb8-16"><a href="#cb8-16"></a>tzvcf_sites&lt;-<span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractSiteList=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb8-18"><a href="#cb8-18"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;zcat /workdir/mw489/TanzaniaData_June2017/vcfFIles/&quot;</span>,</span>
+<span id="cb8-19"><a href="#cb8-19"></a>                  <span class="st">&quot;TanzaniaData_20170601_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf.gz &quot;</span>,</span>
+<span id="cb8-20"><a href="#cb8-20"></a>                  <span class="st">&quot;| cut -f1-5 &gt; &quot;</span>,</span>
+<span id="cb8-21"><a href="#cb8-21"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-22"><a href="#cb8-22"></a>                  <span class="st">&quot;TanzaniaData_20170601_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>))</span>
+<span id="cb8-23"><a href="#cb8-23"></a>    sites&lt;-<span class="kw">read.table</span>(<span class="dt">file =</span> <span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-24"><a href="#cb8-24"></a>                                    <span class="st">&quot;TanzaniaData_20170601_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>),</span>
+<span id="cb8-25"><a href="#cb8-25"></a>                      <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F) }))</span>
+<span id="cb8-26"><a href="#cb8-26"></a></span>
+<span id="cb8-27"><a href="#cb8-27"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb8-28"><a href="#cb8-28"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb8-29"><a href="#cb8-29"></a>paulaJul2016vcf_sites&lt;-<span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractSiteList=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb8-31"><a href="#cb8-31"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;cat /workdir/mw489/LV_paula_Jul2016/raw/&quot;</span>,</span>
+<span id="cb8-32"><a href="#cb8-32"></a>                  <span class="st">&quot;LV_naCRRINextGen_paula_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf &quot;</span>,</span>
+<span id="cb8-33"><a href="#cb8-33"></a>                  <span class="st">&quot;| cut -f1-5 &gt; &quot;</span>,</span>
+<span id="cb8-34"><a href="#cb8-34"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-35"><a href="#cb8-35"></a>                  <span class="st">&quot;LV_naCRRINextGen_paula_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>))</span>
+<span id="cb8-36"><a href="#cb8-36"></a>    sites&lt;-<span class="kw">read.table</span>(<span class="dt">file =</span> <span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-37"><a href="#cb8-37"></a>                                    <span class="st">&quot;LV_naCRRINextGen_paula_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>),</span>
+<span id="cb8-38"><a href="#cb8-38"></a>                      <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F) }))</span>
+<span id="cb8-39"><a href="#cb8-39"></a></span>
+<span id="cb8-40"><a href="#cb8-40"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb8-41"><a href="#cb8-41"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb8-42"><a href="#cb8-42"></a>paulaJan2017vcf_sites&lt;-<span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb8-43"><a href="#cb8-43"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractSiteList=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb8-44"><a href="#cb8-44"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;cat /workdir/mw489/LV_paula_Jan2017/vcfFiles/&quot;</span>,</span>
+<span id="cb8-45"><a href="#cb8-45"></a>                  <span class="st">&quot;paula_jan2017_4plates_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf &quot;</span>,</span>
+<span id="cb8-46"><a href="#cb8-46"></a>                  <span class="st">&quot;| cut -f1-5 &gt; &quot;</span>,</span>
+<span id="cb8-47"><a href="#cb8-47"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-48"><a href="#cb8-48"></a>                  <span class="st">&quot;paula_jan2017_4plates_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>))</span>
+<span id="cb8-49"><a href="#cb8-49"></a>    sites&lt;-<span class="kw">read.table</span>(<span class="dt">file =</span> <span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb8-50"><a href="#cb8-50"></a>                                    <span class="st">&quot;paula_jan2017_4plates_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.sitesWithAlleles&quot;</span>),</span>
+<span id="cb8-51"><a href="#cb8-51"></a>                      <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F) }))</span>
+<span id="cb8-52"><a href="#cb8-52"></a></span>
+<span id="cb8-53"><a href="#cb8-53"></a>dart_sites&lt;-<span class="kw">read.table</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/&quot;</span>,</span>
+<span id="cb8-54"><a href="#cb8-54"></a>                              <span class="st">&quot;DCas19_4459_82719.sitesWithAlleles&quot;</span>),</span>
+<span id="cb8-55"><a href="#cb8-55"></a>                       <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> T)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>june2016vcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="st">  </span><span class="kw">unnest</span>() <span class="op">%$%</span><span class="st"> </span><span class="kw">table</span>(<span class="kw">c</span>(V4,V5)) </span>
+<span id="cb9-3"><a href="#cb9-3"></a>tzvcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="st">  </span><span class="kw">unnest</span>() <span class="op">%$%</span><span class="st"> </span><span class="kw">table</span>(<span class="kw">c</span>(V4,V5))</span>
+<span id="cb9-5"><a href="#cb9-5"></a>paulaJul2016vcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="st">  </span><span class="kw">unnest</span>() <span class="op">%$%</span><span class="st"> </span><span class="kw">table</span>(<span class="kw">c</span>(V4,V5))</span>
+<span id="cb9-7"><a href="#cb9-7"></a>paulaJan2017vcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="st">  </span><span class="kw">unnest</span>() <span class="op">%$%</span><span class="st"> </span><span class="kw">table</span>(<span class="kw">c</span>(V4,V5))</span>
+<span id="cb9-9"><a href="#cb9-9"></a>dart_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="st">  </span><span class="kw">unnest</span>() <span class="op">%$%</span><span class="st"> </span><span class="kw">table</span>(<span class="kw">c</span>(REF,ALT))</span></code></pre></div>
+</div>
+<div id="sites-common-to-all-gbs-sources" class="section level2">
+<h2>Sites common to all GBS sources</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>snpsCommonToAllGBS&lt;-june2016vcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="st">  </span><span class="kw">unnest</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="st">  </span><span class="kw">semi_join</span>(tzvcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="st">              </span><span class="kw">unnest</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="st">  </span><span class="kw">semi_join</span>(paulaJul2016vcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="st">              </span><span class="kw">unnest</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="st">  </span><span class="kw">semi_join</span>(paulaJan2017vcf_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="st">              </span><span class="kw">unnest</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">grepl</span>(<span class="st">&quot;,&quot;</span>,V4),</span>
+<span id="cb10-10"><a href="#cb10-10"></a>         <span class="op">!</span><span class="kw">grepl</span>(<span class="st">&quot;,&quot;</span>,V5),</span>
+<span id="cb10-11"><a href="#cb10-11"></a>         V4<span class="op">!=</span><span class="st">&quot;.&quot;</span>,</span>
+<span id="cb10-12"><a href="#cb10-12"></a>         V5<span class="op">!=</span><span class="st">&quot;.&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>Chr) <span class="co">#%$% table(c(V4,V5))</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="kw">dim</span>(snpsCommonToAllGBS) <span class="co"># [1] 178128      5</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="kw">head</span>(snpsCommonToAllGBS)</span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="kw">saveRDS</span>(snpsCommonToAllGBS,<span class="dt">file=</span><span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb10-18"><a href="#cb10-18"></a>                                       <span class="st">&quot;snpsCommonToAllGBS_82819.rds&quot;</span>))</span></code></pre></div>
+</div>
+<div id="dart-gbs-intersection" class="section level2">
+<h2>DArT-GBS intersection</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>dart_gbs_intersection&lt;-snpsCommonToAllGBS <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="st">  </span><span class="kw">rename</span>(<span class="dt">CHROM=</span>V1,</span>
+<span id="cb11-3"><a href="#cb11-3"></a>         <span class="dt">POS=</span>V2,</span>
+<span id="cb11-4"><a href="#cb11-4"></a>         <span class="dt">ID=</span>V3,</span>
+<span id="cb11-5"><a href="#cb11-5"></a>         <span class="dt">REF=</span>V4,</span>
+<span id="cb11-6"><a href="#cb11-6"></a>         <span class="dt">ALT=</span>V5) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="st">  </span><span class="kw">semi_join</span>(dart_sites)</span>
+<span id="cb11-8"><a href="#cb11-8"></a>dart_gbs_intersection <span class="op">%&gt;%</span><span class="st"> </span>dim <span class="co"># 402</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="kw">saveRDS</span>(dart_gbs_intersection,<span class="dt">file=</span><span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb11-10"><a href="#cb11-10"></a>                                          <span class="st">&quot;dart_gbs_intersection_82819.rds&quot;</span>))</span></code></pre></div>
+</div>
+</div>
+<div id="extract-from-raw-vcfs" class="section level1">
+<h1>Extract from raw VCFs</h1>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(magrittr)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>gbs_sites&lt;-<span class="kw">readRDS</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>                                       <span class="st">&quot;snpsCommonToAllGBS_82819.rds&quot;</span>))</span>
+<span id="cb12-4"><a href="#cb12-4"></a>dart_gbs_isect_sites&lt;-<span class="kw">readRDS</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5"></a>                                          <span class="st">&quot;dart_gbs_intersection_82819.rds&quot;</span>))</span>
+<span id="cb12-6"><a href="#cb12-6"></a>dart_sites&lt;-<span class="kw">read.table</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/&quot;</span>,</span>
+<span id="cb12-7"><a href="#cb12-7"></a>                              <span class="st">&quot;DCas19_4459_82719.sitesWithAlleles&quot;</span>),</span>
+<span id="cb12-8"><a href="#cb12-8"></a>                       <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> T)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(magrittr); <span class="kw">require</span>(furrr)</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">write_isect_sites=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){</span>
+<span id="cb13-6"><a href="#cb13-6"></a>    isect_thischr&lt;-dart_gbs_isect_sites <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="st">      </span><span class="kw">filter</span>(CHROM<span class="op">==</span>Chr) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="st">      </span><span class="kw">select</span>(CHROM,POS)</span>
+<span id="cb13-9"><a href="#cb13-9"></a>    <span class="kw">write.table</span>(isect_thischr,</span>
+<span id="cb13-10"><a href="#cb13-10"></a>                <span class="dt">file=</span><span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-11"><a href="#cb13-11"></a>                            Chr,<span class="st">&quot;_gbs_dart_isect_sites_82819.sites&quot;</span>),</span>
+<span id="cb13-12"><a href="#cb13-12"></a>                <span class="dt">row.names =</span> F, <span class="dt">col.names =</span> F, <span class="dt">quote =</span> F) }))</span>
+<span id="cb13-13"><a href="#cb13-13"></a></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb13-15"><a href="#cb13-15"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb13-16"><a href="#cb13-16"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractRaw_gbsSamples=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){</span>
+<span id="cb13-18"><a href="#cb13-18"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --gzvcf /workdir/mw489/June2016_VCF/cassavaGBSbuild_June2016_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf.gz &quot;</span>,</span>
+<span id="cb13-19"><a href="#cb13-19"></a>                  <span class="st">&quot;--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb13-20"><a href="#cb13-20"></a>                  <span class="st">&quot;gbsSamples_toVerifyAgainstDArT_82819.txt &quot;</span>,</span>
+<span id="cb13-21"><a href="#cb13-21"></a>                  <span class="st">&quot;--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-22"><a href="#cb13-22"></a>                  Chr,<span class="st">&quot;_gbs_dart_isect_sites_82819.sites &quot;</span>,</span>
+<span id="cb13-23"><a href="#cb13-23"></a>                  <span class="st">&quot;--recode &quot;</span>,</span>
+<span id="cb13-24"><a href="#cb13-24"></a>                  <span class="st">&quot;--stdout | bgzip -c -@ 24 &gt; &quot;</span>,</span>
+<span id="cb13-25"><a href="#cb13-25"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-26"><a href="#cb13-26"></a>                  Chr,<span class="st">&quot;_gbsSamples_june2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span>
+<span id="cb13-27"><a href="#cb13-27"></a><span class="co"># 180 samples</span></span>
+<span id="cb13-28"><a href="#cb13-28"></a></span>
+<span id="cb13-29"><a href="#cb13-29"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb13-30"><a href="#cb13-30"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb13-31"><a href="#cb13-31"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb13-32"><a href="#cb13-32"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractRaw_gbsSamples=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){</span>
+<span id="cb13-33"><a href="#cb13-33"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --gzvcf /workdir/mw489/TanzaniaData_June2017/vcfFIles/&quot;</span>,</span>
+<span id="cb13-34"><a href="#cb13-34"></a>                  <span class="st">&quot;TanzaniaData_20170601_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf.gz &quot;</span>,</span>
+<span id="cb13-35"><a href="#cb13-35"></a>                  <span class="st">&quot;--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb13-36"><a href="#cb13-36"></a>                  <span class="st">&quot;gbsSamples_toVerifyAgainstDArT_82819.txt &quot;</span>,</span>
+<span id="cb13-37"><a href="#cb13-37"></a>                  <span class="st">&quot;--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-38"><a href="#cb13-38"></a>                  Chr,<span class="st">&quot;_gbs_dart_isect_sites_82819.sites &quot;</span>,</span>
+<span id="cb13-39"><a href="#cb13-39"></a>                  <span class="st">&quot;--recode &quot;</span>,</span>
+<span id="cb13-40"><a href="#cb13-40"></a>                  <span class="st">&quot;--stdout | bgzip -c -@ 24 &gt; &quot;</span>,</span>
+<span id="cb13-41"><a href="#cb13-41"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-42"><a href="#cb13-42"></a>                  Chr,<span class="st">&quot;_gbsSamples_tzvcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span>
+<span id="cb13-43"><a href="#cb13-43"></a><span class="co"># 480 samples</span></span>
+<span id="cb13-44"><a href="#cb13-44"></a></span>
+<span id="cb13-45"><a href="#cb13-45"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb13-46"><a href="#cb13-46"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb13-47"><a href="#cb13-47"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb13-48"><a href="#cb13-48"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractRaw_gbsSamples=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){</span>
+<span id="cb13-49"><a href="#cb13-49"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --vcf /workdir/mw489/LV_paula_Jul2016/raw/&quot;</span>,</span>
+<span id="cb13-50"><a href="#cb13-50"></a>                  <span class="st">&quot;LV_naCRRINextGen_paula_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf &quot;</span>,</span>
+<span id="cb13-51"><a href="#cb13-51"></a>                  <span class="st">&quot;--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb13-52"><a href="#cb13-52"></a>                  <span class="st">&quot;gbsSamples_toVerifyAgainstDArT_82819.txt &quot;</span>,</span>
+<span id="cb13-53"><a href="#cb13-53"></a>                  <span class="st">&quot;--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-54"><a href="#cb13-54"></a>                  Chr,<span class="st">&quot;_gbs_dart_isect_sites_82819.sites &quot;</span>,</span>
+<span id="cb13-55"><a href="#cb13-55"></a>                  <span class="st">&quot;--recode &quot;</span>,</span>
+<span id="cb13-56"><a href="#cb13-56"></a>                  <span class="st">&quot;--stdout | bgzip -c -@ 24 &gt; &quot;</span>,</span>
+<span id="cb13-57"><a href="#cb13-57"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-58"><a href="#cb13-58"></a>                  Chr,<span class="st">&quot;_gbsSamples_paulaJul2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span>
+<span id="cb13-59"><a href="#cb13-59"></a><span class="co">## </span><span class="al">NOTE</span><span class="co">: NO SAMPLES EXTRACTED!!!</span></span>
+<span id="cb13-60"><a href="#cb13-60"></a></span>
+<span id="cb13-61"><a href="#cb13-61"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb13-62"><a href="#cb13-62"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb13-63"><a href="#cb13-63"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb13-64"><a href="#cb13-64"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractRaw_gbsSamples=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){</span>
+<span id="cb13-65"><a href="#cb13-65"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --vcf /workdir/mw489/LV_paula_Jan2017/vcfFiles/&quot;</span>,</span>
+<span id="cb13-66"><a href="#cb13-66"></a>                  <span class="st">&quot;paula_jan2017_4plates_withRef_chr&quot;</span>,Chr,<span class="st">&quot;.vcf &quot;</span>,</span>
+<span id="cb13-67"><a href="#cb13-67"></a>                    <span class="st">&quot;--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb13-68"><a href="#cb13-68"></a>                  <span class="st">&quot;gbsSamples_toVerifyAgainstDArT_82819.txt &quot;</span>,</span>
+<span id="cb13-69"><a href="#cb13-69"></a>                  <span class="st">&quot;--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-70"><a href="#cb13-70"></a>                  Chr,<span class="st">&quot;_gbs_dart_isect_sites_82819.sites &quot;</span>,</span>
+<span id="cb13-71"><a href="#cb13-71"></a>                  <span class="st">&quot;--recode &quot;</span>,</span>
+<span id="cb13-72"><a href="#cb13-72"></a>                  <span class="st">&quot;--stdout | bgzip -c -@ 24 &gt; &quot;</span>,</span>
+<span id="cb13-73"><a href="#cb13-73"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-74"><a href="#cb13-74"></a>                  Chr,<span class="st">&quot;_gbsSamples_paulaJan2017vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span>
+<span id="cb13-75"><a href="#cb13-75"></a><span class="co">## 19 samples extracted</span></span>
+<span id="cb13-76"><a href="#cb13-76"></a></span>
+<span id="cb13-77"><a href="#cb13-77"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb13-78"><a href="#cb13-78"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb13-79"><a href="#cb13-79"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb13-80"><a href="#cb13-80"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ExtractRaw_dartSamples=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){</span>
+<span id="cb13-81"><a href="#cb13-81"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --gzvcf /workdir/mw489/DCas19_4459/&quot;</span>,</span>
+<span id="cb13-82"><a href="#cb13-82"></a>                  <span class="st">&quot;DCas19_4459_82719.vcf.gz &quot;</span>,</span>
+<span id="cb13-83"><a href="#cb13-83"></a>                  <span class="st">&quot;--keep /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb13-84"><a href="#cb13-84"></a>                  <span class="st">&quot;dartSamples_toVerifyAgainstGBS_82819.txt &quot;</span>,</span>
+<span id="cb13-85"><a href="#cb13-85"></a>                  <span class="st">&quot;--positions /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-86"><a href="#cb13-86"></a>                  Chr,<span class="st">&quot;_gbs_dart_isect_sites_82819.sites &quot;</span>,</span>
+<span id="cb13-87"><a href="#cb13-87"></a>                  <span class="st">&quot;--recode &quot;</span>,</span>
+<span id="cb13-88"><a href="#cb13-88"></a>                  <span class="st">&quot;--stdout | bgzip -c -@ 24 &gt; &quot;</span>,</span>
+<span id="cb13-89"><a href="#cb13-89"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb13-90"><a href="#cb13-90"></a>                  Chr,<span class="st">&quot;_dartSamples_toVerifyAgainstGBS_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span>
+<span id="cb13-91"><a href="#cb13-91"></a><span class="co"># 629 samples</span></span></code></pre></div>
+</div>
+<div id="index" class="section level1">
+<h1>Index</h1>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Index=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb14-5"><a href="#cb14-5"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb14-6"><a href="#cb14-6"></a>                  Chr,<span class="st">&quot;_gbsSamples_june2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) </span>
+<span id="cb14-7"><a href="#cb14-7"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb14-8"><a href="#cb14-8"></a>                  Chr,<span class="st">&quot;_gbsSamples_tzvcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>))</span>
+<span id="cb14-9"><a href="#cb14-9"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb14-10"><a href="#cb14-10"></a>                  Chr,<span class="st">&quot;_gbsSamples_paulaJul2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>))</span>
+<span id="cb14-11"><a href="#cb14-11"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb14-12"><a href="#cb14-12"></a>                  Chr,<span class="st">&quot;_gbsSamples_paulaJan2017vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>))</span>
+<span id="cb14-13"><a href="#cb14-13"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb14-14"><a href="#cb14-14"></a>                  Chr,<span class="st">&quot;_dartSamples_toVerifyAgainstGBS_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span></code></pre></div>
+</div>
+<div id="merge-gbs" class="section level1">
+<h1>Merge GBS</h1>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Merge=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb15-5"><a href="#cb15-5"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools merge &quot;</span>,</span>
+<span id="cb15-6"><a href="#cb15-6"></a>                  <span class="st">&quot;--output /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb15-7"><a href="#cb15-7"></a>                  Chr,<span class="st">&quot;_AllgbsSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz &quot;</span>,</span>
+<span id="cb15-8"><a href="#cb15-8"></a>                  <span class="st">&quot;--merge snps --output-type z --threads 6 &quot;</span>,</span>
+<span id="cb15-9"><a href="#cb15-9"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb15-10"><a href="#cb15-10"></a>                  Chr,<span class="st">&quot;_gbsSamples_june2016vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz &quot;</span>,</span>
+<span id="cb15-11"><a href="#cb15-11"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb15-12"><a href="#cb15-12"></a>                  Chr,<span class="st">&quot;_gbsSamples_tzvcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz &quot;</span>,</span>
+<span id="cb15-13"><a href="#cb15-13"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb15-14"><a href="#cb15-14"></a>                  Chr,<span class="st">&quot;_gbsSamples_paulaJan2017vcf_toVerifyAgainstDArT_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span></code></pre></div>
+</div>
+<div id="merge-gbs-dart" class="section level1">
+<h1>Merge GBS-DArT</h1>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Merge=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb16-5"><a href="#cb16-5"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb16-6"><a href="#cb16-6"></a>                  Chr,<span class="st">&quot;_AllgbsSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) </span>
+<span id="cb16-7"><a href="#cb16-7"></a>    </span>
+<span id="cb16-8"><a href="#cb16-8"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools merge &quot;</span>,</span>
+<span id="cb16-9"><a href="#cb16-9"></a>                  <span class="st">&quot;--output /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb16-10"><a href="#cb16-10"></a>                  Chr,<span class="st">&quot;_AllSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz &quot;</span>,</span>
+<span id="cb16-11"><a href="#cb16-11"></a>                  <span class="st">&quot;--merge snps --output-type z --threads 6 &quot;</span>,</span>
+<span id="cb16-12"><a href="#cb16-12"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb16-13"><a href="#cb16-13"></a>                  Chr,<span class="st">&quot;_AllgbsSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz &quot;</span>,</span>
+<span id="cb16-14"><a href="#cb16-14"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb16-15"><a href="#cb16-15"></a>                  Chr,<span class="st">&quot;_dartSamples_toVerifyAgainstGBS_gbsDartIntersectingSites_82819.vcf.gz&quot;</span>)) }))</span></code></pre></div>
+</div>
+<div id="pre-analysis-filter" class="section level1">
+<h1>Pre-analysis filter</h1>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">PreAnalysisFilter=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb17-5"><a href="#cb17-5"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --gzvcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb17-6"><a href="#cb17-6"></a>                  Chr,<span class="st">&quot;_AllSamplesToVerify_gbsDartIntersectingSites_82819.vcf.gz &quot;</span>,</span>
+<span id="cb17-7"><a href="#cb17-7"></a>                  <span class="st">&quot;--min-alleles 2 --max-alleles 2 --minDP 4 --maxDP 50 &quot;</span>, </span>
+<span id="cb17-8"><a href="#cb17-8"></a>                  <span class="st">&quot;--recode --stdout | bgzip -c -@ 24 &gt; &quot;</span>,</span>
+<span id="cb17-9"><a href="#cb17-9"></a>                  <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb17-10"><a href="#cb17-10"></a>                  Chr,<span class="st">&quot;_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz&quot;</span>))}))</span></code></pre></div>
+</div>
+<div id="concat-chroms" class="section level1">
+<h1>Concat chroms</h1>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">options</span>(<span class="dt">mc.cores=</span><span class="dv">18</span>)</span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">plan</span>(multiprocess)</span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="kw">tibble</span>(<span class="dt">Chr=</span><span class="dv">1</span><span class="op">:</span><span class="dv">18</span>) <span class="op">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Index=</span><span class="kw">future_map</span>(Chr,<span class="cf">function</span>(Chr){ </span>
+<span id="cb18-5"><a href="#cb18-5"></a>    <span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;tabix -f -p vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,</span>
+<span id="cb18-6"><a href="#cb18-6"></a>                  Chr,<span class="st">&quot;_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz&quot;</span>))</span>
+<span id="cb18-7"><a href="#cb18-7"></a>  }))</span>
+<span id="cb18-8"><a href="#cb18-8"></a></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;bcftools concat --allow-overlaps &quot;</span>,</span>
+<span id="cb18-10"><a href="#cb18-10"></a>              <span class="st">&quot;--output /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb18-11"><a href="#cb18-11"></a>              <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz &quot;</span>,</span>
+<span id="cb18-12"><a href="#cb18-12"></a>              <span class="st">&quot;--output-type z --threads 6 &quot;</span>,</span>
+<span id="cb18-13"><a href="#cb18-13"></a>              <span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/chr&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">18</span>,</span>
+<span id="cb18-14"><a href="#cb18-14"></a>                     <span class="st">&quot;_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz&quot;</span>,<span class="dt">collapse =</span> <span class="st">&quot; &quot;</span>)))</span>
+<span id="cb18-15"><a href="#cb18-15"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;vcftools --gzvcf &quot;</span>,</span>
+<span id="cb18-16"><a href="#cb18-16"></a>              <span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb18-17"><a href="#cb18-17"></a>              <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz&quot;</span>))</span></code></pre></div>
+<p>After filtering, kept 1308 out of 1308 Individuals After filtering, kept 402 out of a possible 402 Sites</p>
+</div>
+<div id="make-binary-blink-bedbimfam" class="section level1">
+<h1>Make binary blink (bed/bim/fam)</h1>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;&quot;</span>,</span>
+<span id="cb19-2"><a href="#cb19-2"></a>                      <span class="st">&quot;plink --vcf /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb19-3"><a href="#cb19-3"></a>                      <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.vcf.gz &quot;</span>, </span>
+<span id="cb19-4"><a href="#cb19-4"></a>                      <span class="st">&quot;--make-bed --const-fid &quot;</span>,</span>
+<span id="cb19-5"><a href="#cb19-5"></a>                      <span class="st">&quot;--out /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>, </span>
+<span id="cb19-6"><a href="#cb19-6"></a>                      <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819&quot;</span>)) </span></code></pre></div>
+</div>
+<div id="plink-ibd" class="section level1">
+<h1>PLINK IBD</h1>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">system</span>(<span class="kw">paste0</span>(<span class="st">&quot;export PATH=/programs/plink-1.9-x86_64-beta3.30:$PATH;&quot;</span>,</span>
+<span id="cb20-2"><a href="#cb20-2"></a>              <span class="st">&quot;plink --bfile /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb20-3"><a href="#cb20-3"></a>              <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819 &quot;</span>,</span>
+<span id="cb20-4"><a href="#cb20-4"></a>              <span class="st">&quot;--genome --out /workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb20-5"><a href="#cb20-5"></a>              <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819;&quot;</span>))</span></code></pre></div>
+</div>
+<div id="choose-dart-gbs-matching-records" class="section level1">
+<h1>Choose DArT-GBS matching records</h1>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">library</span>(tidyverse); <span class="kw">library</span>(magrittr); <span class="kw">library</span>(data.table)</span>
+<span id="cb21-2"><a href="#cb21-2"></a>genome&lt;-<span class="kw">fread</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb21-3"><a href="#cb21-3"></a>                     <span class="st">&quot;AllChrom_AllSamplesToVerify_gbsDartIntersectingSites_filtered_82819.genome&quot;</span>),</span>
+<span id="cb21-4"><a href="#cb21-4"></a>              <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> T) <span class="op">%&gt;%</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a><span class="st">  </span>as_tibble</span>
+<span id="cb21-6"><a href="#cb21-6"></a>  </span>
+<span id="cb21-7"><a href="#cb21-7"></a>dart2gbs&lt;-<span class="kw">readRDS</span>(<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/dart2gbs_NameMatchesToVerifyByIBD_82819.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="make-official-matches" class="section level1">
+<h1>Make “official” matches</h1>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>IBDmatches&lt;-dart2gbs <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="st">  </span><span class="kw">left_join</span>(</span>
+<span id="cb22-3"><a href="#cb22-3"></a>    genome <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="st">      </span><span class="kw">filter</span>(DST<span class="op">&gt;=</span><span class="fl">0.9</span> <span class="op">|</span><span class="st"> </span>PI_HAT<span class="op">&gt;=</span><span class="fl">0.65</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-5"><a href="#cb22-5"></a><span class="st">      </span><span class="kw">select</span>(IID1,IID2,DST,PI_HAT) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-6"><a href="#cb22-6"></a><span class="st">      </span><span class="kw">rename</span>(<span class="dt">FullSampleName=</span>IID1,</span>
+<span id="cb22-7"><a href="#cb22-7"></a>             <span class="dt">dartSampleName=</span>IID2)</span>
+<span id="cb22-8"><a href="#cb22-8"></a>    ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-9"><a href="#cb22-9"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(DST)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># 564 pass</span></span>
+<span id="cb22-10"><a href="#cb22-10"></a><span class="st">  </span><span class="kw">arrange</span>(FullSampleName,<span class="kw">desc</span>(PI_HAT)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-11"><a href="#cb22-11"></a><span class="st">  </span><span class="kw">group_by</span>(dartSampleName) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-12"><a href="#cb22-12"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-13"><a href="#cb22-13"></a><span class="st">  </span><span class="kw">group_by</span>(FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-14"><a href="#cb22-14"></a><span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb22-15"><a href="#cb22-15"></a><span class="st">  </span><span class="kw">ungroup</span>() <span class="co"># 455 unique dart-gbs matches!</span></span>
+<span id="cb22-16"><a href="#cb22-16"></a>IBDmatches <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(FullSampleName) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n))</span>
+<span id="cb22-17"><a href="#cb22-17"></a>IBDmatches <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(dartSampleName) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n))</span></code></pre></div>
+<p>455 unique pairs of FullSampleName (GBS) and dartName (DArTseqLD)</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">saveRDS</span>(IBDmatches,<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/gbs2dart_SamplesVerifiedByIBD_82819.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="check-if-any-were-in-refpanel3" class="section level1">
+<h1>Check if any were in RefPanel3</h1>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>refpanel3_samples&lt;-<span class="kw">read.table</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/ImputationStageIII_72619/&quot;</span>,</span>
+<span id="cb24-2"><a href="#cb24-2"></a>                  <span class="st">&quot;chr2_RefPanelAndGSprogeny_ReadyForGP_72719.fam&quot;</span>),</span>
+<span id="cb24-3"><a href="#cb24-3"></a>           <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)<span class="op">$</span>V2</span>
+<span id="cb24-4"><a href="#cb24-4"></a></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="kw">table</span>(IBDmatches<span class="op">$</span>FullSampleName <span class="op">%in%</span><span class="st"> </span>refpanel3_samples)</span></code></pre></div>
+<p>FALSE TRUE 398 57</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>IBDmatches<span class="op">$</span>FullSampleName[IBDmatches<span class="op">$</span>FullSampleName <span class="op">%in%</span><span class="st"> </span>refpanel3_samples]</span></code></pre></div>
+<p>Of those, were any imputed as GBS+DArT?</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>gbsPlusDart_refpanel3_samples&lt;-<span class="kw">read.table</span>(<span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/ImputationStageI_71119/&quot;</span>,</span>
+<span id="cb26-2"><a href="#cb26-2"></a>                                                 <span class="st">&quot;samplesWithVerifiedGBSandDart_71119.txt&quot;</span>),</span>
+<span id="cb26-3"><a href="#cb26-3"></a>                                          <span class="dt">stringsAsFactors =</span> F, <span class="dt">header =</span> F)<span class="op">$</span>V1</span>
+<span id="cb26-4"><a href="#cb26-4"></a><span class="kw">table</span>(IBDmatches<span class="op">$</span>FullSampleName <span class="op">%in%</span><span class="st"> </span>gbsPlusDart_refpanel3_samples)</span></code></pre></div>
+<p>FALSE TRUE 413 42</p>
+</div>
+<div id="lists-for-imputation" class="section level1">
+<h1>Lists for imputation</h1>
+<p>Make a list for later use: samples imputed in RefPanel3 as GBS only, which now have matches Exclude those from RefPanel3 when imputed target (since now include in target)</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>refpanel3samples_prevImputedAsGBSonly_nowWithVerifiedDart&lt;-IBDmatches<span class="op">$</span>FullSampleName <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb27-2"><a href="#cb27-2"></a><span class="st">  </span>.[. <span class="op">%in%</span><span class="st"> </span>refpanel3_samples] <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb27-3"><a href="#cb27-3"></a><span class="st">  </span>.[<span class="op">!</span>. <span class="op">%in%</span><span class="st"> </span>gbsPlusDart_refpanel3_samples] <span class="co"># 15 of them</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="kw">write.table</span>(refpanel3samples_prevImputedAsGBSonly_nowWithVerifiedDart,</span>
+<span id="cb27-5"><a href="#cb27-5"></a>            <span class="dt">file=</span><span class="kw">paste0</span>(<span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/&quot;</span>,</span>
+<span id="cb27-6"><a href="#cb27-6"></a>                        <span class="st">&quot;refpanel3samples_prevImputedAsGBSonly_nowWithVerifiedDart_82819.txt&quot;</span>),</span>
+<span id="cb27-7"><a href="#cb27-7"></a>            <span class="dt">row.names =</span> F, <span class="dt">col.names =</span> F, <span class="dt">quote =</span> F)</span></code></pre></div>
+<p>Finally, make a list of the 413 GBS-DArT matches that <em>weren’t</em> imputed as GBS+DArT samples previously in RefPanelI (i.e. exclude the 42 referenced above)…</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>IBDmatches <span class="op">%&lt;&gt;%</span><span class="st"> </span></span>
+<span id="cb28-2"><a href="#cb28-2"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span>FullSampleName <span class="op">%in%</span><span class="st"> </span>gbsPlusDart_refpanel3_samples)</span>
+<span id="cb28-3"><a href="#cb28-3"></a><span class="kw">saveRDS</span>(IBDmatches,<span class="dt">file=</span><span class="st">&quot;/workdir/mw489/DCas19_4459/VerifyMatchesToGBS_82819/gbs2dart_SamplesVerifiedByIBD_toImpute_82819.rds&quot;</span>)</span></code></pre></div>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

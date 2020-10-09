@@ -12,7 +12,7 @@
 <meta name="author" content="Marnin Wolfe" />
 
 
-<title>EMBRAPA 2020 GS and related procedures</title>
+<title>NaCRRI 2020 GS and related procedures</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,6 +32,15 @@ div.section {
   padding-top: 12px;
 }
 </style>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
 
 
 
@@ -262,7 +271,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">EMBRAPA_2020GS</a>
+      <a class="navbar-brand" href="index.html">NaCRRI_2020GS</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -277,13 +286,19 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="convertDCas19_4403_ToVCF_102419.html">Conversion DArT report to VCF</a>
+      <a href="convertDArTseqLD_to_VCF_82719.html">Conversion DArT report to VCF</a>
     </li>
     <li>
-      <a href="Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html">Verify GBS-to-DArTseqLD sample matches</a>
+      <a href="Verify_gbs2dart_sampleMatches_82819.html">Verify GBS-to-DArTseqLD sample matches</a>
     </li>
     <li>
-      <a href="Imputation_EMBRAPA_102419.html">Imputation steps</a>
+      <a href="Imputation_EastAfrica_StageI_82819.html">Imputation Stage I</a>
+    </li>
+    <li>
+      <a href="Imputation_EastAfrica_StageII_91019.html">Imputation Stage II</a>
+    </li>
+    <li>
+      <a href="Imputation_EastAfrica_StageIII_91119.html">Imputation Stage III</a>
     </li>
   </ul>
 </li>
@@ -295,10 +310,10 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="convertDCas20_5360_ToVCF.html">Conversion DArT report DCas20_5360 to VCF</a>
+      <a href="convertDCas20_5419_ToVCF.html">Conversion DArT report DCas20_5419 to VCF</a>
     </li>
     <li>
-      <a href="ImputeDCas20_5360.html">Impute GS C2 (DCas20_5360)</a>
+      <a href="ImputeDCas20_5419.html">Impute DCas20_5419</a>
     </li>
   </ul>
 </li>
@@ -320,7 +335,7 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/wolfemd/EMBRAPA_2020GS">
+  <a href="https://github.com/wolfemd/NaCRRI_2020GS">
     <span class="fa fa-github"></span>
      
     Source code
@@ -335,7 +350,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">EMBRAPA 2020 GS and related procedures</h1>
+<h1 class="title toc-ignore">NaCRRI 2020 GS and related procedures</h1>
 <h4 class="author">Marnin Wolfe</h4>
 
 </div>
@@ -361,13 +376,13 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-09-01
+<strong>Last updated:</strong> 2020-10-09
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
 </p>
 <p>
-<strong>Knit directory:</strong> <code>EMBRAPA_2020GS/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+<strong>Knit directory:</strong> <code>NaCRRI_2020GS/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
@@ -392,16 +407,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStreed97980a47c1fe36dcc9725d3f89207ddc3135ccatargetblankd97980aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/d97980a47c1fe36dcc9725d3f89207ddc3135cca" target="_blank">d97980a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStree4f8a229950ea3e4858b03edda1b13894dcdec908targetblank4f8a229a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/4f8a229950ea3e4858b03edda1b13894dcdec908" target="_blank">4f8a229</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomwolfemdEMBRAPA2020GStreed97980a47c1fe36dcc9725d3f89207ddc3135ccatargetblankd97980aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefUsersmw489GoogleDriveNextGenGSEMBRAPA2020GStree4f8a229950ea3e4858b03edda1b13894dcdec908targetblank4f8a229a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/wolfemd/EMBRAPA_2020GS/tree/d97980a47c1fe36dcc9725d3f89207ddc3135cca" target="_blank">d97980a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./tree/4f8a229950ea3e4858b03edda1b13894dcdec908" target="_blank">4f8a229</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -409,19 +424,421 @@ Note that you need to be careful to ensure that all relevant files for the analy
 <pre><code>
 Ignored files:
     Ignored:    .DS_Store
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
     Ignored:    data/.DS_Store
 
 Untracked files:
-    Untracked:  data/OrderAppendix_1_DCas20-5360/
-    Untracked:  data/Report-DCas20-5360/
+    Untracked:  data/Report-DCas20-5419/
+    Untracked:  output/BeagleLogs/
+    Untracked:  output/DosageMatrix_DCas20_5419_EA_REFimputedAndFiltered.rds
+    Untracked:  output/DosageMatrix_DCas20_5419_LA_REFimputedAndFiltered.rds
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr10_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr10_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr10_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr11_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr11_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr12_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr12_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr13_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr13_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr14_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr14_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr15_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr15_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr16_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr16_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr17_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr17_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr18_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr18_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr1_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr1_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr2_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr2_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr3_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr3_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr4_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr4_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr5_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr5_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr6_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr6_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr7_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr7_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr8_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr8_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.INFO
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.hwe
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.log
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.sitesPassing
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputed.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.bed
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.bim
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.fam
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.log
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.raw
+    Untracked:  output/chr9_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_EAplusLA_REFimputedAndFiltered.log
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputed.log
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputed.vcf.gz
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.bed
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.bim
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.fam
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.log
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.nosex
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.raw
+    Untracked:  output/chr9_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz
     Untracked:  workflowr_log.R
 
 Unstaged changes:
-    Modified:   analysis/ImputeDCas20_5360.Rmd
-    Modified:   analysis/convertDCas20_5360_ToVCF.Rmd
+    Deleted:    EMBRAPA_2020GS.Rproj
+    Deleted:    analysis/Imputation_EMBRAPA_102419.Rmd
+    Deleted:    analysis/ImputeDCas20_5360.Rmd
+    Modified:   analysis/ImputeDCas20_5419.Rmd
+    Deleted:    analysis/Verify_gbs2dart_sampleMatches_EMBRAPA_102419.Rmd
+    Deleted:    analysis/convertDCas19_4403_ToVCF_102419.Rmd
+    Deleted:    analysis/convertDCas20_5360_ToVCF.Rmd
 
 </code></pre>
 <p>
@@ -462,10 +879,44 @@ Message
 <tbody>
 <tr>
 <td>
+Rmd
+</td>
+<td>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/201e930b34c57c350bba08034c95d4b92a22d371/analysis/index.Rmd" target="_blank">201e930</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-10-09
+</td>
+<td>
+Start workflowr project.
+</td>
+</tr>
+<tr>
+<td>
 html
 </td>
 <td>
-<a href="https://rawcdn.githack.com/wolfemd/EMBRAPA_2020GS/d97980a47c1fe36dcc9725d3f89207ddc3135cca/docs/index.html" target="_blank">d97980a</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/fa3b6e12e6b95493739dbc649086684017c5a9b2/docs/index.html" target="_blank">fa3b6e1</a>
+</td>
+<td>
+wolfemd
+</td>
+<td>
+2020-09-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/d97980a47c1fe36dcc9725d3f89207ddc3135cca/docs/index.html" target="_blank">d97980a</a>
 </td>
 <td>
 wolfemd
@@ -482,7 +933,7 @@ Build site.
 Rmd
 </td>
 <td>
-<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/f3a0e1614f882499b624b74a4f79f7b8f18b0b65/analysis/index.Rmd" target="_blank">f3a0e16</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/f3a0e1614f882499b624b74a4f79f7b8f18b0b65/analysis/index.Rmd" target="_blank">f3a0e16</a>
 </td>
 <td>
 wolfemd
@@ -499,7 +950,7 @@ Added a link to cassavabase FTP destination for the data.
 html
 </td>
 <td>
-<a href="https://rawcdn.githack.com/wolfemd/EMBRAPA_2020GS/d29d605f5072b6b63a25f0558da88c092d36934a/docs/index.html" target="_blank">d29d605</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/d29d605f5072b6b63a25f0558da88c092d36934a/docs/index.html" target="_blank">d29d605</a>
 </td>
 <td>
 wolfemd
@@ -516,7 +967,7 @@ Build site.
 Rmd
 </td>
 <td>
-<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/6e27397c0be45b378cfb6a9c538ecd02f711b285/analysis/index.Rmd" target="_blank">6e27397</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/6e27397c0be45b378cfb6a9c538ecd02f711b285/analysis/index.Rmd" target="_blank">6e27397</a>
 </td>
 <td>
 wolfemd
@@ -533,7 +984,7 @@ EMBRAPA C2 has been imputed. Publish report and share to cassavabase
 html
 </td>
 <td>
-<a href="https://rawcdn.githack.com/wolfemd/EMBRAPA_2020GS/ed70a5a88793ea93d4c2dd1e53323bbf076f84d3/docs/index.html" target="_blank">ed70a5a</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/ed70a5a88793ea93d4c2dd1e53323bbf076f84d3/docs/index.html" target="_blank">ed70a5a</a>
 </td>
 <td>
 wolfemd
@@ -550,7 +1001,7 @@ Build site.
 Rmd
 </td>
 <td>
-<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/9d4dfab83e5211b61386ae5ee55aa7abff8a3b86/analysis/index.Rmd" target="_blank">9d4dfab</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/9d4dfab83e5211b61386ae5ee55aa7abff8a3b86/analysis/index.Rmd" target="_blank">9d4dfab</a>
 </td>
 <td>
 wolfemd
@@ -567,7 +1018,7 @@ Code organized into functions. Ready to run imputation of C2?
 Rmd
 </td>
 <td>
-<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/4cc20dbd0ea38c1da8cf93d7ab21f2398cf330b3/analysis/index.Rmd" target="_blank">4cc20db</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/4cc20dbd0ea38c1da8cf93d7ab21f2398cf330b3/analysis/index.Rmd" target="_blank">4cc20db</a>
 </td>
 <td>
 wolfemd
@@ -584,7 +1035,7 @@ Start workflowr project.
 Rmd
 </td>
 <td>
-<a href="https://github.com/wolfemd/EMBRAPA_2020GS/blob/245ee4f43c20d77ea44346d3aabf800e9b396fac/analysis/index.Rmd" target="_blank">245ee4f</a>
+<a href="/Users/mw489/Google Drive/NextGenGS/EMBRAPA_2020GS/./blob/245ee4f43c20d77ea44346d3aabf800e9b396fac/analysis/index.Rmd" target="_blank">245ee4f</a>
 </td>
 <td>
 wolfemd
@@ -603,58 +1054,74 @@ Start workflowr project.
 </div>
 </div>
 </div>
-<p>This repository and website documents all analyses, summary, tables and figures associated with EMBRAPA genomic prediction and related procedures (e.g. imputation).</p>
-<div id="analyses" class="section level1">
-<h1>Analyses</h1>
-<p><strong>Imputation conducted in 2019:</strong> Imputation of the L. America reference panel (GBS+DArTseqLD) and EMBRAPA GS C1 (DArTseqLD only) was done in October 2019. The codes for 2019 imputation were never published in a Git repository, though they were shared internally. The 2019 imputed VCFs will serve as imputation reference panel for 2020. Therefore, I am publishing the 2019 codes here <em>as is</em> for reference.</p>
-<ul>
-<li><a href="convertDCas19_4403_ToVCF_102419.html">Convert DCas19-4403 report to VCF for imputation</a>: The report DCas19_4403 was converted to VCF and then included in the ImputationReferencePanel VCF and imputed along with the GBS/GBS+DArT samples.</li>
-<li><a href="Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html">Verify GBS-to-DArTseqLD sample matches</a>: Verify GBS-2-DArT matches by PLINK IBD was done on samples DCas19_4301.</li>
-<li><a href="Imputation_EMBRAPA_102419.html">Imputation steps</a>: this was a multi-stage process including assembly and filtering of VCFs, imputation with Beagle (4.1 and 5.0). The ultimate step of this pipeline was to impute the C1 progeny data, which were extracted from the DArTseqLD report “DCas19_4301”, with the imputation reference panel.</li>
-</ul>
-<p><strong>Imputation 2020:</strong> DArTseqLD (DCas20-5360) arrived on Aug. 22, 2020. Contains <strong>GS C2</strong> for EMBRAPA.</p>
-<p>Two main steps:</p>
-<ul>
-<li><a href="convertDCas20_5360_ToVCF.html">Convert DCas20-5360 report to VCF for imputation</a>:</li>
-<li><a href="ImputeDCas20_5360.html">Impute DCas20-5360</a>:</li>
-</ul>
-<p>Last year’s reference panel for imputation had ~64K SNP. The C1 progeny imputed by it had &lt;9K SNP <em>after</em> post-imputation filters.</p>
-<p>Since imputation with Beagle5.0 is very fast, I imputed C2 (DCas20-5360) with three variants of the reference panel:</p>
+<p>This repository and website documents all analyses, summary, tables and figures associated with NaCRRI genomic prediction and related procedures (e.g. imputation).</p>
+<div id="imputation-conducted-in-2019" class="section level1">
+<h1>Imputation conducted in 2019</h1>
+<p>Imputation of the E. Africa reference panel and NaCRRI GS C2 (DArTseq only) was done in September 2019. The codes for 2019 imputation were never published in a Git repository, though they were shared internally. The 2019 imputed VCFs will serve as imputation reference panel for 2020. Therefore, I am publishing the 2019 codes here <em>as is</em> for reference.</p>
+<p>“Imputation Reference Panel” consisted of 19,136 clones, includes samples in the W. Africa RefPanel except GS progeny. 413 clones (in addition to W. Africa dataset’s 411) were genotyped with both GBS and DArTseqLD (~340 from TARI). 56,250 SNP (imputed, phased and filtered). The East Africa version of the RefPanel was used to impute 1597 samples (NaCRRI GS C2) genotyped with DArTseq (<em>not</em> DArTseqLD). The resulting dataset after keeping only sites passing post-impute filters for the progeny has 23,431 SNP (“ready for GS”).</p>
+<p>Found here: <a href="ftp://ftp.cassavabase.org/marnin_datasets/nextgenImputation2019/ImputationEastAfrica_StageIII_91119/" class="uri">ftp://ftp.cassavabase.org/marnin_datasets/nextgenImputation2019/ImputationEastAfrica_StageIII_91119/</a></p>
+<p>E.g. <code>chr1_ImputationEastAfrica_AllSamples_ReadyForGP_91419.vcf.gz</code></p>
+<p>Two DArT reports were involved:</p>
+<p>DArT reports involved:</p>
 <ol style="list-style-type: decimal">
-<li>Last year’s reference panel, without C1 (64K SNP)</li>
+<li>DCas19_4459: Tanzania samples with DArTseqLD, NaCRRI samples with DArTseq (not LD).</li>
+<li>DCas19_4432: NaCRRI GS C2 (DArTseq not LD).</li>
+</ol>
+<p><strong>Steps</strong>:</p>
+<ul>
+<li><p><a href="convertDArTseqLD_to_VCF_82719.html">Convert DCas19-4459 report to VCF for imputation</a>: The report DCas19_4403 was converted to VCF and then included in the ImputationReferencePanel VCF and imputed along with the GBS/GBS+DArT samples.</p></li>
+<li><p><a href="Verify_gbs2dart_sampleMatches_82819.html">Verify GBS-to-DArTseqLD sample matches</a>: Verify GBS-2-DArT matches by PLINK IBD was done on samples DCas19_4459.</p></li>
+<li><p><strong>Imputation</strong>: this was a multi-stage process including assembly and filtering of VCFs, imputation with Beagle (4.1 and 5.0). The ultimate step of this pipeline was to impute the 1597 GS C2 progeny data, which were extracted from the DArTseq report “DCas19_4432”, with the imputation reference panel.</p>
+<ul>
+<li><a href="Imputation_EastAfrica_StageI_82819.html">Imputation Stage I</a></li>
+<li><a href="Imputation_EastAfrica_StageII_91019.html">Imputation Stage II</a></li>
+<li><a href="Imputation_EastAfrica_StageIII_91119.html">Imputation Stage III</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="imputation-conducted-in-2020" class="section level1">
+<h1>Imputation conducted in 2020</h1>
+<p>DArTseqLD (DCas20-5419) arrived in September 2020. From Robert Kawuki: From Robert Kawuki on Sep 1, 2020: “These samples were derived from Pre-breeding populations we have. On cassavabase under the NaCRRI folder these applies to populations namely”2019_SET_Pre_Breeding_Namulonge" and “2019_CET_Pre_Breeding_Namulonge”. These populations comprise crosses made between East African clones with Latin American and/or West African clones."</p>
+<p><strong>Steps</strong>:</p>
+<ul>
+<li><a href="convertDCas20_5419_ToVCF.html">Convert DCas20-5419 report to VCF for imputation</a>:</li>
+<li><a href="ImputeDCas20_5419.html">Impute DCas20-5419</a>:</li>
+</ul>
+<p>Since imputation with Beagle5.0 is very fast, and given the origins of the samples, I’d like to impute it a few different ways and allow NaCRRI team to compare and contrast in downstream analysis.</p>
+<p>Specifically, I think it makes sense to impute it with variants of the reference panel: (1) E. Africa ref panel, (2) L. America.</p>
+<ol style="list-style-type: decimal">
+<li>E. Africa ref panel</li>
+</ol>
+<ul>
+<li><strong>RefPanel VCF filename:</strong> <code>chr*_ImputationReferencePanel_StageVI_91119.vcf.gz</code></li>
+<li><strong>Imputed filename:</strong> <code>chr*_DCas20_5419_EA_REFimputed.vcf.gz</code></li>
+<li><strong>Post-impute filtered filename:</strong> <code>chr*_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz</code></li>
+<li><strong>Genome-wide dosage matrix format for use in R:</strong></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>L. America ref panel</li>
 </ol>
 <ul>
 <li><strong>RefPanel VCF filename:</strong> <code>chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz</code></li>
-<li><strong>Imputed C2 filename:</strong> <code>chr*_DCas20_5360_REFimputed.vcf.gz</code></li>
-<li><strong>Post-impute filtered C2 filename:</strong> <code>chr*_DCas20_5360_REFimputedAndFiltered.vcf.gz</code></li>
-</ul>
-<ol start="2" style="list-style-type: decimal">
-<li>Last year’s ref. panel + C1 (include unfiltered C1 data = 64K refpanel SNP)</li>
-</ol>
-<ul>
-<li><strong>RefPanel VCF filename:</strong> <code>chr*_ImputationReferencePanel_C1progenyAdded_EMBRAPA.vcf.gz</code></li>
-<li><strong>Imputed C2 filename:</strong> <code>chr*_DCas20_5360_REFimputedWithC1unfiltered.vcf.gz</code></li>
-<li><strong>Post-impute filtered C2 filename:</strong> <code>chr*_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered.vcf.gz</code></li>
-</ul>
-<ol start="3" style="list-style-type: decimal">
-<li>Last year’s reference panel + C1 (reduce refpanel to sites passing post-impute filter in C1 = 9K SNP)</li>
-</ol>
-<ul>
-<li><strong>RefPanel VCF filename:</strong> <code>chr*_ImputationReferencePanel_C1progenyAddedFilteredSites_EMBRAPA.vcf.gz</code></li>
-<li><strong>Imputed C2 filename:</strong> <code>chr*_DCas20_5360_REFimputedWithC1filtered.vcf.gz</code></li>
-<li><strong>Post-impute filtered C2 filename:</strong> <code>chr*_DCas20_5360_REFimputedWithC1filtered_PostImputeFiltered.vcf.gz</code></li>
+<li><strong>Imputed filename:</strong> <code>chr*_DCas20_5419_LA_REFimputed.vcf.gz</code></li>
+<li><strong>Post-impute filtered filename:</strong> <code>chr*_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz</code></li>
+<li><strong>Genome-wide dosage matrix format for use in R:</strong></li>
 </ul>
 <p><strong>SUGGESTION:</strong> Use combination PCA, prediction, correlation of kinship matrices (off-diagonals and diagonals) to compare these datasets.</p>
+</div>
+<div id="genomic-prediction-in-2020" class="section level1">
+<h1>Genomic prediction in 2020</h1>
+<p>None as yet.</p>
 </div>
 <div id="data-availability-and-reproducibility" class="section level1">
 <h1>Data availability and reproducibility</h1>
 <p>The R package <strong>workflowr</strong> was used to document this study reproducibly.</p>
 <p>Much of the supporting data <em>and</em> output from the analyses documented here are too large for GitHub.</p>
-<p>The repository will be mirrored, here: <a href="ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/">ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/</a> with all data.</p>
+<p>The repository will be mirrored, here: <a href="ftp://ftp.cassavabase.org/marnin_datasets/NaCRRI_2020GS/" class="uri">ftp://ftp.cassavabase.org/marnin_datasets/NaCRRI_2020GS/</a> with all data.</p>
 </div>
 <div id="directory-structure-of-this-repository" class="section level1">
 <h1>Directory structure of this repository</h1>
-<p><strong>NOTICE:</strong> <code>data/</code> and <code>output/</code> are empty on GitHub. Please see <a href="ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/">ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/</a> for access.</p>
+<p><strong>NOTICE:</strong> <code>data/</code> and <code>output/</code> are empty on GitHub. Please see <a href="ftp://ftp.cassavabase.org/marnin_datasets/NaCRRI_2020GS/" class="uri">ftp://ftp.cassavabase.org/marnin_datasets/NaCRRI_2020GS/</a> for access.</p>
 <ol style="list-style-type: decimal">
 <li><code>data/</code>: raw data (e.g. unimputed SNP data)</li>
 <li><code>output/</code>: outputs (e.g. imputed SNP data)</li>
@@ -662,7 +1129,24 @@ Start workflowr project.
 <li><code>docs/</code>: compiled <strong>.html</strong>, “knitted” from <strong>.Rmd</strong></li>
 </ol>
 <p>Supporting functions <code>code/</code></p>
-<p>The analyses in the <strong>html</strong> / <strong>Rmd</strong> files referenced above often source R scripts in the <code>code/</code> sub-folder. These are wrapper functions around the packaged core functions in <strong>predCrossVar</strong>, to do the specific analyses for this paper.</p>
+<p>The analyses in the <strong>html</strong> / <strong>Rmd</strong> files referenced above often source R scripts in the <code>code/</code> sub-folder.</p>
+<div id="further-details-on-imputation-procedure" class="section level2">
+<h2>Further details on imputation procedure</h2>
+<p>The common strategy for imputation used across all imputations in 2019 is as follows:</p>
+<p>Relies on:</p>
+<ol style="list-style-type: decimal">
+<li><p>Samples genotyping with both marker platforms (GBS + DArT)</p></li>
+<li><p>SNP markers observed by both platforms</p></li>
+<li><p>NextGenC custom DArT assay and reporting format, namely use of the ApeKI restriction enzyme _and_ reporting of read depth data to us.</p></li>
+<li><p>Read depth data was used to compute genotype likelihoods (GL). For imputation, I used a combination of Beagle4.1 to do initial imputation steps. Beagle 4.1 is slow _but_ can use the GLs to produce a result which should be more accurate than simply using called genotypes (GT). For phasing steps _and_ for the imputation of target progeny (those with DArT-only), I used Beagle5.0 because it is _fast_ and _accurate_ IF you have GT calls and a big reference panel.</p></li>
+<li><p>Be conservative. Between each imputation step, I applied the following filter: keep sites with AR2 or DR2&gt;=0.75, P_HWE&gt;1e-20, MAF&gt;0.005. AR2 and DR2 are scores assigned by Beagle4.1 and Beagle5.0, respectively to measure expected quality of imputation (reported in the INFO field of VCF). P_HWE was based on HWE chi-square done by `vcftools`. MAF&gt;0.005 is to remove anything that is essentially fixed in the dataset.</p></li>
+<li><p>Samples that were supposed to have GBS and DArT were verified before combining the data. Used identity-by-descent (IBD) estimation in plink v1.9 (`plink1.9 –genome`) at DArT-GBS intersecting sites, to validate identity match (threshold &gt;=0.75).</p></li>
+</ol>
+<p>Two stages to building imputation reference panels:</p>
+<p>Stage I. Impute all GBS+DArT samples. Plus GBS-only founders and diversity lines.</p>
+<p>Stage II. Impute GBS-only GS descendents</p>
+<p>Third and final Stage III: Impute target panels (i.e. selection candidates with DArT-only).</p>
+</div>
 </div>
 
 
