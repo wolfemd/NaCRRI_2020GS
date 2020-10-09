@@ -1,5 +1,5 @@
 ---
-title: "EMBRAPA 2020 GS and related procedures"
+title: "NaCRRI 2020 GS and related procedures"
 site: workflowr::wflow_site
 author: "Marnin Wolfe"
 output:
@@ -9,64 +9,114 @@ editor_options:
   chunk_output_type: console
 ---
 
-This repository and website documents all analyses, summary, tables and figures associated with EMBRAPA genomic prediction and related procedures (e.g. imputation). 
+This repository and website documents all analyses, summary, tables and figures associated with NaCRRI genomic prediction and related procedures (e.g. imputation).
 
-# Analyses
+# Imputation conducted in 2019
 
-**Imputation conducted in 2019:** Imputation of the L. America reference panel (GBS+DArTseqLD) and EMBRAPA GS C1 (DArTseqLD only) was done in October 2019. The codes for 2019 imputation were never published in a Git repository, though they were shared internally. The 2019 imputed VCFs will serve as imputation reference panel for 2020. Therefore, I am publishing the 2019 codes here _as is_ for reference.
+Imputation of the E. Africa reference panel and NaCRRI GS C2 (DArTseq only) was done in September 2019. The codes for 2019 imputation were never published in a Git repository, though they were shared internally. The 2019 imputed VCFs will serve as imputation reference panel for 2020. Therefore, I am publishing the 2019 codes here *as is* for reference.
 
-  * [Convert DCas19-4403 report to VCF for imputation](convertDCas19_4403_ToVCF_102419.html): The report DCas19_4403 was converted to VCF and then included in the ImputationReferencePanel VCF and imputed along with the GBS/GBS+DArT samples.
-  * [Verify GBS-to-DArTseqLD sample matches](Verify_gbs2dart_sampleMatches_EMBRAPA_102419.html): Verify GBS-2-DArT matches by PLINK IBD was done on samples DCas19_4301.
-  * [Imputation steps](Imputation_EMBRAPA_102419.html): this was a multi-stage process including assembly and filtering of VCFs, imputation with Beagle (4.1 and 5.0). The ultimate step of this pipeline was to impute the C1 progeny data, which were extracted from the DArTseqLD report "DCas19_4301", with the imputation reference panel.
+"Imputation Reference Panel" consisted of 19,136 clones, includes samples in the W. Africa RefPanel except GS progeny. 413 clones (in addition to W. Africa dataset's 411) were genotyped with both GBS and DArTseqLD (\~340 from TARI). 56,250 SNP (imputed, phased and filtered). The East Africa version of the RefPanel was used to impute 1597 samples (NaCRRI GS C2) genotyped with DArTseq (*not* DArTseqLD). The resulting dataset after keeping only sites passing post-impute filters for the progeny has 23,431 SNP ("ready for GS").
 
-**Imputation 2020:** DArTseqLD (DCas20-5360) arrived on Aug. 22, 2020. Contains **GS C2** for EMBRAPA. 
+Found here: <ftp://ftp.cassavabase.org/marnin_datasets/nextgenImputation2019/ImputationEastAfrica_StageIII_91119/>
 
-Two main steps:  
+E.g. `chr1_ImputationEastAfrica_AllSamples_ReadyForGP_91419.vcf.gz`
 
-  * [Convert DCas20-5360 report to VCF for imputation](convertDCas20_5360_ToVCF.html):
-  * [Impute DCas20-5360](ImputeDCas20_5360.html):  
+Two DArT reports were involved:
 
-Last year's reference panel for imputation had ~64K SNP. The C1 progeny imputed by it had <9K SNP _after_ post-imputation filters.
+DArT reports involved:
 
-Since imputation with Beagle5.0 is very fast, I imputed C2 (DCas20-5360) with three variants of the reference panel:
+1.  DCas19\_4459: Tanzania samples with DArTseqLD, NaCRRI samples with DArTseq (not LD).
+2.  DCas19\_4432: NaCRRI GS C2 (DArTseq not LD).
 
-1. Last year's reference panel, without C1 (64K SNP)
-  + **RefPanel VCF filename:** `chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz`
-  + **Imputed C2 filename:** `chr*_DCas20_5360_REFimputed.vcf.gz`
-  + **Post-impute filtered C2 filename:** `chr*_DCas20_5360_REFimputedAndFiltered.vcf.gz`
-  
-2. Last year's ref. panel + C1 (include unfiltered C1 data = 64K refpanel SNP)
-  + **RefPanel VCF filename:** `chr*_ImputationReferencePanel_C1progenyAdded_EMBRAPA.vcf.gz`
-  + **Imputed C2 filename:** `chr*_DCas20_5360_REFimputedWithC1unfiltered.vcf.gz`
-  + **Post-impute filtered C2 filename:** `chr*_DCas20_5360_REFimputedWithC1unfiltered_PostImputeFiltered.vcf.gz`
-  
-3. Last year's reference panel + C1 (reduce refpanel to sites passing post-impute filter in C1 = 9K SNP)
+**Steps**:
 
-  + **RefPanel VCF filename:** `chr*_ImputationReferencePanel_C1progenyAddedFilteredSites_EMBRAPA.vcf.gz`
-  + **Imputed C2 filename:** `chr*_DCas20_5360_REFimputedWithC1filtered.vcf.gz`
-  + **Post-impute filtered C2 filename:** `chr*_DCas20_5360_REFimputedWithC1filtered_PostImputeFiltered.vcf.gz`
+-   [Convert DCas19-4459 report to VCF for imputation](convertDArTseqLD_to_VCF_82719.html): The report DCas19\_4403 was converted to VCF and then included in the ImputationReferencePanel VCF and imputed along with the GBS/GBS+DArT samples.
 
+-   [Verify GBS-to-DArTseqLD sample matches](Verify_gbs2dart_sampleMatches_82819.html): Verify GBS-2-DArT matches by PLINK IBD was done on samples DCas19\_4459.
+
+-   **Imputation**: this was a multi-stage process including assembly and filtering of VCFs, imputation with Beagle (4.1 and 5.0). The ultimate step of this pipeline was to impute the 1597 GS C2 progeny data, which were extracted from the DArTseq report "DCas19\_4432", with the imputation reference panel.
+
+    -   [Imputation Stage I](Imputation_EastAfrica_StageI_82819.html)
+    -   [Imputation Stage II](Imputation_EastAfrica_StageII_91019.html)
+    -   [Imputation Stage III](Imputation_EastAfrica_StageIII_91119.html)
+
+# Imputation conducted in 2020
+
+DArTseqLD (DCas20-5419) arrived in September 2020. From Robert Kawuki: From Robert Kawuki on Sep 1, 2020: "These samples were derived from Pre-breeding populations we have. On cassavabase under the NaCRRI folder these applies to populations namely "2019_SET_Pre_Breeding_Namulonge" and "2019_CET_Pre_Breeding_Namulonge". These populations comprise crosses made between East African clones with Latin American and/or West African clones."
+
+**Steps**:
+
+-   [Convert DCas20-5419 report to VCF for imputation](convertDCas20_5419_ToVCF.html):
+-   [Impute DCas20-5419](ImputeDCas20_5419.html):
+
+Since imputation with Beagle5.0 is very fast, and given the origins of the samples, I'd like to impute it a few different ways and allow NaCRRI team to compare and contrast in downstream analysis.
+
+Specifically, I think it makes sense to impute it with variants of the reference panel: (1) E. Africa ref panel, (2) L. America.
+
+1.  E. Africa ref panel
+
+-   **RefPanel VCF filename:** `chr*_ImputationReferencePanel_StageVI_91119.vcf.gz`
+-   **Imputed filename:** `chr*_DCas20_5419_EA_REFimputed.vcf.gz`
+-   **Post-impute filtered filename:** `chr*_DCas20_5419_EA_REFimputedAndFiltered.vcf.gz`
+-   **Genome-wide dosage matrix format for use in R:** 
+
+
+2.  L. America ref panel
+
+-   **RefPanel VCF filename:** `chr*_ImputationReferencePanel_EMBRAPA_Phased_102619.vcf.gz`
+-   **Imputed filename:** `chr*_DCas20_5419_LA_REFimputed.vcf.gz`
+-   **Post-impute filtered filename:** `chr*_DCas20_5419_LA_REFimputedAndFiltered.vcf.gz`
+-   **Genome-wide dosage matrix format for use in R:** 
 
 **SUGGESTION:** Use combination PCA, prediction, correlation of kinship matrices (off-diagonals and diagonals) to compare these datasets.
 
+# Genomic prediction in 2020
+
+None as yet.
+
 # Data availability and reproducibility
 
-The R package **workflowr** was used to document this study reproducibly. 
+The R package **workflowr** was used to document this study reproducibly.
 
-Much of the supporting data _and_ output from the analyses documented here are too large for GitHub. 
+Much of the supporting data *and* output from the analyses documented here are too large for GitHub.
 
-The repository will be mirrored, here:  [ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/](ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/) with all data.
+The repository will be mirrored, here: <ftp://ftp.cassavabase.org/marnin_datasets/NaCRRI_2020GS/> with all data.
 
 # Directory structure of this repository
 
-**NOTICE:** `data/` and `output/` are empty on GitHub. Please see [ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/](ftp://ftp.cassavabase.org/marnin_datasets/EMBRAPA_2020GS/) for access.
+**NOTICE:** `data/` and `output/` are empty on GitHub. Please see <ftp://ftp.cassavabase.org/marnin_datasets/NaCRRI_2020GS/> for access.
 
-1. `data/`: raw data (e.g. unimputed SNP data)
-2. `output/`: outputs (e.g. imputed SNP data)
-3. `analysis/`: most code and workflow documented in **.Rmd** files
-4. `docs/`: compiled **.html**, "knitted" from **.Rmd**
+1.  `data/`: raw data (e.g. unimputed SNP data)
+2.  `output/`: outputs (e.g. imputed SNP data)
+3.  `analysis/`: most code and workflow documented in **.Rmd** files
+4.  `docs/`: compiled **.html**, "knitted" from **.Rmd**
 
 Supporting functions `code/`
 
-The analyses in the **html** / **Rmd** files referenced above often source R scripts in the `code/` sub-folder. These are wrapper functions around the packaged core functions in **predCrossVar**, to do the specific analyses for this paper.
+The analyses in the **html** / **Rmd** files referenced above often source R scripts in the `code/` sub-folder. 
 
+## Further details on imputation procedure
+
+The common strategy for imputation used across all imputations in 2019 is as follows:
+
+Relies on:
+
+1.  Samples genotyping with both marker platforms (GBS + DArT)
+
+2.  SNP markers observed by both platforms
+
+3.  NextGenC custom DArT assay and reporting format, namely use of the ApeKI restriction enzyme \_and\_ reporting of read depth data to us.
+
+4.  Read depth data was used to compute genotype likelihoods (GL). For imputation, I used a combination of Beagle4.1 to do initial imputation steps. Beagle 4.1 is slow \_but\_ can use the GLs to produce a result which should be more accurate than simply using called genotypes (GT). For phasing steps \_and\_ for the imputation of target progeny (those with DArT-only), I used Beagle5.0 because it is \_fast\_ and \_accurate\_ IF you have GT calls and a big reference panel.
+
+5.  Be conservative. Between each imputation step, I applied the following filter: keep sites with AR2 or DR2\>=0.75, P\_HWE\>1e-20, MAF\>0.005. AR2 and DR2 are scores assigned by Beagle4.1 and Beagle5.0, respectively to measure expected quality of imputation (reported in the INFO field of VCF). P\_HWE was based on HWE chi-square done by \`vcftools\`. MAF\>0.005 is to remove anything that is essentially fixed in the dataset.
+
+6.  Samples that were supposed to have GBS and DArT were verified before combining the data. Used identity-by-descent (IBD) estimation in plink v1.9 (\`plink1.9 --genome\`) at DArT-GBS intersecting sites, to validate identity match (threshold \>=0.75).
+
+Two stages to building imputation reference panels:
+
+Stage I. Impute all GBS+DArT samples. Plus GBS-only founders and diversity lines.
+
+Stage II. Impute GBS-only GS descendents
+
+Third and final Stage III: Impute target panels (i.e. selection candidates with DArT-only).
